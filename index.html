@@ -77,7 +77,41 @@
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk';
         const { createClient } = supabase;
         const _supabase = createClient(SB_URL, SB_KEY);
+// --- FUNCIÓN DE INTELIGENCIA: MAPA DE CALOR ---
+async function consultarMapaCalor(artId) {
+    const { data, error } = await _supabase
+        .from('sinapsis_reacciones')
+        .select('parrafo_index, tipo_reaccion')
+        .eq('artículo_id', artId);
 
+    if (error) return console.error("Error en inteligencia:", error);
+
+    // Agrupamos los datos por párrafo para el análisis
+    const conteo = data.reduce((acc, curr) => {
+        const idx = curr.parrafo_index;
+        if (!acc[idx]) acc[idx] = { '💡': 0, '⚖️': 0, '❓': 0 };
+        acc[idx][curr.tipo_reaccion]++;
+        return acc;
+    }, {});
+
+    visualizarMetricas(conteo);
+}
+
+function visualizarMetricas(conteo) {
+    // Esta función inyectará los números al lado de cada párrafo en el modal
+    Object.keys(conteo).forEach(idx => {
+        const barra = document.querySelectorAll('.interaccion-barra')[idx];
+        if (barra) {
+            const stats = conteo[idx];
+            barra.insertAdjacentHTML('beforeend', `
+                <div style="font-size: 0.8em; margin-top: 5px; color: var(--blue);">
+                    Impacto: 💡${stats['💡']} | ⚖️${stats['⚖️']} | ❓${stats['❓']}
+                </div>
+            `);
+        }
+    });
+}
+        
         // --- CARGAR ARTÍCULOS ---
         async function obtenerArticulos() {
             try {
