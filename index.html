@@ -144,35 +144,37 @@ function visualizarMetricas(conteo) {
         }
 
         // --- LÓGICA DE LECTURA Y REACCIÓN ---
-        function abrirLectura(art) {
-            const modal = document.getElementById('modalArticulo');
-            const container = document.getElementById('contenidoCompleto');
-            
-            // Procesar párrafos (asumiendo que el texto tiene saltos de línea)
-            const parrafos = (art.Contenido || "Contenido en proceso...").split('\n').map((p, index) => {
-                if(p.trim() === "") return ""; // Ignorar líneas vacías
-                return `
-                    <div class="parrafo-interactivo">
-                        <p>${p}</p>
-                        <div>
-                            <button class="reaccion-btn" onclick="reaccionar(${art.id}, ${index}, '💡')">💡 Interesante</button>
-                            <button class="reaccion-btn" onclick="reaccionar(${art.id}, ${index}, '⚖️')">⚖️ Debatible</button>
-                            <button class="reaccion-btn" onclick="reaccionar(${art.id}, ${index}, '❓')">❓ Duda</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+       function abrirLectura(art) {
+    const modal = document.getElementById('modalArticulo');
+    const container = document.getElementById('contenidoCompleto');
+    
+    const parrafos = (art.Contenido || "Contenido en proceso...").split('\n').map((p, index) => {
+        if(p.trim() === "") return "";
+        return `
+            <div class="parrafo-interactivo">
+                <p>${p}</p>
+                <div class="interaccion-barra">
+                    <button class="reaccion-btn" onclick="reaccionar(${art.id}, ${index}, '💡')">💡 Interesante</button>
+                    <button class="reaccion-btn" onclick="reaccionar(${art.id}, ${index}, '⚖️')">⚖️ Debatible</button>
+                    <button class="reaccion-btn" onclick="reaccionar(${art.id}, ${index}, '❓')">❓ Duda</button>
+                </div>
+            </div>
+        `;
+    }).join('');
 
-            container.innerHTML = `
-                <h1 style="color:var(--blue)">${art.Titulo}</h1>
-                <p style="color:var(--orange)">Análisis por ${art.Autor}</p>
-                <hr style="border:0; border-top:1px solid #30363d; margin: 20px 0;">
-                <div class="texto-articulo">${parrafos}</div>
-            `;
-            modal.style.display = 'block';
-            document.body.style.overflow = 'hidden'; // Bloquear scroll de fondo
-        }
+    container.innerHTML = `
+        <h1 style="color:var(--blue)">${art.Titulo}</h1>
+        <p style="color:var(--orange)">Análisis por ${art.Autor}</p>
+        <hr style="border:0; border-top:1px solid #30363d; margin: 20px 0;">
+        <div class="texto-articulo">${parrafos}</div>
+    `;
+    
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
 
+    // ESTA ES LA LÍNEA CLAVE: Llama al mapa de calor al abrir
+    consultarMapaCalor(art.id); 
+}
         function cerrarLectura() {
             document.getElementById('modalArticulo').style.display = 'none';
             document.body.style.overflow = 'auto'; // Liberar scroll
