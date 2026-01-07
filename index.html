@@ -48,44 +48,56 @@
 
     <script>
         // --- CONFIGURACIÓN DE CONEXIÓN ---
-        const SB_URL = https://wajivhbldplztjvqudht.supabase.co; 
-        const SB_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk;
-        const supabase = createClient(SB_URL, SB_KEY);
+        const SB_URL = 'https://wajivhbldplztjvqudht.supabase.co'; 
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk';
+       const { createClient } = supabase;
+       const _supabase = createClient(SB_URL, SB_KEY);
+        
 
-        // --- LÓGICA DE CARGA ---
-        async function obtenerArticulos() {
-            const { data, error } = await supabase
-                .from('articulos')
-                .select('*')
-                .order('created_at', { ascending: false });
+        // --- LÓGICA DE CARGA ACTUALIZADA ---
+async function obtenerArticulos() {
+    try {
+        const { data, error } = await _supabase
+            .from('articulos')
+            .select('*')
+            .order('created_at', { ascending: false });
 
-            if (error) {
-                console.error('Error:', error);
-            } else {
-                dibujarCards(data);
-            }
+        if (error) {
+            console.error('Error en la consulta:', error);
+            document.getElementById('grid-articulos').innerHTML = '<p>Error de conexión con el umbral.</p>';
+        } else {
+            dibujarCards(data);
         }
+    } catch (err) {
+        console.error('Error inesperado:', err);
+    }
+} // <--- Esta llave faltaba
 
-        function dibujarCards(lista) {
-            const grid = document.getElementById('grid-articulos');
-            if (lista.length === 0) {
-                grid.innerHTML = '<p>No se encontraron análisis en este umbral.</p>';
-                return;
-            }
-            grid.innerHTML = lista.map(art => `
-                <div class="card">
-                    <img src="${art.Imagen_URL || 'https://via.placeholder.com/400x200'}" alt="Portada">
-                    <div class="card-info">
-                        <small style="color:var(--orange)">ESTUDIO ESTRATÉGICO</small>
-                        <h3 style="margin: 10px 0;">${art.Titulo}</h3>
-                        <p style="font-size: 0.9em; color: #8b949e;">${art.Sinopsis}</p>
-                        <hr style="border: 0; border-top: 1px solid #30363d;">
-                        <img src="https://ui-avatars.com/api/?name=${art.Autor}&background=random" class="avatar">
-                        <small>Por: <strong>${art.Autor}</strong></small>
-                    </div>
+function dibujarCards(lista) {
+    const grid = document.getElementById('grid-articulos');
+    if (!lista || lista.length === 0) {
+        grid.innerHTML = '<p>No se encontraron análisis en este umbral. Verifica la base de datos.</p>';
+        return;
+    }
+    grid.innerHTML = lista.map(art => `
+        <div class="card">
+            <img src="${art.Imagen_URL || 'https://via.placeholder.com/400x200'}" alt="Portada">
+            <div class="card-info">
+                <small style="color:var(--orange)">ESTUDIO ESTRATÉGICO</small>
+                <h3 style="margin: 10px 0;">${art.Titulo || 'Sin título'}</h3>
+                <p style="font-size: 0.9em; color: #8b949e;">${art.Sinopsis || 'Sin descripción disponible.'}</p>
+                <hr style="border: 0; border-top: 1px solid #30363d;">
+                <div style="display: flex; align-items: center;">
+                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(art.Autor || 'Anon')}&background=random" class="avatar">
+                    <small>Por: <strong>${art.Autor || 'Autor Desconocido'}</strong></small>
                 </div>
-            `).join('');
-        }
+            </div>
+        </div>
+    `).join('');
+}
+
+// IMPORTANTE: Asegúrate de llamar a la función al final
+obtenerArticulos();
 
         // Ejecutar al cargar la página
         obtenerArticulos();
