@@ -149,6 +149,13 @@
     <p>Por: <strong>${art.Autor}</strong></p>
     <hr style="border:0; border-top:1px solid #30363d; margin: 20px 0;">
     <div class="texto-articulo">${parrafos}</div>
+    <div style="margin-top: 40px; padding: 25px; border: 1px dashed var(--blue); border-radius: 10px; text-align: center; background: rgba(88, 166, 255, 0.05);">
+            <p style="color: var(--silver); margin-bottom: 15px;">¿Deseas profundizar o debatir una tesis específica con el autor?</p>
+            <a href="mailto:analisis@sinapsisasimetrica.org.ve?subject=Consulta Estratégica: ${encodeURIComponent(art.Titulo)}&body=Respetados analistas de Sinapsis,%0D%0A%0D%0AHe analizado el artículo sobre ${encodeURIComponent(art.Titulo)} y deseo proponer el siguiente debate:%0D%0A%0D%0A[Escribe aquí tu observación sobre un párrafo específico]%0D%0A%0D%0A---" 
+               style="background: var(--blue); color: #000; padding: 12px 25px; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block; transition: 0.3s;">
+               NOTIFICAR AL AUTOR
+            </a>
+        </div>
 `;
             modal.style.display = 'block';
             document.body.style.overflow = 'hidden';
@@ -183,6 +190,26 @@
         function cerrarLectura() {
             document.getElementById('modalArticulo').style.display = 'none';
             document.body.style.overflow = 'auto';
+        }
+
+// --- INSTRUMENTO ESTADÍSTICO PARA EL SIMPOSIO ---
+        async function generarReporteSimposio() {
+            console.log("Extrayendo métricas de impacto...");
+            const { data, error } = await _supabase
+                .from('sinapsis_reacciones')
+                .select('artículo_id, tipo_reaccion');
+
+            if (error) return console.error("Falla en la extracción de inteligencia:", error);
+
+            // Contabilizar reacciones por ID de artículo
+            const conteoGlobal = data.reduce((acc, curr) => {
+                acc[curr.artículo_id] = (acc[curr.artículo_id] || 0) + 1;
+                return acc;
+            }, {});
+
+            console.log("--- PRIORIDADES PARA EL SIMPOSIO (Impacto por ID) ---");
+            console.table(conteoGlobal);
+            alert("Reporte generado en la consola (F12). Revisa el ranking de IDs.");
         }
 
         obtenerArticulos();
