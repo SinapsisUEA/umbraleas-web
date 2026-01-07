@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Sinapsis | Centro de Inteligencia para el Simposio</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --bg: #05070a; --panel: #0d1117; --blue: #58a6ff; --orange: #f0883e; --silver: #c9d1d9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--silver); margin: 0; padding: 20px; }
+        header { border-bottom: 2px solid var(--blue); padding-bottom: 10px; margin-bottom: 30px; }
+        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .stat-card { background: var(--panel); padding: 20px; border-radius: 10px; border: 1px solid #30363d; }
+        h2 { color: var(--orange); font-size: 1.2em; margin-top: 0; }
+        canvas { max-width: 100%; height: 300px !important; }
+        .btn-refresh { background: var(--blue); color: #000; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<header style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h1 style="margin:0; color:var(--blue);">BÚNKER DE INTELIGENCIA</h1>
+        <p style="margin:0; font-size: 0.9em;">Análisis de Impacto para Organización de Simposio</p>
+    </div>
+    <button class="btn-refresh" onclick="cargarMetricas()">ACTUALIZAR SINAPSIS</button>
+</header>
+
+<div class="grid-stats">
+    <div class="stat-card">
+        <h2>Ranking de Impacto (Total Reacciones)</h2>
+        <canvas id="chartImpacto"></canvas>
+    </div>
+
+    <div class="stat-card">
+        <h2>Naturaleza del Debate (Tipos de Reacción)</h2>
+        <canvas id="chartTipos"></canvas>
+    </div>
+</div>
+
+<script>
+    const SB_URL = 'https://wajivhbldplztjvqudht.supabase.co'; 
+    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk';
+    const _supabase = supabase.createClient(SB_URL, SB_KEY);
+
+    let chart1, chart2;
+
+    async function cargarMetricas() {
+        // 1. Obtener datos de reacciones y unir con títulos de artículos
+        const { data: reacciones, error } = await _supabase
+            .from('sinapsis_reacciones')
+            .select('tipo_reaccion, articulos(Titulo)');
+
+        if (error) return console.error(error);
+
+        // 2. Procesar datos para impacto por artículo
+        const conteoArticulos = {};
+        const conteoTipos = { '💡': 0, '⚖️': 0, '❓': 0 };
+
+        reacciones.forEach(r => {
+            const titulo = r.articulos.Titulo;
+            conteoArticulos[titulo] = (conteoArticulos[titulo] || 0) + 1;
+            if(conteoTipos[r.tipo_reaccion] !== undefined) conteoTipos[r.tipo_reaccion]++;
+        });
+
+        dibujarGraficos(conteoArticulos, conteoTipos);
+    }
+
+    function dibujarGraficos(articulos, tipos) {
+        if (chart1) chart1.destroy();
+        if (chart2) chart2.destroy();
+
+        // Gráfico 1: Barras de Impacto
+        const ctx1 = document.getElementById('chartImpacto').getContext('2d');
+        chart1 = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(articulos),
+                datasets: [{
+                    label: 'Total Sinapsis',
+                    data: Object.values(articulos),
+                    backgroundColor: '#58a6ff'
+                }]
+            },
+            options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+        });
+
+        // Gráfico 2: Tarta de Tipos
+        const ctx2 = document.getElementById('chartTipos').getContext('2d');
+        chart2 = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['💡 Interesante', '⚖️ Debatible', '❓ Duda'],
+                datasets: [{
+                    data: [tipos['💡'], tipos['⚖️'], tipos['❓']],
+                    backgroundColor: ['#f0883e', '#58a6ff', '#8b949e']
+                }]
+            }
+        });
+    }
+
+    cargarMetricas();
+</script>
+</body>
+</html>
