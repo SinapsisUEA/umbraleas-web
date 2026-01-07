@@ -82,14 +82,18 @@
 
         // --- BUSCADOR ESTRATÉGICO ---
         async function buscar() {
-            const term = document.getElementById('buscador').value.toLowerCase();
-            const { data } = await _supabase.from('articulos').select('*');
-            const filtrados = data.filter(a => 
-                (a.Titulo && a.Titulo.toLowerCase().includes(term)) || 
-                (a.Autor && a.Autor.toLowerCase().includes(term))
-            );
-            dibujarCards(filtrados);
-        }
+    const term = document.getElementById('buscador').value.toLowerCase();
+    const { data, error } = await _supabase.from('articulos').select('*');
+    
+    if (error) return;
+
+    const filtrados = data.filter(a => 
+        (a.Titulo && a.Titulo.toLowerCase().includes(term)) || 
+        (a.Autor && a.Autor.toLowerCase().includes(term)) ||
+        (a.Categoria && a.Categoria.toLowerCase().includes(term))
+    );
+    dibujarCards(filtrados);
+}
 
         // --- CARGAR ARTÍCULOS ---
         async function obtenerArticulos() {
@@ -105,19 +109,21 @@
         function dibujarCards(lista) {
             const grid = document.getElementById('grid-articulos');
             grid.innerHTML = lista.map(art => `
-                <div class="card" onclick='abrirLectura(${JSON.stringify(art)})'>
-                    <img src="${art.Imagen_URL || 'https://via.placeholder.com/400x200'}" alt="Portada">
-                    <div class="card-info">
-                        <small style="color:var(--orange)">ESTUDIO ESTRATÉGICO</small>
-                        <h3 style="margin: 10px 0;">${art.Titulo}</h3>
-                        <p style="font-size: 0.9em; height: 3.6em; overflow: hidden;">${art.Sinopsis}</p>
-                        <div style="display: flex; align-items: center; margin-top: 15px;">
-                            <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(art.Autor)}&background=random&color=fff" class="avatar">
-                            <small>Por: <strong>${art.Autor}</strong></small>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+    <div class="card" onclick='abrirLectura(${JSON.stringify(art)})'>
+        <img src="${art.Imagen_URL || 'https://via.placeholder.com/400x200'}" alt="Portada">
+        <div class="card-info">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <small style="color:var(--orange); font-weight: bold; text-transform: uppercase;">${art.Categoria || 'ESTUDIO'}</small>
+            </div>
+            <h3 style="margin: 10px 0;">${art.Titulo}</h3>
+            <p style="font-size: 0.9em; height: 3.6em; overflow: hidden;">${art.Sinopsis}</p>
+            <div style="display: flex; align-items: center; margin-top: 15px;">
+                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(art.Autor)}&background=random&color=fff" class="avatar">
+                <small>Por: <strong>${art.Autor}</strong></small>
+            </div>
+        </div>
+    </div>
+`).join('');
         }
 
         // --- LECTURA PROFUNDA ---
@@ -138,11 +144,12 @@
             `).join('');
 
             container.innerHTML = `
-                <h1 style="color:var(--blue)">${art.Titulo}</h1>
-                <p style="color:var(--orange)">Análisis por ${art.Autor}</p>
-                <hr style="border:0; border-top:1px solid #30363d; margin: 20px 0;">
-                <div class="texto-articulo">${parrafos}</div>
-            `;
+    <small style="color:var(--orange); font-weight:bold;">${art.Categoria || 'ANÁLISIS ESTRATÉGICO'}</small>
+    <h1 style="color:var(--blue); margin-top: 5px;">${art.Titulo}</h1>
+    <p>Por: <strong>${art.Autor}</strong></p>
+    <hr style="border:0; border-top:1px solid #30363d; margin: 20px 0;">
+    <div class="texto-articulo">${parrafos}</div>
+`;
             modal.style.display = 'block';
             document.body.style.overflow = 'hidden';
             consultarMapaCalor(art.id);
