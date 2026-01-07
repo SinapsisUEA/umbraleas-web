@@ -14,11 +14,9 @@
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--silver); margin: 0; }
         
-        /* Cabecera y Buscador */
         header { background: #000; padding: 50px 20px; text-align: center; border-bottom: 1px solid #30363d; }
         .search-box { width: 90%; max-width: 600px; padding: 12px 20px; border-radius: 20px; border: 1px solid var(--blue); background: #111; color: #fff; }
 
-        /* Grid de Artículos */
         .container { padding: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
         .card { background: var(--card); border: 1px solid #30363d; border-radius: 12px; overflow: hidden; transition: 0.3s; cursor: pointer; }
         .card:hover { border-color: var(--orange); transform: translateY(-5px); }
@@ -26,7 +24,27 @@
         .card-info { padding: 15px; }
         .avatar { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--orange); vertical-align: middle; margin-right: 10px; }
 
-        /* Banner Simposio */
+        /* Estilos del Modal corregidos */
+        .modal-lectura {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 1000; overflow-y: auto; padding: 20px;
+        }
+        .modal-content {
+            max-width: 800px; margin: 40px auto; background: var(--card); 
+            padding: 40px; border-radius: 15px; border: 1px solid var(--blue);
+        }
+        .texto-articulo { line-height: 1.8; font-size: 1.1em; color: #e6edf3; }
+        .btn-cerrar { color: var(--orange); cursor: pointer; float: right; font-size: 2em; }
+        
+        .parrafo-interactivo { margin-bottom: 25px; padding: 10px; border-radius: 8px; transition: 0.3s; }
+        .parrafo-interactivo:hover { background: #1c2128; }
+        
+        .reaccion-btn { 
+            background: #1f242c; border: 1px solid #30363d; color: #fff; 
+            padding: 5px 12px; border-radius: 5px; cursor: pointer; margin-right: 10px; font-size: 0.8em;
+        }
+        .reaccion-btn:hover { border-color: var(--blue); background: #262c36; }
+
         .simposio { position: fixed; bottom: 20px; right: 20px; background: var(--orange); color: #000; padding: 10px 20px; border-radius: 30px; font-weight: bold; z-index: 100; }
     </style>
 </head>
@@ -37,122 +55,110 @@
         <p>Umbral de la Estrategia Asimétrica</p>
         <input type="text" id="buscador" class="search-box" placeholder="Buscar por tema o autor..." onkeyup="buscar()">
     </header>
-/* Estilos del Modal de Lectura */
-.modal-lectura {
-    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.95); z-index: 1000; overflow-y: auto; padding: 20px;
-}
-.modal-content {
-    max-width: 800px; margin: 40px auto; background: var(--card); 
-    padding: 40px; border-radius: 15px; border: 1px solid var(--blue);
-}
-.texto-articulo { line-height: 1.8; font-size: 1.1em; color: #e6edf3; }
-.btn-cerrar { color: var(--orange); cursor: pointer; float: right; font-size: 2em; }
-/* Reacciones asimétricas */
-.reaccion-btn { 
-    background: #1f242c; border: 1px solid #30363d; color: #fff; 
-    padding: 5px 10px; border-radius: 5px; cursor: pointer; margin: 5px;
-}
-.reaccion-btn:hover { border-color: var(--blue); }
-    
+
     <div class="container" id="grid-articulos">
         <p style="text-align: center; grid-column: 1/-1;">Iniciando sinapsis con el cerebro de datos...</p>
     </div>
 
-    <div class="simposio">
-        <div id="modalArticulo" class="modal-lectura">
-    <div class="modal-content">
-        <span class="btn-cerrar" onclick="cerrarLectura()">&times;</span>
-        <div id="contenidoCompleto"></div>
+    <div id="modalArticulo" class="modal-lectura">
+        <div class="modal-content">
+            <span class="btn-cerrar" onclick="cerrarLectura()">&times;</span>
+            <div id="contenidoCompleto"></div>
+        </div>
     </div>
-</div>
+
+    <div class="simposio">
         <i class="fas fa-rss"></i> SIMPOSIO ACTIVO
     </div>
 
     <script>
-        // --- CONFIGURACIÓN DE CONEXIÓN ---
+        // --- CONEXIÓN ---
         const SB_URL = 'https://wajivhbldplztjvqudht.supabase.co'; 
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk';
-       const { createClient } = supabase;
-       const _supabase = createClient(SB_URL, SB_KEY);
-        
+        const { createClient } = supabase;
+        const _supabase = createClient(SB_URL, SB_KEY);
 
-        // --- LÓGICA DE CARGA ACTUALIZADA ---
-async function obtenerArticulos() {
-    try {
-        const { data, error } = await _supabase
-            .from('articulos')
-            .select('*')
-            .order('created_at', { ascending: false });
+        // --- CARGAR ARTÍCULOS ---
+        async function obtenerArticulos() {
+            try {
+                const { data, error } = await _supabase
+                    .from('articulos')
+                    .select('*')
+                    .order('created_at', { ascending: false });
 
-        if (error) {
-            console.error('Error en la consulta:', error);
-            document.getElementById('grid-articulos').innerHTML = '<p>Error de conexión con el umbral.</p>';
-        } else {
-            dibujarCards(data);
+                if (error) throw error;
+                dibujarCards(data);
+            } catch (err) {
+                console.error('Error:', err);
+                document.getElementById('grid-articulos').innerHTML = 'Error de conexión con el umbral.';
+            }
         }
-    } catch (err) {
-        console.error('Error inesperado:', err);
-    }
-} // <--- Esta llave faltaba
-function dibujarCards(lista) {
-    const grid = document.getElementById('grid-articulos');
-    grid.innerHTML = lista.map(art => `
-        <div class="card" onclick="abrirLectura(${JSON.stringify(art).replace(/"/g, '&quot;')})">
-            <img src="${art.Imagen_URL || 'https://via.placeholder.com/400x200'}" alt="Portada">
-            <div class="card-info">
-                <small style="color:var(--orange)">ESTUDIO ESTRATÉGICO</small>
-                <h3>${art.Titulo}</h3>
-                <p>${art.Sinopsis}</p>
-                <small>Por: <strong>${art.Autor}</strong></small>
-            </div>
-        </div>
-    `).join('');
-}
 
-function abrirLectura(art) {
-    const modal = document.getElementById('modalArticulo');
-    const container = document.getElementById('contenidoCompleto');
-    
-    // Convertimos el contenido en párrafos interactivos
-    const parrafos = art.Contenido.split('\n').map((p, index) => `
-        <div class="parrafo-interactivo">
-            <p>${p}</p>
-            <div class="interaccion-barra">
-                <button class="reaccion-btn" onclick="reaccionar(${art.id}, ${index}, '💡')">💡 Interesante</button>
-                <button class="reaccion-btn" onclick="reaccionar(${art.id}, ${index}, '⚖️')">⚖️ Debatible</button>
-                <button class="reaccion-btn" onclick="reaccionar(${art.id}, ${index}, '❓')">❓ Duda</button>
-            </div>
-        </div>
-    `).join('');
+        function dibujarCards(lista) {
+            const grid = document.getElementById('grid-articulos');
+            grid.innerHTML = lista.map(art => `
+                <div class="card" onclick='abrirLectura(${JSON.stringify(art)})'>
+                    <img src="${art.Imagen_URL || 'https://via.placeholder.com/400x200'}" alt="Portada">
+                    <div class="card-info">
+                        <small style="color:var(--orange)">ESTUDIO ESTRATÉGICO</small>
+                        <h3>${art.Titulo}</h3>
+                        <p>${art.Sinopsis}</p>
+                        <small>Por: <strong>${art.Autor}</strong></small>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-    container.innerHTML = `
-        <h1 style="color:var(--blue)">${art.Titulo}</h1>
-        <p style="color:var(--orange)">Análisis por ${art.Autor}</p>
-        <hr border="0.5">
-        <div class="texto-articulo">${parrafos}</div>
-    `;
-    modal.style.display = 'block';
-}
+        // --- LÓGICA DE LECTURA Y REACCIÓN ---
+        function abrirLectura(art) {
+            const modal = document.getElementById('modalArticulo');
+            const container = document.getElementById('contenidoCompleto');
+            
+            // Procesar párrafos (asumiendo que el texto tiene saltos de línea)
+            const parrafos = (art.Contenido || "Contenido en proceso...").split('\n').map((p, index) => {
+                if(p.trim() === "") return ""; // Ignorar líneas vacías
+                return `
+                    <div class="parrafo-interactivo">
+                        <p>${p}</p>
+                        <div>
+                            <button class="reaccion-btn" onclick="reaccionar(${art.id}, ${index}, '💡')">💡 Interesante</button>
+                            <button class="reaccion-btn" onclick="reaccionar(${art.id}, ${index}, '⚖️')">⚖️ Debatible</button>
+                            <button class="reaccion-btn" onclick="reaccionar(${art.id}, ${index}, '❓')">❓ Duda</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
 
-function cerrarLectura() {
-    document.getElementById('modalArticulo').style.display = 'none';
-}
+            container.innerHTML = `
+                <h1 style="color:var(--blue)">${art.Titulo}</h1>
+                <p style="color:var(--orange)">Análisis por ${art.Autor}</p>
+                <hr style="border:0; border-top:1px solid #30363d; margin: 20px 0;">
+                <div class="texto-articulo">${parrafos}</div>
+            `;
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Bloquear scroll de fondo
+        }
 
-async function reaccionar(artId, pIndex, tipo) {
-    const { error } = await _supabase
-        .from('sinapsis_reacciones')
-        .insert([{ artículo_id: artId, parrafo_index: pIndex, tipo_reaccion: tipo }]);
-    
-    if (error) alert("Error en la sinapsis");
-    else alert("Tu reacción ha sido integrada al mapa de calor.");
-}
+        function cerrarLectura() {
+            document.getElementById('modalArticulo').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Liberar scroll
+        }
 
-// IMPORTANTE: Asegúrate de llamar a la función al final
-obtenerArticulos();
+        async function reaccionar(artId, pIndex, tipo) {
+            const { error } = await _supabase
+                .from('sinapsis_reacciones')
+                .insert([{ artículo_id: artId, parrafo_index: pIndex, tipo_reaccion: tipo }]);
+            
+            if (error) {
+                console.error(error);
+                alert("Error al registrar reacción.");
+            } else {
+                alert("Reacción integrada a la sinapsis.");
+            }
+        }
 
-        // Ejecutar al cargar la página
+        // Iniciar sistema
         obtenerArticulos();
     </script>
 </body>
-</html>   
+</html>
