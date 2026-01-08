@@ -26,6 +26,13 @@
     <button class="btn-refresh" onclick="cargarMetricas()">SINCRONIZAR DATOS</button>
 </header>
 
+<div style="margin-bottom: 20px; display: flex; gap: 20px; align-items: center; background: var(--panel); padding: 15px; border-radius: 10px; border: 1px solid #30363d;">
+    <label style="color: var(--blue); font-weight: bold;">SELECCIONAR FOCO DE ANÁLISIS:</label>
+    <select id="selectorArticulo" onchange="actualizarFocoArticulo()" style="background: #111; color: #fff; padding: 8px; border-radius: 5px; border: 1px solid var(--blue); width: 300px;">
+        <option value="todos">Todos los artículos (Vista Global)</option>
+    </select>
+</div>
+
 <div class="grid-stats">
     <div class="stat-card">
         <h2>Impacto por Artículo (Sinapsis Totales)</h2>
@@ -42,6 +49,23 @@
     </div>
 </div>
 
+<div class="stat-card" style="margin-top: 20px; width: 100%;">
+    <h2>Hallazgos Críticos para el Simposio (Fricción y Disenso)</h2>
+    <table id="tablaHallazgos" style="width: 100%; border-collapse: collapse; color: var(--silver); text-align: left;">
+        <thead>
+            <tr style="border-bottom: 2px solid var(--blue); color: var(--orange);">
+                <th style="padding: 10px;">Artículo</th>
+                <th style="padding: 10px;">💡 Interés</th>
+                <th style="padding: 10px;">⚖️ Debate</th>
+                <th style="padding: 10px;">❓ Duda</th>
+                <th style="padding: 10px;">Prioridad Simposio</th>
+            </tr>
+        </thead>
+        <tbody id="cuerpoTabla">
+            </tbody>
+    </table>
+</div>
+
 <div id="debug-info">Estado del Búnker: Esperando conexión...</div>
 
 <script>
@@ -52,82 +76,79 @@
     let chart1 = null;
     let chart2 = null;
 
+    let datosGlobales = []; // Memoria táctica
+
     async function cargarMetricas() {
         document.getElementById('debug-info').innerText = "Sincronizando con el umbral...";
-        
         try {
             const { data: reacciones, error } = await _supabase
                 .from('sinapsis_reacciones')
                 .select('tipo_reaccion, articulos(Titulo)');
 
             if (error) throw error;
+            datosGlobales = reacciones;
 
-            const conteoArticulos = {};
-            const conteoTipos = { '💡': 0, '⚖️': 0, '❓': 0 };
-
-            reacciones.forEach(r => {
-                const titulo = r.articulos ? r.articulos.Titulo : "Desconocido";
-                conteoArticulos[titulo] = (conteoArticulos[titulo] || 0) + 1;
-                if(conteoTipos[r.tipo_reaccion] !== undefined) conteoTipos[r.tipo_reaccion]++;
+            // Llenar el selector de artículos la primera vez
+            const selector = document.getElementById('selectorArticulo');
+            const titulos = [...new Set(reacciones.map(r => r.articulos.Titulo))];
+            selector.innerHTML = '<option value="todos">Todos los artículos (Vista Global)</option>';
+            titulos.forEach(t => {
+                selector.innerHTML += `<option value="${t}">${t}</option>`;
             });
 
-            dibujarGraficos(conteoArticulos, conteoTipos);
-            document.getElementById('debug-info').innerText = "Sinapsis actualizada: " + reacciones.length + " eventos registrados.";
+            procesarYMostrar('todos');
         } catch (err) {
-            console.error(err);
-            document.getElementById('debug-info').innerText = "Error: No se pudo conectar con el búnker.";
+            document.getElementById('debug-info').innerText = "Error de conexión.";
         }
     }
 
-    function dibujarGraficos(articulos, tipos) {
-        // Destruir gráficos previos para evitar errores de renderizado
-        if (chart1) chart1.destroy();
-        if (chart2) chart2.destroy();
+    function procesarYMostrar(filtro) {
+        const conteoArticulos = {};
+        const conteoTipos = { '💡': 0, '⚖️': 0, '❓': 0 };
+        const tablaResumen = {};
 
-        // CONFIGURACIÓN GRÁFICO 1
-        const ctx1 = document.getElementById('chartImpacto').getContext('2d');
-        chart1 = new Chart(ctx1, {
-            type: 'bar',
-            data: {
-                labels: Object.keys(articulos),
-                datasets: [{
-                    label: 'Sinapsis',
-                    data: Object.values(articulos),
-                    backgroundColor: '#58a6ff',
-                    borderColor: '#c9d1d9',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, ticks: { color: '#c9d1d9' }, grid: { color: '#30363d' } },
-                    x: { ticks: { color: '#c9d1d9', maxRotation: 45, minRotation: 45 }, grid: { display: false } }
-                }
+        datosGlobales.forEach(r => {
+            const titulo = r.articulos ? r.articulos.Titulo : "Desconocido";
+            
+            // Lógica para la tabla global
+            if (!tablaResumen[titulo]) tablaResumen[titulo] = { '💡': 0, '⚖️': 0, '❓': 0 };
+            tablaResumen[titulo][r.tipo_reaccion]++;
+
+            // Lógica para los gráficos
+            if (filtro === 'todos' || filtro === titulo) {
+                conteoArticulos[titulo] = (conteoArticulos[titulo] || 0) + 1;
+                conteoTipos[r.tipo_reaccion]++;
             }
         });
 
-        // CONFIGURACIÓN GRÁFICO 2
-        const ctx2 = document.getElementById('chartTipos').getContext('2d');
-        chart2 = new Chart(ctx2, {
-            type: 'doughnut',
-            data: {
-                labels: ['💡 Interesante', '⚖️ Debatible', '❓ Duda'],
-                datasets: [{
-                    data: [tipos['💡'], tipos['⚖️'], tipos['❓']],
-                    backgroundColor: ['#f0883e', '#58a6ff', '#8b949e'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: '#c9d1d9' } }
-                }
-            }
+        dibujarGraficos(conteoArticulos, conteoTipos);
+        actualizarTabla(tablaResumen);
+        document.getElementById('debug-info').innerText = `Análisis para: ${filtro}`;
+    }
+
+    function actualizarFocoArticulo() {
+        const seleccion = document.getElementById('selectorArticulo').value;
+        procesarYMostrar(seleccion);
+    }
+
+    function actualizarTabla(resumen) {
+        const cuerpo = document.getElementById('cuerpoTabla');
+        cuerpo.innerHTML = "";
+        
+        Object.keys(resumen).forEach(titulo => {
+            const d = resumen[titulo];
+            const friccion = d['⚖️'] + d['❓'];
+            const prioridad = friccion > 5 ? "ALTA (Conflictivo)" : "Normal";
+            
+            cuerpo.innerHTML += `
+                <tr style="border-bottom: 1px solid #30363d;">
+                    <td style="padding: 10px;">${titulo}</td>
+                    <td style="padding: 10px;">${d['💡']}</td>
+                    <td style="padding: 10px; color: var(--blue);">${d['⚖️']}</td>
+                    <td style="padding: 10px; color: var(--orange);">${d['❓']}</td>
+                    <td style="padding: 10px;">${prioridad}</td>
+                </tr>
+            `;
         });
     }
 
