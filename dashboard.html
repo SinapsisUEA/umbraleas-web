@@ -8,152 +8,135 @@
     <style>
         :root { --bg: #05070a; --panel: #0d1117; --blue: #58a6ff; --orange: #f0883e; --silver: #c9d1d9; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--silver); margin: 0; padding: 20px; }
-        header { border-bottom: 2px solid var(--blue); padding-bottom: 10px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        header { border-bottom: 2px solid var(--blue); padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
         .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
-        .stat-card { background: var(--panel); padding: 25px; border-radius: 10px; border: 1px solid #30363d; min-height: 450px; }
-        h2 { color: var(--orange); font-size: 1.1em; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-refresh { background: var(--blue); color: #000; border: none; padding: 10px 25px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        #debug-info { margin-top: 20px; font-size: 0.8em; color: #8b949e; }
+        .stat-card { background: var(--panel); padding: 25px; border-radius: 10px; border: 1px solid #30363d; min-height: 400px; }
+        .filter-bar { background: var(--panel); padding: 15px; border-radius: 10px; border: 1px solid var(--blue); margin-bottom: 20px; display: flex; gap: 15px; align-items: center; }
+        select { background: #111; color: #fff; border: 1px solid var(--blue); padding: 8px; border-radius: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9em; }
+        th { border-bottom: 2px solid var(--blue); color: var(--orange); padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #30363d; }
     </style>
 </head>
 <body>
 
 <header>
-    <div>
-        <h1 style="margin:0; color:var(--blue); letter-spacing: 2px;">BÚNKER DE INTELIGENCIA</h1>
-        <p style="margin:0; font-size: 0.9em; color: var(--orange);">Métricas Asimétricas para el Simposio</p>
-    </div>
-    <button class="btn-refresh" onclick="cargarMetricas()">SINCRONIZAR DATOS</button>
+    <h1>BÚNKER DE INTELIGENCIA</h1>
+    <button style="background:var(--blue); border:none; padding:10px; cursor:pointer; font-weight:bold;" onclick="cargarMetricas()">RECARGAR DATOS</button>
 </header>
 
-<div style="margin-bottom: 20px; display: flex; gap: 20px; align-items: center; background: var(--panel); padding: 15px; border-radius: 10px; border: 1px solid #30363d;">
-    <label style="color: var(--blue); font-weight: bold;">SELECCIONAR FOCO DE ANÁLISIS:</label>
-    <select id="selectorArticulo" onchange="actualizarFocoArticulo()" style="background: #111; color: #fff; padding: 8px; border-radius: 5px; border: 1px solid var(--blue); width: 300px;">
-        <option value="todos">Todos los artículos (Vista Global)</option>
+<div class="filter-bar">
+    <label>FOCO DE ANÁLISIS:</label>
+    <select id="selectorArticulo" onchange="actualizarFocoArticulo()">
+        <option value="todos">Cargando artículos...</option>
     </select>
 </div>
 
 <div class="grid-stats">
     <div class="stat-card">
-        <h2>Impacto por Artículo (Sinapsis Totales)</h2>
-        <div style="position: relative; height:350px;">
-            <canvas id="chartImpacto"></canvas>
-        </div>
+        <h2>Impacto por Artículo</h2>
+        <div style="height:300px;"><canvas id="chartImpacto"></canvas></div>
     </div>
-
     <div class="stat-card">
-        <h2>Naturaleza del Debate (Reacciones)</h2>
-        <div style="position: relative; height:350px;">
-            <canvas id="chartTipos"></canvas>
-        </div>
+        <h2>Naturaleza del Debate</h2>
+        <div style="height:300px;"><canvas id="chartTipos"></canvas></div>
     </div>
 </div>
 
-<div class="stat-card" style="margin-top: 20px; width: 100%;">
-    <h2>Hallazgos Críticos para el Simposio (Fricción y Disenso)</h2>
-    <table id="tablaHallazgos" style="width: 100%; border-collapse: collapse; color: var(--silver); text-align: left;">
+<div class="stat-card" style="margin-top:20px;">
+    <h2>Hallazgos Críticos para el Simposio</h2>
+    <table>
         <thead>
-            <tr style="border-bottom: 2px solid var(--blue); color: var(--orange);">
-                <th style="padding: 10px;">Artículo</th>
-                <th style="padding: 10px;">💡 Interés</th>
-                <th style="padding: 10px;">⚖️ Debate</th>
-                <th style="padding: 10px;">❓ Duda</th>
-                <th style="padding: 10px;">Prioridad Simposio</th>
-            </tr>
+            <tr><th>Artículo</th><th>💡 Interés</th><th>⚖️ Debate</th><th>❓ Duda</th><th>Prioridad</th></tr>
         </thead>
-        <tbody id="cuerpoTabla">
-            </tbody>
+        <tbody id="cuerpoTabla"></tbody>
     </table>
 </div>
 
-<div id="debug-info">Estado del Búnker: Esperando conexión...</div>
+<div id="debug-info" style="margin-top:20px; color:var(--orange);">Estado: Iniciando...</div>
 
 <script>
     const SB_URL = 'https://wajivhbldplztjvqudht.supabase.co'; 
     const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk';
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
-    let chart1 = null;
-    let chart2 = null;
-
-    let datosGlobales = []; // Memoria táctica
+    let datosGlobales = [];
+    let chart1, chart2;
 
     async function cargarMetricas() {
-        document.getElementById('debug-info').innerText = "Sincronizando con el umbral...";
+        const debug = document.getElementById('debug-info');
+        debug.innerText = "Conectando con la base de datos...";
+        
         try {
-            const { data: reacciones, error } = await _supabase
-                .from('sinapsis_reacciones')
-                .select('tipo_reaccion, articulos(Titulo)');
-
+            const { data, error } = await _supabase.from('sinapsis_reacciones').select('tipo_reaccion, articulos(Titulo)');
             if (error) throw error;
-            datosGlobales = reacciones;
-
-            // Llenar el selector de artículos la primera vez
+            
+            datosGlobales = data;
+            
+            // Actualizar Selector
             const selector = document.getElementById('selectorArticulo');
-            const titulos = [...new Set(reacciones.map(r => r.articulos.Titulo))];
-            selector.innerHTML = '<option value="todos">Todos los artículos (Vista Global)</option>';
-            titulos.forEach(t => {
-                selector.innerHTML += `<option value="${t}">${t}</option>`;
-            });
+            const titulos = [...new Set(data.map(r => r.articulos?.Titulo).filter(t => t))];
+            selector.innerHTML = '<option value="todos">Vista General (Todos)</option>';
+            titulos.forEach(t => selector.innerHTML += `<option value="${t}">${t}</option>`);
 
             procesarYMostrar('todos');
+            debug.innerText = "Conexión exitosa. Datos sincronizados.";
         } catch (err) {
-            document.getElementById('debug-info').innerText = "Error de conexión.";
+            debug.innerText = "Error de conexión: " + err.message;
         }
     }
 
     function procesarYMostrar(filtro) {
-        const conteoArticulos = {};
+        const conteoArt = {};
         const conteoTipos = { '💡': 0, '⚖️': 0, '❓': 0 };
-        const tablaResumen = {};
+        const resumen = {};
 
         datosGlobales.forEach(r => {
-            const titulo = r.articulos ? r.articulos.Titulo : "Desconocido";
-            
-            // Lógica para la tabla global
-            if (!tablaResumen[titulo]) tablaResumen[titulo] = { '💡': 0, '⚖️': 0, '❓': 0 };
-            tablaResumen[titulo][r.tipo_reaccion]++;
+            const t = r.articulos?.Titulo || "Sin Título";
+            if (!resumen[t]) resumen[t] = { '💡': 0, '⚖️': 0, '❓': 0 };
+            resumen[t][r.tipo_reaccion]++;
 
-            // Lógica para los gráficos
-            if (filtro === 'todos' || filtro === titulo) {
-                conteoArticulos[titulo] = (conteoArticulos[titulo] || 0) + 1;
+            if (filtro === 'todos' || filtro === t) {
+                conteoArt[t] = (conteoArt[t] || 0) + 1;
                 conteoTipos[r.tipo_reaccion]++;
             }
         });
 
-        dibujarGraficos(conteoArticulos, conteoTipos);
-        actualizarTabla(tablaResumen);
-        document.getElementById('debug-info').innerText = `Análisis para: ${filtro}`;
+        dibujarGraficos(conteoArt, conteoTipos);
+        actualizarTabla(resumen);
     }
 
-    function actualizarFocoArticulo() {
-        const seleccion = document.getElementById('selectorArticulo').value;
-        procesarYMostrar(seleccion);
+    function dibujarGraficos(articulos, tipos) {
+        if (chart1) chart1.destroy();
+        if (chart2) chart2.destroy();
+
+        chart1 = new Chart(document.getElementById('chartImpacto'), {
+            type: 'bar',
+            data: { labels: Object.keys(articulos), datasets: [{ label: 'Reacciones', data: Object.values(articulos), backgroundColor: '#58a6ff' }] },
+            options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#c9d1d9' } }, y: { ticks: { color: '#c9d1d9' } } } }
+        });
+
+        chart2 = new Chart(document.getElementById('chartTipos'), {
+            type: 'doughnut',
+            data: { labels: ['Interés', 'Debate', 'Duda'], datasets: [{ data: [tipos['💡'], tipos['⚖️'], tipos['❓']], backgroundColor: ['#f0883e', '#58a6ff', '#8b949e'] }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#c9d1d9' } } } }
+        });
     }
 
     function actualizarTabla(resumen) {
         const cuerpo = document.getElementById('cuerpoTabla');
-        cuerpo.innerHTML = "";
-        
-        Object.keys(resumen).forEach(titulo => {
-            const d = resumen[titulo];
-            const friccion = d['⚖️'] + d['❓'];
-            const prioridad = friccion > 5 ? "ALTA (Conflictivo)" : "Normal";
-            
-            cuerpo.innerHTML += `
-                <tr style="border-bottom: 1px solid #30363d;">
-                    <td style="padding: 10px;">${titulo}</td>
-                    <td style="padding: 10px;">${d['💡']}</td>
-                    <td style="padding: 10px; color: var(--blue);">${d['⚖️']}</td>
-                    <td style="padding: 10px; color: var(--orange);">${d['❓']}</td>
-                    <td style="padding: 10px;">${prioridad}</td>
-                </tr>
-            `;
-        });
+        cuerpo.innerHTML = Object.keys(resumen).map(t => {
+            const d = resumen[t];
+            const prioridad = (d['⚖️'] + d['❓'] > 3) ? '<b style="color:var(--orange)">ALTA - DISENSO</b>' : 'Baja';
+            return `<tr><td>${t}</td><td>${d['💡']}</td><td>${d['⚖️']}</td><td>${d['❓']}</td><td>${prioridad}</td></tr>`;
+        }).join('');
     }
 
-    // Carga inicial
-    cargarMetricas();
+    function actualizarFocoArticulo() {
+        procesarYMostrar(document.getElementById('selectorArticulo').value);
+    }
+
+    window.onload = cargarMetricas;
 </script>
 </body>
 </html>
