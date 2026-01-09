@@ -47,10 +47,16 @@
     <h2>Hallazgos Críticos para el Simposio</h2>
     <table>
         <thead>
-            <tr><th>Artículo</th><th>💡 Interés</th><th>⚖️ Debate</th><th>❓ Duda</th><th>Prioridad</th></tr>
+            <tr><th>Artículo</th><th>Autor</th><th>💡 Interés</th><th>⚖️ Debate</th><th>❓ Duda</th><th>Prioridad</th></tr>
         </thead>
         <tbody id="cuerpoTabla"></tbody>
     </table>
+</div>
+
+<div id="seccionControversia" class="stat-card" style="margin-top:20px; display:none; border: 1px solid var(--orange);">
+    <h2 style="color:var(--orange)">Análisis de Tesis en Conflicto</h2>
+    <div id="listaParrafosCriticos">
+        </div>
 </div>
 
 <div id="debug-info" style="margin-top:20px; color:var(--orange);">Estado: Iniciando...</div>
@@ -68,7 +74,7 @@
         debug.innerText = "Conectando con la base de datos...";
         
         try {
-            const { data, error } = await _supabase.from('sinapsis_reacciones').select('tipo_reaccion, articulos(Titulo)');
+           const { data, error } = await _supabase.from('sinapsis_reacciones').select('tipo_reaccion, articulos(Titulo, Autor)');
             if (error) throw error;
             
             datosGlobales = data;
@@ -93,7 +99,8 @@
 
         datosGlobales.forEach(r => {
             const t = r.articulos?.Titulo || "Sin Título";
-            if (!resumen[t]) resumen[t] = { '💡': 0, '⚖️': 0, '❓': 0 };
+            const aut = r.articulos?.Autor || "Anónimo";
+            if (!resumen[t]) resumen[t] = { '💡': 0, '⚖️': 0, '❓': 0, autor: aut };
             resumen[t][r.tipo_reaccion]++;
 
             if (filtro === 'todos' || filtro === t) {
@@ -154,17 +161,74 @@
     }
 
     function actualizarTabla(resumen) {
-        const cuerpo = document.getElementById('cuerpoTabla');
-        cuerpo.innerHTML = Object.keys(resumen).map(t => {
-            const d = resumen[t];
-            const prioridad = (d['⚖️'] + d['❓'] > 3) ? '<b style="color:var(--orange)">ALTA - DISENSO</b>' : 'Baja';
-            return `<tr><td>${t}</td><td>${d['💡']}</td><td>${d['⚖️']}</td><td>${d['❓']}</td><td>${prioridad}</td></tr>`;
-        }).join('');
-    }
+    const cuerpo = document.getElementById('cuerpoTabla');
+    cuerpo.innerHTML = Object.keys(resumen).map(t => {
+        const d = resumen[t];
+        const prioridad = (d['⚖️'] + d['❓'] > 3) ? '<b style="color:var(--orange)">ALTA - DISENSO</b>' : 'Baja';
+        
+        return `<tr>
+            <td>${t}</td>
+            <td style="color:var(--blue)">${d.autor}</td> <td>${d['💡']}</td>
+            <td>${d['⚖️']}</td>
+            <td>${d['❓']}</td>
+            <td>${prioridad}</td>
+        </tr>`;
+    }).join('');
+}
 
-    function actualizarFocoArticulo() {
-        procesarYMostrar(document.getElementById('selectorArticulo').value);
+   function actualizarFocoArticulo() {
+    const seleccion = document.getElementById('selectorArticulo').value;
+    procesarYMostrar(seleccion);
+    
+    if (seleccion !== 'todos') {
+        mostrarDetalleControversia(seleccion);
+    } else {
+        document.getElementById('seccionControversia').style.display = 'none';
     }
+}
+
+async function mostrarDetalleControversia(titulo) {
+    const seccion = document.getElementById('seccionControversia');
+    const lista = document.getElementById('listaParrafosCriticos');
+    seccion.style.display = 'block';
+    lista.innerHTML = "Analizando nudos críticos...";
+
+    // 1. Obtener el artículo y sus párrafos
+    const { data: art } = await _supabase.from('articulos').select('id, Contenido').eq('Titulo', titulo).single();
+    const parrafosOriginales = art.Contenido.split('\n');
+
+    // 2. Obtener reacciones de disenso (Dudas y Debates)
+    const { data: reacciones } = await _supabase
+        .from('sinapsis_reacciones')
+        .select('parrafo_index, tipo_reaccion, comentario_texto')
+        .eq('artículo_id', art.id)
+        .in('tipo_reaccion', ['⚖️', '❓']);
+
+    // 3. Agrupar por párrafo
+    const mapa = reacciones.reduce((acc, r) => {
+        if (!acc[r.parrafo_index]) acc[r.parrafo_index] = { count: 0, comentarios: [] };
+        acc[r.parrafo_index].count++;
+        if (r.comentario_texto) acc[r.parrafo_index].comentarios.push(r.comentario_texto);
+        return acc;
+    }, {});
+
+    // 4. Renderizar los párrafos con más de 1 reacción de disenso
+    lista.innerHTML = "";
+    Object.keys(mapa).forEach(idx => {
+        const p = mapa[idx];
+        const textoLimpio = parrafosOriginales[idx] || "Texto no encontrado";
+        
+        lista.innerHTML += `
+            <div style="background: rgba(240, 136, 62, 0.05); padding: 15px; border-left: 4px solid var(--orange); margin-bottom: 15px;">
+                <p style="font-style: italic; color: #fff;">"${textoLimpio}"</p>
+                <div style="font-size: 0.85em; color: var(--silver); margin-top: 10px;">
+                    <strong>Señales de Disenso:</strong> ${p.count} | 
+                    <strong>Argumentos:</strong> ${p.comentarios.length > 0 ? p.comentarios.join(' | ') : 'Sin comentarios escritos aún.'}
+                </div>
+            </div>
+        `;
+    });
+}
 
     window.onload = cargarMetricas;
 </script>
