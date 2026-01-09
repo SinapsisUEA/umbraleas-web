@@ -56,6 +56,22 @@
         <h2>Naturaleza del Debate</h2>
         <div style="height:350px;"><canvas id="chartTipos"></canvas></div>
     </div>
+
+<div class="grid-stats" style="margin-top:20px;">
+    
+    <div id="seccionControversia" class="stat-card" style="display:none; border: 1px solid var(--orange);">
+        <h2 style="color:var(--orange)">🔥 Nudos Críticos (Disenso)</h2>
+        <div id="listaParrafosCriticos"></div>
+    </div>
+
+    <div id="seccionMensajes" class="stat-card" style="display:none; border: 1px solid var(--blue);">
+        <h2 style="color:var(--blue)">📥 Buzón de Diálogo Directo</h2>
+        <div id="listaMensajesDirectos">
+            </div>
+    </div>
+
+</div>
+
 </div>
 
 <div class="stat-card" style="margin-top:20px;">
@@ -82,6 +98,13 @@
 </div>
 
 <div id="debug-info" style="margin-top:20px; color:var(--orange);">Estado: Iniciando...</div>
+
+<div class="stat-card" style="margin-top:20px; border: 1px solid var(--blue);">
+    <h2 style="color:var(--blue)">📥 Buzón de Interacción: Diálogos con Autores</h2>
+    <div id="listaMensajesDirectos" style="max-height: 400px; overflow-y: auto;">
+        <p style="color:gray">Seleccione un artículo para filtrar los mensajes...</p>
+    </div>
+</div>
 
 <script>
     const SB_URL = 'https://wajivhbldplztjvqudht.supabase.co'; 
@@ -183,57 +206,95 @@ function generarInvitacion(titulo, autor, dudas, debates) {
     }
 
     async function mostrarDetalleControversia(titulo) {
-        const seccion = document.getElementById('seccionControversia');
-        const lista = document.getElementById('listaParrafosCriticos');
-        seccion.style.display = 'block';
-        lista.innerHTML = "Analizando nudos críticos...";
-        try {
-            const { data: art } = await _supabase.from('articulos').select('id, Contenido').eq('Titulo', titulo).single();
-            const parrafos = art.Contenido.split('\n');
-            const { data: reac } = await _supabase.from('sinapsis_reacciones').select('parrafo_index, tipo_reaccion, comentario_texto').eq('artículo_id', art.id).in('tipo_reaccion', ['⚖️', '❓']);
-            const mapa = reac.reduce((acc, r) => {
-                if (!acc[r.parrafo_index]) acc[r.parrafo_index] = { count: 0, comentarios: [] };
-                acc[r.parrafo_index].count++;
-                if (r.comentario_texto) acc[r.parrafo_index].comentarios.push(r.comentario_texto);
-                return acc;
-            }, {});
-            lista.innerHTML = "";
-            Object.keys(mapa).forEach(idx => {
-                const p = mapa[idx];
-                lista.innerHTML += `<div style="border-left:4px solid var(--orange); padding:15px; margin-bottom:10px; background:rgba(255,255,255,0.05)">
+    const seccion = document.getElementById('seccionControversia');
+    const listaCritica = document.getElementById('listaParrafosCriticos');
+    const listaMensajes = document.getElementById('listaMensajesDirectos');
+    
+    seccion.style.display = 'block';
+    listaCritica.innerHTML = "Analizando nudos críticos...";
+    listaMensajes.innerHTML = "Extrayendo mensajes directos...";
+
+    try {
+        // 1. Obtener ID del artículo
+        const { data: art } = await _supabase.from('articulos').select('id, Contenido').eq('Titulo', titulo).single();
+        const parrafos = art.Contenido.split('\n');
+
+        // 2. Obtener todas las reacciones (incluyendo mensajes 💬)
+        const { data: reacciones } = await _supabase
+            .from('sinapsis_reacciones')
+            .select('parrafo_index, tipo_reaccion, comentario_texto, created_at')
+            .eq('artículo_id', art.id);
+
+        // 3. Filtrar y mostrar Mensajes Directos (💬)
+        const mensajes = reacciones.filter(r => r.tipo_reaccion === '💬');
+        if (mensajes.length > 0) {
+            listaMensajes.innerHTML = mensajes.map(m => `
+                <div style="background: rgba(88, 166, 255, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #30363d;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <span style="color:var(--blue); font-weight:bold;">Interlocutor Anónimo</span>
+                        <small style="color:gray;">${new Date(m.created_at).toLocaleDateString()}</small>
+                    </div>
+                    <p style="margin:0; color:#fff;">"${m.comentario_texto}"</p>
+                </div>
+            `).join('');
+        } else {
+            listaMensajes.innerHTML = "<p style='color:gray'>No hay mensajes directos para este autor aún.</p>";
+        }
+
+        // 4. Filtrar y mostrar Nudos Críticos (⚖️, ❓)
+        const disenso = reacciones.filter(r => ['⚖️', '❓'].includes(r.tipo_reaccion));
+        const mapa = disenso.reduce((acc, r) => {
+            if (!acc[r.parrafo_index]) acc[r.parrafo_index] = { count: 0, textos: [] };
+            acc[r.parrafo_index].count++;
+            return acc;
+        }, {});
+
+        listaCritica.innerHTML = "";
+        Object.keys(mapa).forEach(idx => {
+            listaCritica.innerHTML += `
+                <div style="border-left:4px solid var(--orange); padding:15px; margin-bottom:10px; background:rgba(255,255,255,0.05)">
                     <p><i>"${parrafos[idx] || '...'}"</i></p>
-                    <small>Señales: ${p.count} | Argumentos: ${p.comentarios.join(' // ') || 'Sin texto'}</small>
+                    <small style="color:var(--orange)">Señales de conflicto: ${mapa[idx].count}</small>
                 </div>`;
-            });
-        } catch (e) { lista.innerHTML = "No hay detalles de controversia registrados."; }
+        });
+
+    } catch (e) {
+        listaCritica.innerHTML = "Sin datos de controversia.";
+        listaMensajes.innerHTML = "Sin mensajes.";
     }
+}
 
 function exportarPDF() {
     const debug = document.getElementById('debug-info');
     const headerPdf = document.getElementById('header-pdf');
-    debug.innerText = "Generando Documento de Mando...";
+    debug.innerText = "Generando Documento de Mando con Diálogos...";
 
-    // 1. Mostrar el sello institucional
+    // 1. Mostrar elementos exclusivos del reporte
     headerPdf.style.display = 'block';
 
     const elemento = document.body;
     const opciones = {
-        margin:       12,
+        margin:       10,
         filename:     'REPORTE_ESTRATEGICO_SINAPSIS_2025.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, backgroundColor: '#05070a', useCORS: true },
+        html2canvas:  { 
+            scale: 2, 
+            backgroundColor: '#05070a',
+            useCORS: true,
+            scrollY: 0
+        },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
     };
 
-    // 2. Ocultar elementos de navegación
-    const UI = document.querySelectorAll('button, select, .filter-bar');
+    // 2. Ocultar interfaz de navegación pero MANTENER el buzón de mensajes
+    const UI = document.querySelectorAll('button, select, .filter-bar, #debug-info');
     UI.forEach(el => el.style.visibility = 'hidden');
 
     html2pdf().set(opciones).from(elemento).save().then(() => {
-        // 3. Restaurar la interfaz original
+        // 3. Restaurar sistema
         UI.forEach(el => el.style.visibility = 'visible');
         headerPdf.style.display = 'none';
-        debug.innerText = "Reporte Institucional Exportado.";
+        debug.innerText = "Reporte con Diálogos Exportado con Éxito.";
     });
 }
 
