@@ -106,6 +106,29 @@
         if (error) console.error(error);
         else dibujarCards(data);
     }
+    
+    async function enviarComentarioAutor(artId, autor, titulo) {
+    const texto = document.getElementById('comentarioAutor').value;
+    if (!texto) return alert("Por favor, escriba un mensaje.");
+
+    // A. Registrar en Supabase (Se guarda para el análisis del Búnker)
+    const { error } = await _supabase.from('sinapsis_reacciones').insert([{
+        artículo_id: artId,
+        tipo_reaccion: '💬', // Nuevo icono de comentario
+        comentario_texto: texto,
+        parrafo_index: 0 // Lo asignamos al encabezado general
+    }]);
+
+    if (error) console.error("Error al registrar en Sinapsis:", error);
+
+    // B. Abrir correo para el autor
+    const asunto = encodeURIComponent(`Diálogo Sinapsis: Comentario sobre "${titulo}"`);
+    const cuerpo = encodeURIComponent(`Estimado(a) ${autor},\n\nUn lector ha generado el siguiente comentario sobre su tesis en la Revista Sinapsis:\n\n"${texto}"\n\nEste mensaje ha sido registrado para los ejes temáticos del Simposio.`);
+    
+    window.location.href = `mailto:?subject=${asunto}&body=${cuerpo}`;
+    
+    alert("Mensaje registrado en la red y enviado al autor.");
+}
 
     function dibujarCards(lista) {
         const grid = document.getElementById('grid-articulos');
@@ -131,24 +154,39 @@
     }
 
     function abrirLectura(art) {
-        const modal = document.getElementById('modalArticulo');
-        const contenido = document.getElementById('contenidoArticulo');
-        
-        let htmlParrafos = art.Contenido.split('\n').map((p, i) => `
-            <div class="parrafo-container" style="margin-bottom:20px;">
-                <p style="line-height:1.8; font-size:1.1em;">${p}</p>
-                <div class="reacciones">
-                    <button class="btn-reaction" onclick="reaccionar(${art.id}, ${i}, '💡')">💡 Interés</button>
-                    <button class="btn-reaction" onclick="reaccionar(${art.id}, ${i}, '⚖️')">⚖️ Debate</button>
-                    <button class="btn-reaction" onclick="reaccionar(${art.id}, ${i}, '❓')">❓ Duda</button>
-                </div>
+    const modal = document.getElementById('modalArticulo');
+    const contenido = document.getElementById('contenidoArticulo');
+    
+    // 1. Generar párrafos con reacciones
+    let htmlParrafos = art.Contenido.split('\n').map((p, i) => `
+        <div class="parrafo-container" style="margin-bottom:20px;">
+            <p style="line-height:1.8; font-size:1.1em;">${p}</p>
+            <div class="reacciones">
+                <button class="btn-reaction" onclick="reaccionar(${art.id}, ${i}, '💡')">💡 Interés</button>
+                <button class="btn-reaction" onclick="reaccionar(${art.id}, ${i}, '⚖️')">⚖️ Debate</button>
+                <button class="btn-reaction" onclick="reaccionar(${art.id}, ${i}, '❓')">❓ Duda</button>
             </div>
-        `).join('');
+        </div>
+    `).join('');
 
-        contenido.innerHTML = `<h1 style="color:var(--blue)">${art.Titulo}</h1><hr>${htmlParrafos}`;
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }
+    // 2. Añadir el buzón de diálogo con el autor
+    const buzonInteraccion = `
+        <div style="margin-top:50px; padding:30px; background:var(--card); border: 1px solid var(--orange); border-radius:10px;">
+            <h3 style="color:var(--orange)">📧 Diálogo Crítico con ${art.Autor}</h3>
+            <p style="font-size:0.9em;">Sus comentarios serán integrados al análisis estratégico del Simposio.</p>
+            <textarea id="comentarioAutor" placeholder="Escriba aquí su pregunta o tesis para el autor..." 
+                      style="width:100%; height:100px; background:#000; color:#fff; border:1px solid #333; padding:10px; margin-top:10px;"></textarea>
+            <button onclick="enviarComentarioAutor(${art.id}, '${art.Autor}', '${art.Titulo}')" 
+                    style="margin-top:15px; background:var(--orange); border:none; padding:10px 20px; font-weight:bold; cursor:pointer; color:#000;">
+                ENVIAR AL AUTOR Y AL SIMPOSIO
+            </button>
+        </div>
+    `;
+
+    contenido.innerHTML = `<h1 style="color:var(--blue)">${art.Titulo}</h1><hr>${htmlParrafos}${buzonInteraccion}`;
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
 
     async function reaccionar(artId, pIndex, tipo) {
         const { error } = await _supabase.from('sinapsis_reacciones').insert([{ artículo_id: artId, parrafo_index: pIndex, tipo_reaccion: tipo }]);
