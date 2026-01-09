@@ -156,17 +156,24 @@
             const tieneDisenso = (d['⚖️'] + d['❓'] > 3);
             const prioridad = tieneDisenso ? '<b style="color:var(--orange)">ALTA - DISENSO</b>' : 'Baja';
             const botonAccion = tieneDisenso ? 
-                `<button onclick="generarInvitacion('${t}', '${d.autor}', ${d['❓']}, ${d['⚖️']})" style="background:var(--blue); color:#000; border:none; padding:5px 10px; cursor:pointer; font-weight:bold; border-radius:3px;">CONVOCAR</button>` : '---';
+    `<button onclick="generarInvitacion(\`${t.replace(/`/g, "'")}\`, \`${d.autor.replace(/`/g, "'")}\`, ${d['❓']}, ${d['⚖️']})" 
+     style="background:var(--blue); color:#000; border:none; padding:5px 10px; cursor:pointer; font-weight:bold; border-radius:3px;">
+     CONVOCAR
+     </button>` : '---';
             return `<tr><td>${t}</td><td style="color:var(--blue)">${d.autor}</td><td>${d['💡']}</td><td>${d['⚖️']}</td><td>${d['❓']}</td><td>${prioridad}</td><td>${botonAccion}</td></tr>`;
         }).join('');
     }
 
-    function generarInvitacion(titulo, autor, dudas, debates) {
-        const total = dudas + debates;
-        const asunto = encodeURIComponent(`Convocatoria Simposio: ${titulo}`);
-        const cuerpo = encodeURIComponent(`Estimado(a) ${autor},\n\nSu tesis "${titulo}" ha generado ${total} puntos de disenso crítico. Lo convocamos al Simposio para defender sus planteamientos.\n\nAtentamente,\nCentro Sinapsis.`);
-        window.location.href = `mailto:?subject=${asunto}&body=${cuerpo}`;
-    }
+function generarInvitacion(titulo, autor, dudas, debates) {
+    const total = dudas + debates;
+    const asunto = encodeURIComponent(`Convocatoria Simposio: ${titulo}`);
+    const cuerpo = encodeURIComponent(`Estimado(a) ${autor},\n\nSu tesis "${titulo}" ha generado ${total} puntos de disenso crítico (Dudas y Debates). Lo convocamos al Simposio para defender sus planteamientos.\n\nAtentamente,\nCentro Sinapsis.`);
+    
+    const mailtoUrl = `mailto:?subject=${asunto}&body=${cuerpo}`;
+    
+    // Abrir en una nueva pestaña o ventana para evitar que el búnker se detenga
+    window.open(mailtoUrl, '_blank');
+}
 
     function actualizarFocoArticulo() {
         const seleccion = document.getElementById('selectorArticulo').value;
