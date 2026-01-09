@@ -35,11 +35,11 @@
 <div class="grid-stats">
     <div class="stat-card">
         <h2>Impacto por Artículo</h2>
-        <div style="height:300px;"><canvas id="chartImpacto"></canvas></div>
+        <div style="height:350px;"><canvas id="chartImpacto"></canvas></div>
     </div>
     <div class="stat-card">
         <h2>Naturaleza del Debate</h2>
-        <div style="height:300px;"><canvas id="chartTipos"></canvas></div>
+        <div style="height:350px;"><canvas id="chartTipos"></canvas></div>
     </div>
 </div>
 
@@ -47,30 +47,15 @@
     <h2>Hallazgos Críticos para el Simposio</h2>
     <table>
         <thead>
-            <tr><th>Artículo</th><th>Autor</th><th>💡 Interés</th><th>⚖️ Debate</th><th>❓ Duda</th><th>Prioridad</th>
-<th>Acción Asimétrica</th> ```
-
----
-
-### 2. Lógica de Generación de Invitación (JavaScript)
-Añadiremos una función que redacte el mensaje automáticamente usando los datos de impacto del artículo.
-
-**Ubicación:** Al final de tu script, antes de `window.onload`.
-
-```javascript
-function generarInvitación(titulo, autor, dudas, debates) {
-    const totalCritico = dudas + debates;
-    const asunto = encodeURIComponent(`Convocatoria al Simposio: Defensa de Tesis - ${titulo}`);
-    const cuerpo = encodeURIComponent(
-        `Estimado(a) ${autor},\n\n` +
-        `Tras el análisis de impacto realizado en nuestro Búnker de Inteligencia, hemos detectado que su artículo "${titulo}" ha generado un nivel de sinapsis crítico, acumulando ${totalCritico} puntos de disenso (Dudas y Debates).\n\n` +
-        `Dada la relevancia de sus tesis y la respuesta de nuestra comunidad de analistas, le invitamos formalmente a participar como ponente en el próximo Simposio para defender sus planteamientos frente a los nudos críticos identificados.\n\n` +
-        `Quedamos a la espera de su confirmación para coordinar la logística de su mesa de trabajo.\n\n` +
-        `Atentamente,\nCentro de Análisis Sinapsis.`
-    );
-    
-    window.location.href = `mailto:?subject=${asunto}&body=${cuerpo}`;
-}</tr>
+            <tr>
+                <th>Artículo</th>
+                <th>Autor</th>
+                <th>💡 Interés</th>
+                <th>⚖️ Debate</th>
+                <th>❓ Duda</th>
+                <th>Prioridad</th>
+                <th>Acción Asimétrica</th>
+            </tr>
         </thead>
         <tbody id="cuerpoTabla"></tbody>
     </table>
@@ -78,8 +63,7 @@ function generarInvitación(titulo, autor, dudas, debates) {
 
 <div id="seccionControversia" class="stat-card" style="margin-top:20px; display:none; border: 1px solid var(--orange);">
     <h2 style="color:var(--orange)">Análisis de Tesis en Conflicto</h2>
-    <div id="listaParrafosCriticos">
-        </div>
+    <div id="listaParrafosCriticos"></div>
 </div>
 
 <div id="debug-info" style="margin-top:20px; color:var(--orange);">Estado: Iniciando...</div>
@@ -95,19 +79,14 @@ function generarInvitación(titulo, autor, dudas, debates) {
     async function cargarMetricas() {
         const debug = document.getElementById('debug-info');
         debug.innerText = "Conectando con la base de datos...";
-        
         try {
-           const { data, error } = await _supabase.from('sinapsis_reacciones').select('tipo_reaccion, articulos(Titulo, Autor)');
+           const { data, error } = await _supabase.from('sinapsis_reacciones').select('tipo_reaccion, articulos(id, Titulo, Autor)');
             if (error) throw error;
-            
             datosGlobales = data;
-            
-            // Actualizar Selector
             const selector = document.getElementById('selectorArticulo');
             const titulos = [...new Set(data.map(r => r.articulos?.Titulo).filter(t => t))];
             selector.innerHTML = '<option value="todos">Vista General (Todos)</option>';
             titulos.forEach(t => selector.innerHTML += `<option value="${t}">${t}</option>`);
-
             procesarYMostrar('todos');
             debug.innerText = "Conexión exitosa. Datos sincronizados.";
         } catch (err) {
@@ -119,19 +98,16 @@ function generarInvitación(titulo, autor, dudas, debates) {
         const conteoArt = {};
         const conteoTipos = { '💡': 0, '⚖️': 0, '❓': 0 };
         const resumen = {};
-
         datosGlobales.forEach(r => {
             const t = r.articulos?.Titulo || "Sin Título";
             const aut = r.articulos?.Autor || "Anónimo";
             if (!resumen[t]) resumen[t] = { '💡': 0, '⚖️': 0, '❓': 0, autor: aut };
             resumen[t][r.tipo_reaccion]++;
-
             if (filtro === 'todos' || filtro === t) {
                 conteoArt[t] = (conteoArt[t] || 0) + 1;
                 conteoTipos[r.tipo_reaccion]++;
             }
         });
-
         dibujarGraficos(conteoArt, conteoTipos);
         actualizarTabla(resumen);
     }
@@ -139,43 +115,18 @@ function generarInvitación(titulo, autor, dudas, debates) {
     function dibujarGraficos(articulos, tipos) {
         if (chart1) chart1.destroy();
         if (chart2) chart2.destroy();
-
         chart1 = new Chart(document.getElementById('chartImpacto'), {
             type: 'bar',
-            data: { 
-                labels: Object.keys(articulos), 
-                datasets: [{ 
-                    label: 'Reacciones', 
-                    data: Object.values(articulos), 
-                    backgroundColor: '#58a6ff' 
-                }] 
-            },
+            data: { labels: Object.keys(articulos), datasets: [{ label: 'Reacciones', data: Object.values(articulos), backgroundColor: '#58a6ff' }] },
             options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
+                responsive: true, maintainAspectRatio: false, 
                 scales: { 
-                    x: { 
-                        ticks: { 
-                            color: '#c9d1d9',
-                            autoSkip: false, // Muestra todos los nombres
-                            maxRotation: 90, // Los pone verticales si es necesario
-                            minRotation: 45, // Inclinación mínima para legibilidad
-                            font: { size: 11 }
-                        },
-                        grid: { display: false }
-                    }, 
-                    y: { 
-                        beginAtZero: true,
-                        ticks: { color: '#c9d1d9' },
-                        grid: { color: '#30363d' }
-                    } 
+                    x: { ticks: { color: '#c9d1d9', autoSkip: false, maxRotation: 90, minRotation: 45, font: { size: 11 } }, grid: { display: false } },
+                    y: { beginAtZero: true, ticks: { color: '#c9d1d9' }, grid: { color: '#30363d' } }
                 },
-                plugins: {
-                    legend: { display: false } // No necesitamos la leyenda arriba
-                }
+                plugins: { legend: { display: false } }
             }
         });
-
         chart2 = new Chart(document.getElementById('chartTipos'), {
             type: 'doughnut',
             data: { labels: ['Interés', 'Debate', 'Duda'], datasets: [{ data: [tipos['💡'], tipos['⚖️'], tipos['❓']], backgroundColor: ['#f0883e', '#58a6ff', '#8b949e'] }] },
@@ -184,83 +135,56 @@ function generarInvitación(titulo, autor, dudas, debates) {
     }
 
     function actualizarTabla(resumen) {
-    const cuerpo = document.getElementById('cuerpoTabla');
-    cuerpo.innerHTML = Object.keys(resumen).map(t => {
-        const d = resumen[t];
-        const tieneDisenso = (d['⚖️'] + d['❓'] > 3);
-        const prioridad = tieneDisenso ? '<b style="color:var(--orange)">ALTA - DISENSO</b>' : 'Baja';
-        
-        // El botón solo es visible si hay disenso suficiente para un debate
-        const botonAccion = tieneDisenso ? 
-            `<button onclick="generarInvitación('${t}', '${d.autor}', ${d['❓']}, ${d['⚖️']})" 
-             style="background:var(--blue); color:#000; border:none; padding:5px 10px; cursor:pointer; font-weight:bold; border-radius:3px;">
-             CONVOCAR
-             </button>` : '---';
-        
-        return `<tr>
-            <td>${t}</td>
-            <td style="color:var(--blue)">${d.autor}</td>
-            <td>${d['💡']}</td>
-            <td>${d['⚖️']}</td>
-            <td>${d['❓']}</td>
-            <td>${prioridad}</td>
-            <td>${botonAccion}</td>
-        </tr>`;
-    }).join('');
-
-   function actualizarFocoArticulo() {
-    const seleccion = document.getElementById('selectorArticulo').value;
-    procesarYMostrar(seleccion);
-    
-    if (seleccion !== 'todos') {
-        mostrarDetalleControversia(seleccion);
-    } else {
-        document.getElementById('seccionControversia').style.display = 'none';
+        const cuerpo = document.getElementById('cuerpoTabla');
+        cuerpo.innerHTML = Object.keys(resumen).map(t => {
+            const d = resumen[t];
+            const tieneDisenso = (d['⚖️'] + d['❓'] > 3);
+            const prioridad = tieneDisenso ? '<b style="color:var(--orange)">ALTA - DISENSO</b>' : 'Baja';
+            const botonAccion = tieneDisenso ? 
+                `<button onclick="generarInvitacion('${t}', '${d.autor}', ${d['❓']}, ${d['⚖️']})" style="background:var(--blue); color:#000; border:none; padding:5px 10px; cursor:pointer; font-weight:bold; border-radius:3px;">CONVOCAR</button>` : '---';
+            return `<tr><td>${t}</td><td style="color:var(--blue)">${d.autor}</td><td>${d['💡']}</td><td>${d['⚖️']}</td><td>${d['❓']}</td><td>${prioridad}</td><td>${botonAccion}</td></tr>`;
+        }).join('');
     }
-}
 
-async function mostrarDetalleControversia(titulo) {
-    const seccion = document.getElementById('seccionControversia');
-    const lista = document.getElementById('listaParrafosCriticos');
-    seccion.style.display = 'block';
-    lista.innerHTML = "Analizando nudos críticos...";
+    function generarInvitacion(titulo, autor, dudas, debates) {
+        const total = dudas + debates;
+        const asunto = encodeURIComponent(`Convocatoria Simposio: ${titulo}`);
+        const cuerpo = encodeURIComponent(`Estimado(a) ${autor},\n\nSu tesis "${titulo}" ha generado ${total} puntos de disenso crítico. Lo convocamos al Simposio para defender sus planteamientos.\n\nAtentamente,\nCentro Sinapsis.`);
+        window.location.href = `mailto:?subject=${asunto}&body=${cuerpo}`;
+    }
 
-    // 1. Obtener el artículo y sus párrafos
-    const { data: art } = await _supabase.from('articulos').select('id, Contenido').eq('Titulo', titulo).single();
-    const parrafosOriginales = art.Contenido.split('\n');
+    function actualizarFocoArticulo() {
+        const seleccion = document.getElementById('selectorArticulo').value;
+        procesarYMostrar(seleccion);
+        if (seleccion !== 'todos') { mostrarDetalleControversia(seleccion); } 
+        else { document.getElementById('seccionControversia').style.display = 'none'; }
+    }
 
-    // 2. Obtener reacciones de disenso (Dudas y Debates)
-    const { data: reacciones } = await _supabase
-        .from('sinapsis_reacciones')
-        .select('parrafo_index, tipo_reaccion, comentario_texto')
-        .eq('artículo_id', art.id)
-        .in('tipo_reaccion', ['⚖️', '❓']);
-
-    // 3. Agrupar por párrafo
-    const mapa = reacciones.reduce((acc, r) => {
-        if (!acc[r.parrafo_index]) acc[r.parrafo_index] = { count: 0, comentarios: [] };
-        acc[r.parrafo_index].count++;
-        if (r.comentario_texto) acc[r.parrafo_index].comentarios.push(r.comentario_texto);
-        return acc;
-    }, {});
-
-    // 4. Renderizar los párrafos con más de 1 reacción de disenso
-    lista.innerHTML = "";
-    Object.keys(mapa).forEach(idx => {
-        const p = mapa[idx];
-        const textoLimpio = parrafosOriginales[idx] || "Texto no encontrado";
-        
-        lista.innerHTML += `
-            <div style="background: rgba(240, 136, 62, 0.05); padding: 15px; border-left: 4px solid var(--orange); margin-bottom: 15px;">
-                <p style="font-style: italic; color: #fff;">"${textoLimpio}"</p>
-                <div style="font-size: 0.85em; color: var(--silver); margin-top: 10px;">
-                    <strong>Señales de Disenso:</strong> ${p.count} | 
-                    <strong>Argumentos:</strong> ${p.comentarios.length > 0 ? p.comentarios.join(' | ') : 'Sin comentarios escritos aún.'}
-                </div>
-            </div>
-        `;
-    });
-}
+    async function mostrarDetalleControversia(titulo) {
+        const seccion = document.getElementById('seccionControversia');
+        const lista = document.getElementById('listaParrafosCriticos');
+        seccion.style.display = 'block';
+        lista.innerHTML = "Analizando nudos críticos...";
+        try {
+            const { data: art } = await _supabase.from('articulos').select('id, Contenido').eq('Titulo', titulo).single();
+            const parrafos = art.Contenido.split('\n');
+            const { data: reac } = await _supabase.from('sinapsis_reacciones').select('parrafo_index, tipo_reaccion, comentario_texto').eq('artículo_id', art.id).in('tipo_reaccion', ['⚖️', '❓']);
+            const mapa = reac.reduce((acc, r) => {
+                if (!acc[r.parrafo_index]) acc[r.parrafo_index] = { count: 0, comentarios: [] };
+                acc[r.parrafo_index].count++;
+                if (r.comentario_texto) acc[r.parrafo_index].comentarios.push(r.comentario_texto);
+                return acc;
+            }, {});
+            lista.innerHTML = "";
+            Object.keys(mapa).forEach(idx => {
+                const p = mapa[idx];
+                lista.innerHTML += `<div style="border-left:4px solid var(--orange); padding:15px; margin-bottom:10px; background:rgba(255,255,255,0.05)">
+                    <p><i>"${parrafos[idx] || '...'}"</i></p>
+                    <small>Señales: ${p.count} | Argumentos: ${p.comentarios.join(' // ') || 'Sin texto'}</small>
+                </div>`;
+            });
+        } catch (e) { lista.innerHTML = "No hay detalles de controversia registrados."; }
+    }
 
     window.onload = cargarMetricas;
 </script>
