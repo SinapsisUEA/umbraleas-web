@@ -48,7 +48,74 @@
         .metrica-tag { font-size: 0.75em; color: var(--orange); font-weight: bold; background: rgba(240, 136, 62, 0.1); padding: 3px 8px; border-radius: 4px; }
 
         .simposio { position: fixed; bottom: 20px; right: 20px; background: var(--orange); color: #000; padding: 10px 20px; border-radius: 30px; font-weight: bold; z-index: 100; }
-    </style>
+    
+    /* Contenedor de la Estación Multimedia */
+.media-station {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    background: var(--panel);
+    border: 1px solid var(--blue);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.player-container { 
+    position: relative; 
+    width: 100%; 
+    aspect-ratio: 16 / 9; 
+    background: #000; 
+    border-radius: 8px; 
+    overflow: hidden; 
+}
+
+/* Tarjetas de Artículo con Portada */
+.article-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.article-card {
+    position: relative;
+    height: 400px;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    transition: transform 0.3s ease;
+    border: 1px solid #30363d;
+}
+
+.article-card:hover { transform: translateY(-5px); }
+
+.card-overlay {
+    background: linear-gradient(to top, rgba(5,7,10,1) 20%, rgba(5,7,10,0.5) 60%, transparent);
+    padding: 20px;
+    width: 100%;
+}
+
+/* Avatar del Autor */
+.author-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 2px solid var(--blue);
+    object-fit: cover;
+    background: #111;
+}
+    
+        </style>
 </head>
 <body>
 
