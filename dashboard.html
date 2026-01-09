@@ -5,6 +5,7 @@
     <title>Sinapsis | Búnker de Inteligencia</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root { --bg: #05070a; --panel: #0d1117; --blue: #58a6ff; --orange: #f0883e; --silver: #c9d1d9; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--silver); margin: 0; padding: 20px; }
@@ -22,7 +23,7 @@
 
 <header>
     <h1>BÚNKER DE INTELIGENCIA</h1>
-    <button style="background:var(--blue); border:none; padding:10px; cursor:pointer; font-weight:bold;" onclick="cargarMetricas()">RECARGAR DATOS</button>
+    <button style="background:var(--blue); border:none; padding:10px; cursor:pointer; font-weight:bold;" onclick="cargarMetricas()">RECARGAR DATOS<button style="background:var(--orange); border:none; padding:10px; margin-left:10px; cursor:pointer; font-weight:bold; color:#000;" onclick="exportarPDF()">DESCARGAR REPORTE CRÍTICO</button>
 </header>
 
 <div class="filter-bar">
@@ -185,6 +186,32 @@
             });
         } catch (e) { lista.innerHTML = "No hay detalles de controversia registrados."; }
     }
+
+function exportarPDF() {
+    const debug = document.getElementById('debug-info');
+    debug.innerText = "Generando documento de inteligencia...";
+
+    // Seleccionamos todo el cuerpo del búnker
+    const elemento = document.body;
+
+    // Configuración del "Documento de Mando"
+    const opciones = {
+        margin:       10,
+        filename:     'Reporte_Sinapsis_Simposio.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, backgroundColor: '#05070a' }, // Mantenemos el modo oscuro
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' } // Horizontal para que quepa la tabla
+    };
+
+    // Ocultar botones temporalmente para que no salgan en el PDF
+    const botones = document.querySelectorAll('button, select');
+    botones.forEach(b => b.style.visibility = 'hidden');
+
+    html2pdf().set(opciones).from(elemento).save().then(() => {
+        botones.forEach(b => b.style.visibility = 'visible');
+        debug.innerText = "Reporte exportado con éxito.";
+    });
+}
 
     window.onload = cargarMetricas;
 </script>
