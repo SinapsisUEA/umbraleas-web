@@ -2,217 +2,235 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sinapsis: Umbral de la Estrategia Asimétrica</title>
-    
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Sinapsis | Búnker de Inteligencia</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
-            --bg: #0d1117; --card: #161b22; --blue: #58a6ff; --orange: #f0883e; --silver: #c9d1d9;
-        }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--silver); margin: 0; }
-        
-        header { background: #000; padding: 50px 20px; text-align: center; border-bottom: 1px solid #30363d; }
-        .search-box { width: 90%; max-width: 600px; padding: 12px 20px; border-radius: 20px; border: 1px solid var(--blue); background: #111; color: #fff; }
-
-        .container { padding: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .card { background: var(--card); border: 1px solid #30363d; border-radius: 12px; overflow: hidden; transition: 0.3s; cursor: pointer; }
-        .card:hover { border-color: var(--orange); transform: translateY(-5px); }
-        .card img { width: 100%; height: 180px; object-fit: cover; }
-        .card-info { padding: 15px; }
-        .avatar { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--orange); vertical-align: middle; margin-right: 10px; }
-
-        .modal-lectura {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 1000; overflow-y: auto; padding: 20px;
-        }
-        .modal-content {
-            max-width: 800px; margin: 40px auto; background: var(--card); 
-            padding: 40px; border-radius: 15px; border: 1px solid var(--blue);
-        }
-        .texto-articulo { line-height: 1.8; font-size: 1.1em; color: #e6edf3; }
-        .btn-cerrar { color: var(--orange); cursor: pointer; float: right; font-size: 2em; }
-        
-        .parrafo-interactivo { margin-bottom: 30px; padding: 15px; border-radius: 8px; transition: 0.3s; border-left: 2px solid transparent; }
-        .parrafo-interactivo:hover { border-left: 2px solid var(--blue); background: #1c2128; }
-        
-        .interaccion-barra { margin-top: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-        .reaccion-btn { 
-            background: #1f242c; border: 1px solid #30363d; color: #fff; 
-            padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8em;
-        }
-        .reaccion-btn:hover { border-color: var(--blue); background: #262c36; }
-
-        .metrica-tag { font-size: 0.75em; color: var(--orange); font-weight: bold; background: rgba(240, 136, 62, 0.1); padding: 3px 8px; border-radius: 4px; }
-
-        .simposio { position: fixed; bottom: 20px; right: 20px; background: var(--orange); color: #000; padding: 10px 20px; border-radius: 30px; font-weight: bold; z-index: 100; }
+        :root { --bg: #05070a; --panel: #0d1117; --blue: #58a6ff; --orange: #f0883e; --silver: #c9d1d9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--silver); margin: 0; padding: 20px; }
+        header { border-bottom: 2px solid var(--blue); padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
+        .stat-card { background: var(--panel); padding: 25px; border-radius: 10px; border: 1px solid #30363d; min-height: 550px; display: flex; flex-direction: column; }
+        .filter-bar { background: var(--panel); padding: 15px; border-radius: 10px; border: 1px solid var(--blue); margin-bottom: 20px; display: flex; gap: 15px; align-items: center; }
+        select { background: #111; color: #fff; border: 1px solid var(--blue); padding: 8px; border-radius: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9em; }
+        th { border-bottom: 2px solid var(--blue); color: var(--orange); padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #30363d; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1 style="color:var(--blue); margin:0;">SINAPSIS</h1>
-        <p>Umbral de la Estrategia Asimétrica</p>
-        <input type="text" id="buscador" class="search-box" placeholder="Buscar por tema o autor..." onkeyup="buscar()">
-    </header>
+<header>
+    <h1>BÚNKER DE INTELIGENCIA</h1>
+    <button style="background:var(--blue); border:none; padding:10px; cursor:pointer; font-weight:bold;" onclick="cargarMetricas()">RECARGAR DATOS</button>
+</header>
 
-    <div class="container" id="grid-articulos">
-        <p style="text-align: center; grid-column: 1/-1;">Iniciando sinapsis con el cerebro de datos...</p>
+<div class="filter-bar">
+    <label>FOCO DE ANÁLISIS:</label>
+    <select id="selectorArticulo" onchange="actualizarFocoArticulo()">
+        <option value="todos">Cargando artículos...</option>
+    </select>
+</div>
+
+<div class="grid-stats">
+    <div class="stat-card">
+        <h2>Impacto por Artículo</h2>
+        <div style="height:300px;"><canvas id="chartImpacto"></canvas></div>
     </div>
+    <div class="stat-card">
+        <h2>Naturaleza del Debate</h2>
+        <div style="height:300px;"><canvas id="chartTipos"></canvas></div>
+    </div>
+</div>
 
-    <div id="modalArticulo" class="modal-lectura">
-        <div class="modal-content">
-            <span class="btn-cerrar" onclick="cerrarLectura()">&times;</span>
-            <div id="contenidoCompleto"></div>
+<div class="stat-card" style="margin-top:20px;">
+    <h2>Hallazgos Críticos para el Simposio</h2>
+    <table>
+        <thead>
+            <tr><th>Artículo</th><th>Autor</th><th>💡 Interés</th><th>⚖️ Debate</th><th>❓ Duda</th><th>Prioridad</th></tr>
+        </thead>
+        <tbody id="cuerpoTabla"></tbody>
+    </table>
+</div>
+
+<div id="seccionControversia" class="stat-card" style="margin-top:20px; display:none; border: 1px solid var(--orange);">
+    <h2 style="color:var(--orange)">Análisis de Tesis en Conflicto</h2>
+    <div id="listaParrafosCriticos">
         </div>
-    </div>
+</div>
 
-    <div class="simposio">
-        <i class="fas fa-rss"></i> SIMPOSIO ACTIVO
-    </div>
+<div id="debug-info" style="margin-top:20px; color:var(--orange);">Estado: Iniciando...</div>
 
-    <script>
-        // --- CONEXIÓN ---
-        const SB_URL = 'https://wajivhbldplztjvqudht.supabase.co'; 
-        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk';
-        const { createClient } = supabase;
-        const _supabase = createClient(SB_URL, SB_KEY);
+<script>
+    const SB_URL = 'https://wajivhbldplztjvqudht.supabase.co'; 
+    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk';
+    const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
-        // --- BUSCADOR ESTRATÉGICO ---
-        async function buscar() {
-    const term = document.getElementById('buscador').value.toLowerCase();
-    const { data, error } = await _supabase.from('articulos').select('*');
-    
-    if (error) return;
+    let datosGlobales = [];
+    let chart1, chart2;
 
-    const filtrados = data.filter(a => 
-        (a.Titulo && a.Titulo.toLowerCase().includes(term)) || 
-        (a.Autor && a.Autor.toLowerCase().includes(term)) ||
-        (a.Categoria && a.Categoria.toLowerCase().includes(term))
-    );
-    dibujarCards(filtrados);
+    async function cargarMetricas() {
+        const debug = document.getElementById('debug-info');
+        debug.innerText = "Conectando con la base de datos...";
+        
+        try {
+           const { data, error } = await _supabase.from('sinapsis_reacciones').select('tipo_reaccion, articulos(Titulo, Autor)');
+            if (error) throw error;
+            
+            datosGlobales = data;
+            
+            // Actualizar Selector
+            const selector = document.getElementById('selectorArticulo');
+            const titulos = [...new Set(data.map(r => r.articulos?.Titulo).filter(t => t))];
+            selector.innerHTML = '<option value="todos">Vista General (Todos)</option>';
+            titulos.forEach(t => selector.innerHTML += `<option value="${t}">${t}</option>`);
+
+            procesarYMostrar('todos');
+            debug.innerText = "Conexión exitosa. Datos sincronizados.";
+        } catch (err) {
+            debug.innerText = "Error de conexión: " + err.message;
+        }
+    }
+
+    function procesarYMostrar(filtro) {
+        const conteoArt = {};
+        const conteoTipos = { '💡': 0, '⚖️': 0, '❓': 0 };
+        const resumen = {};
+
+        datosGlobales.forEach(r => {
+            const t = r.articulos?.Titulo || "Sin Título";
+            const aut = r.articulos?.Autor || "Anónimo";
+            if (!resumen[t]) resumen[t] = { '💡': 0, '⚖️': 0, '❓': 0, autor: aut };
+            resumen[t][r.tipo_reaccion]++;
+
+            if (filtro === 'todos' || filtro === t) {
+                conteoArt[t] = (conteoArt[t] || 0) + 1;
+                conteoTipos[r.tipo_reaccion]++;
+            }
+        });
+
+        dibujarGraficos(conteoArt, conteoTipos);
+        actualizarTabla(resumen);
+    }
+
+    function dibujarGraficos(articulos, tipos) {
+        if (chart1) chart1.destroy();
+        if (chart2) chart2.destroy();
+
+        chart1 = new Chart(document.getElementById('chartImpacto'), {
+            type: 'bar',
+            data: { 
+                labels: Object.keys(articulos), 
+                datasets: [{ 
+                    label: 'Reacciones', 
+                    data: Object.values(articulos), 
+                    backgroundColor: '#58a6ff' 
+                }] 
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                scales: { 
+                    x: { 
+                        ticks: { 
+                            color: '#c9d1d9',
+                            autoSkip: false, // Muestra todos los nombres
+                            maxRotation: 90, // Los pone verticales si es necesario
+                            minRotation: 45, // Inclinación mínima para legibilidad
+                            font: { size: 11 }
+                        },
+                        grid: { display: false }
+                    }, 
+                    y: { 
+                        beginAtZero: true,
+                        ticks: { color: '#c9d1d9' },
+                        grid: { color: '#30363d' }
+                    } 
+                },
+                plugins: {
+                    legend: { display: false } // No necesitamos la leyenda arriba
+                }
+            }
+        });
+
+        chart2 = new Chart(document.getElementById('chartTipos'), {
+            type: 'doughnut',
+            data: { labels: ['Interés', 'Debate', 'Duda'], datasets: [{ data: [tipos['💡'], tipos['⚖️'], tipos['❓']], backgroundColor: ['#f0883e', '#58a6ff', '#8b949e'] }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#c9d1d9' } } } }
+        });
+    }
+
+    function actualizarTabla(resumen) {
+    const cuerpo = document.getElementById('cuerpoTabla');
+    cuerpo.innerHTML = Object.keys(resumen).map(t => {
+        const d = resumen[t];
+        const prioridad = (d['⚖️'] + d['❓'] > 3) ? '<b style="color:var(--orange)">ALTA - DISENSO</b>' : 'Baja';
+        
+        return `<tr>
+            <td>${t}</td>
+            <td style="color:var(--blue)">${d.autor}</td> <td>${d['💡']}</td>
+            <td>${d['⚖️']}</td>
+            <td>${d['❓']}</td>
+            <td>${prioridad}</td>
+        </tr>`;
+    }).join('');
 }
 
-        // --- CARGAR ARTÍCULOS ---
-        async function obtenerArticulos() {
-            try {
-                const { data, error } = await _supabase.from('articulos').select('*').order('created_at', { ascending: false });
-                if (error) throw error;
-                dibujarCards(data);
-            } catch (err) {
-                document.getElementById('grid-articulos').innerHTML = 'Error de conexión.';
-            }
-        }
+   function actualizarFocoArticulo() {
+    const seleccion = document.getElementById('selectorArticulo').value;
+    procesarYMostrar(seleccion);
+    
+    if (seleccion !== 'todos') {
+        mostrarDetalleControversia(seleccion);
+    } else {
+        document.getElementById('seccionControversia').style.display = 'none';
+    }
+}
 
-        function dibujarCards(lista) {
-            const grid = document.getElementById('grid-articulos');
-            grid.innerHTML = lista.map(art => `
-    <div class="card" onclick='abrirLectura(${JSON.stringify(art)})'>
-        <img src="${art.Imagen_URL || 'https://via.placeholder.com/400x200'}" alt="Portada">
-        <div class="card-info">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <small style="color:var(--orange); font-weight: bold; text-transform: uppercase;">${art.Categoria || 'ESTUDIO'}</small>
-            </div>
-            <h3 style="margin: 10px 0;">${art.Titulo}</h3>
-            <p style="font-size: 0.9em; height: 3.6em; overflow: hidden;">${art.Sinopsis}</p>
-            <div style="display: flex; align-items: center; margin-top: 15px;">
-                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(art.Autor)}&background=random&color=fff" class="avatar">
-                <small>Por: <strong>${art.Autor}</strong></small>
-            </div>
-        </div>
-    </div>
-`).join('');
-        }
+async function mostrarDetalleControversia(titulo) {
+    const seccion = document.getElementById('seccionControversia');
+    const lista = document.getElementById('listaParrafosCriticos');
+    seccion.style.display = 'block';
+    lista.innerHTML = "Analizando nudos críticos...";
 
-        // --- LECTURA PROFUNDA ---
-        function abrirLectura(art) {
-            const modal = document.getElementById('modalArticulo');
-            const container = document.getElementById('contenidoCompleto');
-            
-            const parrafos = (art.Contenido || "Contenido en proceso...").split('\n').filter(p => p.trim() !== "").map((p, index) => `
-                <div class="parrafo-interactivo">
-                    <p>${p}</p>
-                    <div class="interaccion-barra">
-                        <button class="reaccion-btn" onclick="reaccionar(${art.id}, ${index}, '💡')">💡</button>
-                        <button class="reaccion-btn" onclick="reaccionar(${art.id}, ${index}, '⚖️')">⚖️</button>
-                        <button class="reaccion-btn" onclick="reaccionar(${art.id}, ${index}, '❓')">❓</button>
-                        <span id="stats-${index}" class="metrica-tag">Sinapsis: 0</span>
-                    </div>
+    // 1. Obtener el artículo y sus párrafos
+    const { data: art } = await _supabase.from('articulos').select('id, Contenido').eq('Titulo', titulo).single();
+    const parrafosOriginales = art.Contenido.split('\n');
+
+    // 2. Obtener reacciones de disenso (Dudas y Debates)
+    const { data: reacciones } = await _supabase
+        .from('sinapsis_reacciones')
+        .select('parrafo_index, tipo_reaccion, comentario_texto')
+        .eq('artículo_id', art.id)
+        .in('tipo_reaccion', ['⚖️', '❓']);
+
+    // 3. Agrupar por párrafo
+    const mapa = reacciones.reduce((acc, r) => {
+        if (!acc[r.parrafo_index]) acc[r.parrafo_index] = { count: 0, comentarios: [] };
+        acc[r.parrafo_index].count++;
+        if (r.comentario_texto) acc[r.parrafo_index].comentarios.push(r.comentario_texto);
+        return acc;
+    }, {});
+
+    // 4. Renderizar los párrafos con más de 1 reacción de disenso
+    lista.innerHTML = "";
+    Object.keys(mapa).forEach(idx => {
+        const p = mapa[idx];
+        const textoLimpio = parrafosOriginales[idx] || "Texto no encontrado";
+        
+        lista.innerHTML += `
+            <div style="background: rgba(240, 136, 62, 0.05); padding: 15px; border-left: 4px solid var(--orange); margin-bottom: 15px;">
+                <p style="font-style: italic; color: #fff;">"${textoLimpio}"</p>
+                <div style="font-size: 0.85em; color: var(--silver); margin-top: 10px;">
+                    <strong>Señales de Disenso:</strong> ${p.count} | 
+                    <strong>Argumentos:</strong> ${p.comentarios.length > 0 ? p.comentarios.join(' | ') : 'Sin comentarios escritos aún.'}
                 </div>
-            `).join('');
+            </div>
+        `;
+    });
+}
 
-            container.innerHTML = `
-    <small style="color:var(--orange); font-weight:bold;">${art.Categoria || 'ANÁLISIS ESTRATÉGICO'}</small>
-    <h1 style="color:var(--blue); margin-top: 5px;">${art.Titulo}</h1>
-    <p>Por: <strong>${art.Autor}</strong></p>
-    <hr style="border:0; border-top:1px solid #30363d; margin: 20px 0;">
-    <div class="texto-articulo">${parrafos}</div>
-    <div style="margin-top: 40px; padding: 25px; border: 1px dashed var(--blue); border-radius: 10px; text-align: center; background: rgba(88, 166, 255, 0.05);">
-            <p style="color: var(--silver); margin-bottom: 15px;">¿Deseas profundizar o debatir una tesis específica con el autor?</p>
-            <a href="mailto:analisis@sinapsisasimetrica.org.ve?subject=Consulta Estratégica: ${encodeURIComponent(art.Titulo)}&body=Respetados analistas de Sinapsis,%0D%0A%0D%0AHe analizado el artículo sobre ${encodeURIComponent(art.Titulo)} y deseo proponer el siguiente debate:%0D%0A%0D%0A[Escribe aquí tu observación sobre un párrafo específico]%0D%0A%0D%0A---" 
-               style="background: var(--blue); color: #000; padding: 12px 25px; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block; transition: 0.3s;">
-               NOTIFICAR AL AUTOR
-            </a>
-        </div>
-`;
-            modal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-            consultarMapaCalor(art.id);
-        }
-
-        // --- INTELIGENCIA DE DATOS ---
-        async function consultarMapaCalor(artId) {
-            const { data, error } = await _supabase.from('sinapsis_reacciones').select('parrafo_index, tipo_reaccion').eq('artículo_id', artId);
-            if (error) return;
-            
-            const conteo = data.reduce((acc, curr) => {
-                acc[curr.parrafo_index] = (acc[curr.parrafo_index] || 0) + 1;
-                return acc;
-            }, {});
-
-            Object.keys(conteo).forEach(idx => {
-                const el = document.getElementById(`stats-${idx}`);
-                if (el) el.innerText = `Sinapsis: ${conteo[idx]}`;
-            });
-        }
-
-        async function reaccionar(artId, pIndex, tipo) {
-            const { error } = await _supabase.from('sinapsis_reacciones').insert([{ artículo_id: artId, parrafo_index: pIndex, tipo_reaccion: tipo }]);
-            if (error) alert("Error de conexión.");
-            else {
-                alert("Reacción integrada.");
-                consultarMapaCalor(artId);
-            }
-        }
-
-        function cerrarLectura() {
-            document.getElementById('modalArticulo').style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-
-// --- INSTRUMENTO ESTADÍSTICO PARA EL SIMPOSIO ---
-        async function generarReporteSimposio() {
-            console.log("Extrayendo métricas de impacto...");
-            const { data, error } = await _supabase
-                .from('sinapsis_reacciones')
-                .select('artículo_id, tipo_reaccion');
-
-            if (error) return console.error("Falla en la extracción de inteligencia:", error);
-
-            // Contabilizar reacciones por ID de artículo
-            const conteoGlobal = data.reduce((acc, curr) => {
-                acc[curr.artículo_id] = (acc[curr.artículo_id] || 0) + 1;
-                return acc;
-            }, {});
-
-            console.log("--- PRIORIDADES PARA EL SIMPOSIO (Impacto por ID) ---");
-            console.table(conteoGlobal);
-            alert("Reporte generado en la consola (F12). Revisa el ranking de IDs.");
-        }
-
-        obtenerArticulos();
-    </script>
+    window.onload = cargarMetricas;
+</script>
 </body>
 </html>
