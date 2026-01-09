@@ -21,6 +21,20 @@
 </head>
 <body>
 
+<div id="header-pdf" style="display: none; border-bottom: 3px double var(--orange); padding-bottom: 20px; margin-bottom: 30px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1 style="color: var(--orange); margin: 0; font-size: 28px; letter-spacing: 3px;">SIMPOSIO SINAPSIS 2025</h1>
+            <p style="color: var(--silver); margin: 5px 0; font-weight: bold; text-transform: uppercase;">Geopolítica del Pensamiento Crítico</p>
+            <p style="color: #8b949e; font-size: 12px;">UNIDAD DE INTELIGENCIA DE DATOS - REPORTE DE DISENSO</p>
+        </div>
+        <div style="border: 2px solid var(--orange); padding: 10px; text-align: center; border-radius: 50%;">
+            <span style="color: var(--orange); font-weight: bold; font-size: 20px;">Σ</span><br>
+            <span style="color: var(--orange); font-size: 8px;">VERITAS</span>
+        </div>
+    </div>
+</div>
+
 <header>
     <h1>BÚNKER DE INTELIGENCIA</h1>
     <button style="background:var(--blue); border:none; padding:10px; cursor:pointer; font-weight:bold;" onclick="cargarMetricas()">RECARGAR DATOS<button style="background:var(--orange); border:none; padding:10px; margin-left:10px; cursor:pointer; font-weight:bold; color:#000;" onclick="exportarPDF()">DESCARGAR REPORTE CRÍTICO</button>
@@ -189,27 +203,30 @@
 
 function exportarPDF() {
     const debug = document.getElementById('debug-info');
-    debug.innerText = "Generando documento de inteligencia...";
+    const headerPdf = document.getElementById('header-pdf');
+    debug.innerText = "Generando Documento de Mando...";
 
-    // Seleccionamos todo el cuerpo del búnker
+    // 1. Mostrar el sello institucional
+    headerPdf.style.display = 'block';
+
     const elemento = document.body;
-
-    // Configuración del "Documento de Mando"
     const opciones = {
-        margin:       10,
-        filename:     'Reporte_Sinapsis_Simposio.pdf',
+        margin:       12,
+        filename:     'REPORTE_ESTRATEGICO_SINAPSIS_2025.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, backgroundColor: '#05070a' }, // Mantenemos el modo oscuro
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' } // Horizontal para que quepa la tabla
+        html2canvas:  { scale: 2, backgroundColor: '#05070a', useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
     };
 
-    // Ocultar botones temporalmente para que no salgan en el PDF
-    const botones = document.querySelectorAll('button, select');
-    botones.forEach(b => b.style.visibility = 'hidden');
+    // 2. Ocultar elementos de navegación
+    const UI = document.querySelectorAll('button, select, .filter-bar');
+    UI.forEach(el => el.style.visibility = 'hidden');
 
     html2pdf().set(opciones).from(elemento).save().then(() => {
-        botones.forEach(b => b.style.visibility = 'visible');
-        debug.innerText = "Reporte exportado con éxito.";
+        // 3. Restaurar la interfaz original
+        UI.forEach(el => el.style.visibility = 'visible');
+        headerPdf.style.display = 'none';
+        debug.innerText = "Reporte Institucional Exportado.";
     });
 }
 
