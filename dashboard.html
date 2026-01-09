@@ -47,7 +47,30 @@
     <h2>Hallazgos Críticos para el Simposio</h2>
     <table>
         <thead>
-            <tr><th>Artículo</th><th>Autor</th><th>💡 Interés</th><th>⚖️ Debate</th><th>❓ Duda</th><th>Prioridad</th></tr>
+            <tr><th>Artículo</th><th>Autor</th><th>💡 Interés</th><th>⚖️ Debate</th><th>❓ Duda</th><th>Prioridad</th>
+<th>Acción Asimétrica</th> ```
+
+---
+
+### 2. Lógica de Generación de Invitación (JavaScript)
+Añadiremos una función que redacte el mensaje automáticamente usando los datos de impacto del artículo.
+
+**Ubicación:** Al final de tu script, antes de `window.onload`.
+
+```javascript
+function generarInvitación(titulo, autor, dudas, debates) {
+    const totalCritico = dudas + debates;
+    const asunto = encodeURIComponent(`Convocatoria al Simposio: Defensa de Tesis - ${titulo}`);
+    const cuerpo = encodeURIComponent(
+        `Estimado(a) ${autor},\n\n` +
+        `Tras el análisis de impacto realizado en nuestro Búnker de Inteligencia, hemos detectado que su artículo "${titulo}" ha generado un nivel de sinapsis crítico, acumulando ${totalCritico} puntos de disenso (Dudas y Debates).\n\n` +
+        `Dada la relevancia de sus tesis y la respuesta de nuestra comunidad de analistas, le invitamos formalmente a participar como ponente en el próximo Simposio para defender sus planteamientos frente a los nudos críticos identificados.\n\n` +
+        `Quedamos a la espera de su confirmación para coordinar la logística de su mesa de trabajo.\n\n` +
+        `Atentamente,\nCentro de Análisis Sinapsis.`
+    );
+    
+    window.location.href = `mailto:?subject=${asunto}&body=${cuerpo}`;
+}</tr>
         </thead>
         <tbody id="cuerpoTabla"></tbody>
     </table>
@@ -164,17 +187,26 @@
     const cuerpo = document.getElementById('cuerpoTabla');
     cuerpo.innerHTML = Object.keys(resumen).map(t => {
         const d = resumen[t];
-        const prioridad = (d['⚖️'] + d['❓'] > 3) ? '<b style="color:var(--orange)">ALTA - DISENSO</b>' : 'Baja';
+        const tieneDisenso = (d['⚖️'] + d['❓'] > 3);
+        const prioridad = tieneDisenso ? '<b style="color:var(--orange)">ALTA - DISENSO</b>' : 'Baja';
+        
+        // El botón solo es visible si hay disenso suficiente para un debate
+        const botonAccion = tieneDisenso ? 
+            `<button onclick="generarInvitación('${t}', '${d.autor}', ${d['❓']}, ${d['⚖️']})" 
+             style="background:var(--blue); color:#000; border:none; padding:5px 10px; cursor:pointer; font-weight:bold; border-radius:3px;">
+             CONVOCAR
+             </button>` : '---';
         
         return `<tr>
             <td>${t}</td>
-            <td style="color:var(--blue)">${d.autor}</td> <td>${d['💡']}</td>
+            <td style="color:var(--blue)">${d.autor}</td>
+            <td>${d['💡']}</td>
             <td>${d['⚖️']}</td>
             <td>${d['❓']}</td>
             <td>${prioridad}</td>
+            <td>${botonAccion}</td>
         </tr>`;
     }).join('');
-}
 
    function actualizarFocoArticulo() {
     const seleccion = document.getElementById('selectorArticulo').value;
