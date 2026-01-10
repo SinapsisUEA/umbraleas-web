@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SINAPSIS | Revista de Estrategia y Prospectiva de Seguridad</title>
+    <title>SINAPSIS | Revista de Estrategia y Seguridad</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -11,218 +11,144 @@
 
     <style>
         :root {
-            --bg: #05070a; 
-            --panel: #0d1117; 
-            --accent: #58a6ff; 
-            --alert: #f0883e; 
-            --text-main: #c9d1d9;
-            --text-muted: #8b949e;
-            --font-serif: 'Libre Baskerville', serif;
-            --font-sans: 'Inter', sans-serif;
+            --bg: #05070a; --panel: #0d1117; --accent: #58a6ff; --alert: #f0883e; 
+            --text-main: #c9d1d9; --text-muted: #8b949e; --font-serif: 'Libre Baskerville', serif;
         }
 
-        body { 
-            font-family: var(--font-sans); 
-            background: var(--bg); 
-            color: var(--text-main); 
-            margin: 0; 
-            line-height: 1.6;
-        }
-
-        /* Header: Autoridad Institucional */
-        header { 
-            background: #000; 
-            padding: 60px 20px; 
-            text-align: center; 
-            border-bottom: 2px solid #30363d;
-        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; }
         
-        .brand-logo { 
-            font-family: var(--font-serif);
-            font-size: 3.5em;
-            letter-spacing: 8px;
-            color: var(--accent);
-            margin: 0;
-            text-transform: uppercase;
-        }
+        header { background: #000; padding: 40px 20px; text-align: center; border-bottom: 2px solid #30363d; }
+        .brand-logo { font-family: var(--font-serif); font-size: 3em; letter-spacing: 6px; color: var(--accent); margin: 0; }
 
-        .tagline {
-            font-size: 1.1em;
-            color: var(--alert);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-top: 10px;
+        /* Botón con Protocolo de Acceso */
+        .admin-access {
+            display: inline-block; margin-top: 20px; padding: 10px 20px;
+            border: 1px solid #333; color: #555; text-decoration: none; font-size: 0.8em;
+            transition: 0.3s; cursor: pointer;
         }
+        .admin-access:hover { color: var(--accent); border-color: var(--accent); }
 
-        /* Botón del Simposio: Punto de Mando Central */
-        .symposium-access {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 12px 30px;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
-            letter-spacing: 1px;
-            transition: 0.3s;
-            background: rgba(88, 166, 255, 0.05);
-        }
-        .symposium-access:hover {
-            background: var(--accent);
-            color: #000;
-            box-shadow: 0 0 20px rgba(88, 166, 255, 0.3);
-        }
-
-        /* Estación Multimedia: Integración Fija */
-        .multimedia-hub {
-            display: grid; 
-            grid-template-columns: 2fr 1fr; 
-            gap: 2px; 
-            background: #30363d;
-            margin: 40px auto;
-            max-width: 1300px;
-            border: 1px solid #30363d;
-        }
-
-        .video-section { background: #000; padding: 0; aspect-ratio: 16/9; }
-        
-        .audio-sidebar { 
-            background: var(--panel); 
-            padding: 30px; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center;
-        }
-
-        .hub-title {
-            font-family: var(--font-serif);
-            font-size: 1.4em;
-            color: var(--accent);
-            margin-bottom: 15px;
-            border-left: 4px solid var(--alert);
-            padding-left: 15px;
-        }
-
-        /* Grid de Artículos Científicos */
-        .container { 
-            padding: 60px 40px; 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
-            gap: 40px; 
-            max-width: 1400px; 
-            margin: auto; 
-        }
+        /* Contenedor Principal: Artículos Primero */
+        .main-layout { max-width: 1400px; margin: auto; padding: 40px; }
+        .article-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; margin-bottom: 60px; }
 
         .card {
-            background: var(--panel);
-            border: 1px solid #30363d;
-            height: 480px;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
+            background: var(--panel); border: 1px solid #30363d; height: 450px;
+            position: relative; overflow: hidden; cursor: pointer; display: flex; flex-direction: column; justify-content: flex-end;
+        }
+        .card-image { position: absolute; top:0; left:0; width:100%; height:100%; background-size:cover !important; z-index:1; opacity: 0.6; transition: 0.5s; }
+        .card:hover .card-image { opacity: 0.8; transform: scale(1.05); }
+        .card-content { position: relative; z-index: 2; padding: 25px; background: linear-gradient(to top, #05070a, transparent); }
+
+        /* Estación Multimedia (Ahora abajo) */
+        .multimedia-footer {
+            display: grid; grid-template-columns: 2fr 1fr; gap: 20px;
+            background: var(--panel); border-top: 1px solid var(--accent); padding: 40px;
         }
 
-        .card:hover { border-color: var(--accent); transform: translateY(-5px); }
-        
-        .card-image-bg {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-size: cover !important;
-            background-position: center !important;
-            z-index: 1;
-            transition: 0.5s;
-        }
-        .card:hover .card-image-bg { transform: scale(1.05); }
+        /* --- MODAL DE LECTURA CIENTÍFICA CON GLOSA LATERAL --- */
+.modal { 
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.98); 
+    z-index: 1000; 
+}
 
-        .card-overlay {
-            position: relative;
-            z-index: 2;
-            background: linear-gradient(to top, #05070a 40%, rgba(5,7,10,0.8) 70%, transparent);
-            padding: 30px;
-        }
+.modal-content { 
+    background: var(--bg); 
+    width: 90%; 
+    max-width: 1100px; /* Un poco más ancho para la columna lateral */
+    margin: 20px auto; 
+    padding: 50px; 
+    height: 90vh; 
+    overflow-y: auto; 
+    border: 1px solid #30363d;
+    box-shadow: 0 0 50px rgba(0,0,0,0.5);
+}
 
-        .avatar-real { 
-            width: 50px; height: 50px; 
-            border-radius: 50%; 
-            border: 2px solid var(--accent); 
-            object-fit: cover;
-        }
+.citation-box { 
+    background: #161b22; 
+    padding: 20px; 
+    border-left: 4px solid var(--accent); 
+    margin: 30px 0; 
+    font-size: 0.9em; 
+    color: var(--text-muted);
+}
 
-        /* Modal y Lectura */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; }
-        .modal-content { 
-            background: var(--bg); 
-            width: 90%; max-width: 900px; 
-            margin: 40px auto; 
-            padding: 60px; 
-            border-radius: 4px; 
-            height: 85vh; 
-            overflow-y: auto; 
-            border-top: 5px solid var(--accent);
-            font-family: var(--font-sans);
-        }
-        
-        .modal-content h1 { font-family: var(--font-serif); font-size: 2.5em; }
+/* Estructura de Párrafo + Reacciones al margen */
+.bloque-lectura {
+    display: grid;
+    grid-template-columns: 1fr 100px; /* El texto ocupa el 1fr, las reacciones 100px */
+    gap: 40px;
+    margin-bottom: 30px;
+    align-items: start;
+}
 
-        .btn-reaction { 
-            background: #161b22; border: 1px solid #30363d; 
-            color: var(--text-muted); padding: 8px 15px; 
-            cursor: pointer; border-radius: 4px; font-size: 0.8em;
-            transition: 0.3s;
-        }
-        .btn-reaction:hover { border-color: var(--accent); color: #fff; }
+.texto-parrafo {
+    line-height: 1.9;
+    font-size: 1.15em;
+    color: #d1d5db;
+    text-align: justify;
+}
 
-        @media (max-width: 900px) {
-            .multimedia-hub { grid-template-columns: 1fr; }
-        }
+.columna-reacciones {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: sticky;
+    top: 20px;
+}
+
+.btn-glosa {
+    background: #111;
+    border: 1px solid #333;
+    color: #888;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.9em;
+    transition: 0.3s;
+}
+
+.btn-glosa:hover {
+    border-color: var(--accent);
+    color: #fff;
+    background: rgba(88, 166, 255, 0.1);
+}
     </style>
 </head>
 <body>
 
 <header>
     <h1 class="brand-logo">SINAPSIS</h1>
-    <div class="tagline">Estrategia Asimétrica • Pensamiento Crítico • Seguridad Global</div>
-    
-    <a href="dashboard.html" class="symposium-access">
-        <i class="fas fa-microchip"></i> ENTRAR AL BÚNKER DEL SIMPOSIO
-    </a>
+    <p style="color:var(--alert); font-size: 0.9em; letter-spacing: 2px;">REVISTA CIENTÍFICA DE ESTRATEGIA ASIMÉTRICA</p>
+    <div class="admin-access" onclick="accesoBunker()">
+        <i class="fas fa-lock"></i> ACCESO RESERVADO ADMINISTRACIÓN
+    </div>
 </header>
 
-<section class="multimedia-hub">
-    <div class="video-section">
+<div class="main-layout">
+    <h2 style="font-family: var(--font-serif); border-bottom: 1px solid #333; padding-bottom: 10px;">ARTÍCULOS ORIGINALES</h2>
+    <div class="article-grid" id="grid-articulos">
+        </div>
+</div>
+
+<section class="multimedia-footer">
+    <div style="aspect-ratio: 16/9; background: #000;">
         <iframe id="mainVideo" width="100%" height="100%" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
     </div>
-    <div class="audio-sidebar">
-        <h3 class="hub-title">EMISIÓN INSTITUCIONAL</h3>
-        <p style="font-size:0.9em; color:var(--text-muted); margin-bottom:20px;">
-            Análisis semanal: Prospectiva de la seguridad en entornos de incertidumbre.
-        </p>
-        
-        <div style="background: #161b22; padding: 20px; border-radius: 8px; border: 1px solid #30363d;">
-            <p style="font-size: 0.8em; color: var(--accent); margin-bottom: 10px; font-weight: bold;">
-                <i class="fas fa-broadcast-tower"></i> FRECUENCIA SINAPSIS (PODCAST)
-            </p>
-            <audio id="mainPodcast" controls style="width:100%; filter: invert(0.8);"></audio>
-        </div>
-        
-        <div style="margin-top: 20px; font-size: 0.8em; color: var(--alert);">
-            <i class="fas fa-circle" style="font-size: 8px;"></i> ESTADO: ARCHIVO DISPONIBLE
-        </div>
+    <div style="padding: 20px;">
+        <h3 style="color:var(--accent); font-family: var(--font-serif);">RECURSOS AUDIOVISUALES</h3>
+        <p style="font-size: 0.85em; color: var(--text-muted);">Complementos de investigación y entrevistas semanales.</p>
+        <audio id="mainPodcast" controls style="width:100%; margin-top: 20px;"></audio>
     </div>
 </section>
 
-<div class="container" id="grid-articulos">
-    </div>
-
 <div id="modalArticulo" class="modal">
     <div class="modal-content">
-        <button onclick="cerrarLectura()" style="float:right; background:none; border:none; color:var(--alert); font-size:1.5em; cursor:pointer;">
-            <i class="fas fa-times"></i>
-        </button>
+        <span onclick="cerrarLectura()" style="float:right; color:var(--alert); cursor:pointer;"><i class="fas fa-times fa-2x"></i></span>
         <div id="contenidoArticulo"></div>
     </div>
 </div>
@@ -232,118 +158,110 @@
     const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk';
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
+    // Protocolo de seguridad para el Búnker
+    function accesoBunker() {
+        const pass = prompt("Acceso restringido. Ingrese clave de comando:");
+        if (pass === "admin123") { // Puedes cambiar esta clave
+            window.location.href = "dashboard.html";
+        } else {
+            alert("Acceso Denegado. Se ha registrado el intento de entrada.");
+        }
+    }
+
     async function obtenerArticulos() {
         const { data, error } = await _supabase.from('articulos').select('*').order('id', { ascending: false });
-        if (error) console.error(error);
-        else dibujarCards(data);
+        if (data) dibujarCards(data);
     }
 
     function dibujarCards(lista) {
         const grid = document.getElementById('grid-articulos');
-        grid.innerHTML = lista.map(art => {
-            const portada = art.Imagen_URL || 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800';
-            const avatar = art.Avatar_URL || `https://ui-avatars.com/api/?name=${encodeURIComponent(art.Autor)}&background=0d1117&color=58a6ff`;
-
-            return `
-                <div class="card" onclick='abrirLectura(${JSON.stringify(art).replace(/'/g, "&apos;")})'>
-                    <div class="card-image-bg" style="background: url('${portada}')"></div>
-                    <div class="card-overlay">
-                        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
-                            <img src="${avatar}" class="avatar-real">
-                            <div style="line-height:1.2;">
-                                <small style="color:var(--accent); font-weight:600; font-size:0.75em; text-transform:uppercase;">Investigador</small><br>
-                                <span style="color:#fff; font-weight:600; font-size:0.9em;">${art.Autor}</span>
-                            </div>
-                        </div>
-                        <small style="color:var(--alert); font-weight:700; font-size:0.7em; text-transform:uppercase; letter-spacing:1px;">${art.Categoria || 'SEGURIDAD ESTRATÉGICA'}</small>
-                        <h3 style="margin: 10px 0; color:#fff; font-family:var(--font-serif); font-size:1.4em; line-height:1.3;">${art.Titulo}</h3>
-                        <p style="font-size: 0.85em; color: var(--text-muted); height: 3.6em; overflow: hidden;">${art.Sinopsis || 'Evaluación técnica de sistemas asimétricos y defensa de infraestructuras críticas.'}</p>
-                    </div>
-                </div>
-            `;
-        }).join('');
-    }
-
-    function abrirLectura(art) {
-        const modal = document.getElementById('modalArticulo');
-        const contenido = document.getElementById('contenidoArticulo');
-        
-        let htmlParrafos = art.Contenido.split('\n').map((p, i) => `
-            <div style="margin-bottom:30px;">
-                <p style="line-height:1.9; font-size:1.15em; color:#d1d5db;">${p}</p>
-                <div style="display:flex; gap:10px; margin-top:10px;">
-                    <button class="btn-reaction" onclick="reaccionar(${art.id}, ${i}, '💡')"><i class="far fa-lightbulb"></i> Interés</button>
-                    <button class="btn-reaction" onclick="reaccionar(${art.id}, ${i}, '⚖️')"><i class="fas fa-balance-scale"></i> Debate</button>
-                    <button class="btn-reaction" onclick="reaccionar(${art.id}, ${i}, '❓')"><i class="far fa-question-circle"></i> Duda</button>
+        grid.innerHTML = lista.map(art => `
+            <div class="card" onclick='abrirLectura(${JSON.stringify(art).replace(/'/g, "&apos;")})'>
+                <div class="card-image" style="background: url('${art.Imagen_URL}') center/cover;"></div>
+                <div class="card-content">
+                    <small style="color:var(--accent); font-weight:bold;">${art.Categoria || 'SEGURIDAD'}</small>
+                    <h3 style="margin: 10px 0; font-family: var(--font-serif);">${art.Titulo}</h3>
+                    <p style="font-size: 0.8em; color: var(--text-muted);">${art.Autor}</p>
                 </div>
             </div>
         `).join('');
+    }
 
-        const buzon = `
-            <div style="margin-top:60px; padding:40px; background:#161b22; border: 1px solid #30363d; border-radius:4px;">
-                <h3 style="color:var(--accent); font-family:var(--font-serif); margin-top:0;">Solicitud de Diálogo Académico</h3>
-                <p style="font-size:0.9em; color:var(--text-muted);">Su intervención será registrada en el Búnker de Inteligencia para el análisis del Simposio.</p>
-                <textarea id="comentarioAutor" placeholder="Escriba su tesis o consulta técnica para el investigador..." 
-                          style="width:100%; height:120px; background:#05070a; color:#fff; border:1px solid #30363d; padding:15px; margin-top:15px; font-family:var(--font-sans);"></textarea>
-                <button onclick="enviarComentarioAutor(${art.id}, '${art.Autor}', '${art.Titulo}')" 
-                        style="margin-top:20px; background:var(--accent); border:none; padding:12px 25px; font-weight:bold; cursor:pointer; color:#000; text-transform:uppercase; font-size:0.8em; letter-spacing:1px;">
-                    Transmitir al Investigador
-                </button>
+    function abrirLectura(art) {
+    const modal = document.getElementById('modalArticulo');
+    const contenido = document.getElementById('contenidoArticulo');
+    
+    // Generación de DOI ficticio basado en el ID si no existe
+    const doi = art.DOI || "10.555/sinapsis.2025." + art.id;
+
+    const encabezado = `
+        <div style="border-bottom: 1px solid #30363d; margin-bottom: 40px; padding-bottom: 20px;">
+            <small style="color:var(--accent); letter-spacing:2px;">REVISTA SINAPSIS | VOL. I | 2025</small>
+            <h1 style="font-family: var(--font-serif); font-size: 2.8em; margin: 15px 0; line-height: 1.1; color: #fff;">${art.Titulo}</h1>
+            <p style="font-size: 1.1em;"><strong>Investigador:</strong> ${art.Autor} | <strong>DOI:</strong> <span style="color:var(--accent)">${doi}</span></p>
+            <div class="citation-box">
+                <strong>Referencia Bibliográfica (APA):</strong><br>
+                ${art.Autor.split(' ').pop()}, ${art.Autor[0]}. (2025). ${art.Titulo}. <i>Sinapsis: Estrategia y Seguridad</i>.
+            </div>
+        </div>
+    `;
+
+    // Procesamiento de cada párrafo con su columna de iconos a la derecha
+    let htmlCuerpo = art.Contenido.split('\n').map((p, i) => {
+        if(p.trim() === "") return "";
+        return `
+            <div class="bloque-lectura">
+                <div class="texto-parrafo">${p}</div>
+                <div class="columna-reacciones">
+                    <button class="btn-glosa" title="Interés" onclick="reaccionar(${art.id}, ${i}, '💡')">💡</button>
+                    <button class="btn-glosa" title="Debate" onclick="reaccionar(${art.id}, ${i}, '⚖️')">⚖️</button>
+                    <button class="btn-glosa" title="Duda" onclick="reaccionar(${art.id}, ${i}, '❓')">❓</button>
+                </div>
             </div>
         `;
+    }).join('');
 
-        contenido.innerHTML = `<small style="color:var(--accent)">DOCUMENTO TÉCNICO</small><h1 style="color:#fff; margin-top:5px;">${art.Titulo}</h1><hr style="border:0; border-top:1px solid #30363d; margin:30px 0;">${htmlParrafos}${buzon}`;
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }
+    const buzon = `
+        <div style="margin-top:60px; padding:40px; background:var(--panel); border: 1px solid var(--accent); border-radius:4px;">
+            <h3 style="color:var(--accent); font-family:var(--font-serif); margin-top:0;">Solicitud de Diálogo Académico</h3>
+            <textarea id="comentarioAutor" placeholder="Escriba su consulta técnica para el autor..." 
+                      style="width:100%; height:120px; background:#000; color:#fff; border:1px solid #333; padding:15px; margin-top:15px; font-family:inherit;"></textarea>
+            <button onclick="enviarMensajeFinal(${art.id}, '${art.Autor.replace(/'/g, "\\'")}', '${art.Titulo.replace(/'/g, "\\'")}')" 
+                    style="margin-top:20px; background:var(--accent); border:none; padding:12px 30px; font-weight:bold; cursor:pointer; color:#000; text-transform:uppercase; letter-spacing:1px;">
+                Transmitir al Investigador
+            </button>
+        </div>
+    `;
 
-    async function enviarComentarioAutor(artId, autor, titulo) {
-    const textoArea = document.getElementById('comentarioAutor');
-    const texto = textoArea.value.trim();
-    
-    if (!texto) {
-        alert("El campo está vacío. Por favor, escriba su mensaje para el autor.");
-        return;
-    }
+    contenido.innerHTML = encabezado + htmlCuerpo + buzon;
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
 
-    try {
-        // A. Registro en la base de datos (Supabase) para el Búnker
+    async function enviarMensajeFinal(artId, autor, titulo) {
+        const texto = document.getElementById('comentarioAutor').value.trim();
+        if(!texto) return;
+
+        // REGISTRO LIMPIO EN SUPABASE
         const { error } = await _supabase.from('sinapsis_reacciones').insert([{
             artículo_id: artId,
             tipo_reaccion: '💬',
             comentario_texto: texto,
-            parrafo_index: 0 
+            parrafo_index: 0
         }]);
 
-        if (error) throw error;
-
-        // B. Apertura del correo (Mailto)
-        // Limpiamos los textos de posibles caracteres que rompan la URL
-        const asunto = `Diálogo Sinapsis: Consulta sobre "${titulo}"`;
-        const cuerpo = `Estimado(a) ${autor},\n\nHe leído su artículo en la Revista Sinapsis y deseo compartir la siguiente reflexión:\n\n"${texto}"\n\nSaludos cordiales.`;
-
-        // Usamos la construcción segura de URI
-        const mailtoUrl = `mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
-        
-        // Ejecutamos la apertura
-        window.location.href = mailtoUrl;
-
-        // Limpiamos el área después de enviar
-        textoArea.value = "";
-        alert("Mensaje registrado en el Búnker y preparando envío al autor.");
-
-    } catch (err) {
-        console.error("Error en la sinapsis de comunicación:", err);
-        alert("No se pudo registrar el mensaje, pero intentaremos abrir el correo.");
-        
-        // Intento de rescate solo con el correo
-        window.location.href = `mailto:?subject=Comentario Sinapsis&body=${encodeURIComponent(texto)}`;
+        if (!error) {
+            // MAILTO BLINDADO PARA CARACTERES ESPECIALES
+            const subject = encodeURIComponent(`Consulta Sinapsis: ${titulo}`);
+            const body = encodeURIComponent(`Estimado(a) ${autor},\n\nSe ha recibido un comentario sobre su artículo "${titulo}":\n\n"${texto}"`);
+            window.location.href = `mailto:?subject=${subject}&body=${body}`;
+            alert("Mensaje registrado y canal de comunicación abierto.");
+        }
     }
-}
 
     async function reaccionar(artId, pIndex, tipo) {
-        const { error } = await _supabase.from('sinapsis_reacciones').insert([{ artículo_id: artId, parrafo_index: pIndex, tipo_reaccion: tipo }]);
-        if (!error) alert("Señal integrada al análisis.");
+        await _supabase.from('sinapsis_reacciones').insert([{ artículo_id: artId, parrafo_index: pIndex, tipo_reaccion: tipo }]);
+        alert("Reacción integrada.");
     }
 
     function cerrarLectura() {
