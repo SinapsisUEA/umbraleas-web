@@ -70,6 +70,21 @@
             </div>
     </div>
 
+<div class="grid-stats" style="margin-top:20px;">
+    
+    <div id="seccionControversia" class="stat-card" style="display:none; border: 1px solid var(--orange);">
+        <h2 style="color:var(--orange)">🔥 Nudos Críticos (Disenso)</h2>
+        <div id="listaParrafosCriticos"></div>
+    </div>
+
+    <div id="seccionMensajes" class="stat-card" style="display:none; border: 1px solid var(--blue);">
+        <h2 style="color:var(--blue)">📥 Buzón de Diálogo Directo</h2>
+        <div id="listaMensajesDirectos">
+            <p style="color:gray">Seleccione un artículo para filtrar los mensajes...</p>
+        </div>
+    </div>
+</div>
+
 </div>
 
 </div>
@@ -207,44 +222,40 @@ function generarInvitacion(titulo, autor, dudas, debates) {
 
     async function mostrarDetalleControversia(titulo) {
     const seccion = document.getElementById('seccionControversia');
+    const seccionMsg = document.getElementById('seccionMensajes');
     const listaCritica = document.getElementById('listaParrafosCriticos');
     const listaMensajes = document.getElementById('listaMensajesDirectos');
     
     seccion.style.display = 'block';
+    seccionMsg.style.display = 'block';
     listaCritica.innerHTML = "Analizando nudos críticos...";
     listaMensajes.innerHTML = "Extrayendo mensajes directos...";
 
     try {
-        // 1. Obtener ID del artículo
         const { data: art } = await _supabase.from('articulos').select('id, Contenido').eq('Titulo', titulo).single();
         const parrafos = art.Contenido.split('\n');
 
-        // 2. Obtener todas las reacciones (incluyendo mensajes 💬)
         const { data: reacciones } = await _supabase
             .from('sinapsis_reacciones')
             .select('parrafo_index, tipo_reaccion, comentario_texto, created_at')
             .eq('artículo_id', art.id);
 
-        // 3. Filtrar y mostrar Mensajes Directos (💬)
+        // Filtrar Mensajes Directos (💬) en color cian para lectura rápida
         const mensajes = reacciones.filter(r => r.tipo_reaccion === '💬');
-        if (mensajes.length > 0) {
-            listaMensajes.innerHTML = mensajes.map(m => `
-                <div style="background: rgba(88, 166, 255, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #30363d;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                        <span style="color:var(--blue); font-weight:bold;">Interlocutor Anónimo</span>
-                        <small style="color:gray;">${new Date(m.created_at).toLocaleDateString()}</small>
-                    </div>
-                    <p style="margin:0; color:#fff;">"${m.comentario_texto}"</p>
+        listaMensajes.innerHTML = mensajes.length > 0 ? mensajes.map(m => `
+            <div style="background: rgba(88, 166, 255, 0.08); padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--blue);">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <span style="color:var(--blue); font-weight:bold; font-size:0.8em;">INTERLOCUTOR</span>
+                    <small style="color:gray;">${new Date(m.created_at).toLocaleDateString()}</small>
                 </div>
-            `).join('');
-        } else {
-            listaMensajes.innerHTML = "<p style='color:gray'>No hay mensajes directos para este autor aún.</p>";
-        }
+                <p style="margin:0; color:#fff; font-size:0.95em;">"${m.comentario_texto}"</p>
+            </div>
+        `).join('') : "<p style='color:gray'>No hay diálogos registrados.</p>";
 
-        // 4. Filtrar y mostrar Nudos Críticos (⚖️, ❓)
+        // Filtrar Nudos Críticos (⚖️, ❓)
         const disenso = reacciones.filter(r => ['⚖️', '❓'].includes(r.tipo_reaccion));
         const mapa = disenso.reduce((acc, r) => {
-            if (!acc[r.parrafo_index]) acc[r.parrafo_index] = { count: 0, textos: [] };
+            if (!acc[r.parrafo_index]) acc[r.parrafo_index] = { count: 0 };
             acc[r.parrafo_index].count++;
             return acc;
         }, {});
@@ -253,15 +264,12 @@ function generarInvitacion(titulo, autor, dudas, debates) {
         Object.keys(mapa).forEach(idx => {
             listaCritica.innerHTML += `
                 <div style="border-left:4px solid var(--orange); padding:15px; margin-bottom:10px; background:rgba(255,255,255,0.05)">
-                    <p><i>"${parrafos[idx] || '...'}"</i></p>
-                    <small style="color:var(--orange)">Señales de conflicto: ${mapa[idx].count}</small>
+                    <p style="font-size:0.9em;"><i>"${parrafos[idx]?.substring(0,150)}..."</i></p>
+                    <small style="color:var(--orange)">Señales de fricción: ${mapa[idx].count}</small>
                 </div>`;
         });
 
-    } catch (e) {
-        listaCritica.innerHTML = "Sin datos de controversia.";
-        listaMensajes.innerHTML = "Sin mensajes.";
-    }
+    } catch (e) { console.error(e); }
 }
 
 function exportarPDF() {
