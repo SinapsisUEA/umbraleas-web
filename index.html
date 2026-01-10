@@ -298,17 +298,48 @@
     }
 
     async function enviarComentarioAutor(artId, autor, titulo) {
-        const textoArea = document.getElementById('comentarioAutor');
-        const texto = textoArea.value.trim();
-        if (!texto) return alert("Ingrese el contenido del mensaje.");
-
-        try {
-            await _supabase.from('sinapsis_reacciones').insert([{ artículo_id: artId, tipo_reaccion: '💬', comentario_texto: texto, parrafo_index: 0 }]);
-            const mailtoUrl = `mailto:?subject=${encodeURIComponent('SINAPSIS: Diálogo Estratégico sobre ' + titulo)}&body=${encodeURIComponent('Estimado(a) ' + autor + ',\n\nSe ha recibido el siguiente aporte a su tesis:\n\n' + texto)}`;
-            window.location.href = mailtoUrl;
-            alert("Aporte registrado y canal de comunicación abierto.");
-        } catch (err) { console.error(err); }
+    const textoArea = document.getElementById('comentarioAutor');
+    const texto = textoArea.value.trim();
+    
+    if (!texto) {
+        alert("El campo está vacío. Por favor, escriba su mensaje para el autor.");
+        return;
     }
+
+    try {
+        // A. Registro en la base de datos (Supabase) para el Búnker
+        const { error } = await _supabase.from('sinapsis_reacciones').insert([{
+            artículo_id: artId,
+            tipo_reaccion: '💬',
+            comentario_texto: texto,
+            parrafo_index: 0 
+        }]);
+
+        if (error) throw error;
+
+        // B. Apertura del correo (Mailto)
+        // Limpiamos los textos de posibles caracteres que rompan la URL
+        const asunto = `Diálogo Sinapsis: Consulta sobre "${titulo}"`;
+        const cuerpo = `Estimado(a) ${autor},\n\nHe leído su artículo en la Revista Sinapsis y deseo compartir la siguiente reflexión:\n\n"${texto}"\n\nSaludos cordiales.`;
+
+        // Usamos la construcción segura de URI
+        const mailtoUrl = `mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+        
+        // Ejecutamos la apertura
+        window.location.href = mailtoUrl;
+
+        // Limpiamos el área después de enviar
+        textoArea.value = "";
+        alert("Mensaje registrado en el Búnker y preparando envío al autor.");
+
+    } catch (err) {
+        console.error("Error en la sinapsis de comunicación:", err);
+        alert("No se pudo registrar el mensaje, pero intentaremos abrir el correo.");
+        
+        // Intento de rescate solo con el correo
+        window.location.href = `mailto:?subject=Comentario Sinapsis&body=${encodeURIComponent(texto)}`;
+    }
+}
 
     async function reaccionar(artId, pIndex, tipo) {
         const { error } = await _supabase.from('sinapsis_reacciones').insert([{ artículo_id: artId, parrafo_index: pIndex, tipo_reaccion: tipo }]);
