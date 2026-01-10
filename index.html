@@ -3,131 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SINAPSIS | Revista de Estrategia y Seguridad</title>
-    
+    <title>SINAPSIS | Estrategia y Seguridad</title>
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <style>
-        :root {
-            --bg: #05070a; --panel: #0d1117; --accent: #58a6ff; --alert: #f0883e; 
-            --text-main: #c9d1d9; --text-muted: #8b949e; --font-serif: 'Libre Baskerville', serif;
-        }
-
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; line-height: 1.6; }
+        :root { --bg: #05070a; --panel: #0d1117; --accent: #58a6ff; --alert: #f0883e; --text: #c9d1d9; --font-serif: 'Libre Baskerville', serif; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+        header { background: #000; padding: 40px; text-align: center; border-bottom: 2px solid #30363d; position: relative; }
+        .brand { font-family: var(--font-serif); font-size: 3em; letter-spacing: 5px; color: var(--accent); margin: 0; }
         
-        header { background: #000; padding: 40px 20px; text-align: center; border-bottom: 2px solid #30363d; position: relative; }
-        .brand-logo { font-family: var(--font-serif); font-size: 3.5em; letter-spacing: 8px; color: var(--accent); margin: 0; }
-
-        /* Mando Central Blindado */
-        .admin-lock {
-            position: absolute; top: 20px; right: 20px; color: #333; cursor: pointer; transition: 0.3s;
-        }
-        .admin-lock:hover { color: var(--accent); }
-
-        /* Módulo del Simposio (Capital Social) */
-        .simposium-section {
-            max-width: 1200px; margin: 40px auto; padding: 40px;
-            background: linear-gradient(135deg, #0d1117 0%, #05070a 100%);
-            border: 1px solid var(--alert); border-radius: 4px;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;
-        }
-
-        .simposium-info h2 { font-family: var(--font-serif); color: var(--alert); margin-top: 0; }
-        .registration-form { display: flex; flex-direction: column; gap: 10px; }
-        .registration-form input { 
-            background: #000; border: 1px solid #333; padding: 12px; color: #fff; border-radius: 4px;
-        }
-        .btn-register { 
-            background: var(--alert); border: none; padding: 12px; font-weight: bold; cursor: pointer; color: #000;
-        }
-
-        /* Artículos Primero */
-        .main-container { max-width: 1400px; margin: auto; padding: 40px; }
-        .article-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 35px; }
-
-        .card {
-            background: var(--panel); border: 1px solid #30363d; height: 500px;
-            position: relative; overflow: hidden; cursor: pointer; display: flex; flex-direction: column; justify-content: flex-end;
-            transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-        }
-        .card:hover { transform: translateY(-8px); border-color: var(--accent); }
-        .card-image { position: absolute; top:0; left:0; width:100%; height:100%; background-size:cover !important; opacity: 0.5; z-index:1; }
+        /* Simposio */
+        .simposium { max-width: 1200px; margin: 40px auto; padding: 40px; border: 1px solid var(--alert); display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: #000; }
+        .reg-form { display: flex; flex-direction: column; gap: 10px; }
+        .reg-form input { padding: 12px; background: #111; border: 1px solid #333; color: #fff; }
         
-        .card-content { position: relative; z-index: 2; padding: 30px; background: linear-gradient(to top, #05070a 60%, transparent); }
-        
-        /* Rostrificación en Card */
-        .author-badge { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
-        .avatar-img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
-        .author-label { color: var(--accent); font-size: 0.7em; font-weight: 800; text-transform: uppercase; }
+        /* Cards */
+        .grid { max-width: 1200px; margin: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; padding: 20px; }
+        .card { background: var(--panel); border: 1px solid #333; cursor: pointer; transition: 0.3s; position: relative; height: 450px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
+        .card:hover { border-color: var(--accent); transform: translateY(-5px); }
+        .card-img { position: absolute; top:0; left:0; width:100%; height:100%; opacity: 0.4; z-index:1; background-size: cover !important; }
+        .card-body { position: relative; z-index: 2; padding: 25px; background: linear-gradient(transparent, #000 80%); }
+        .auth-badge { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--accent); }
 
-        /* Modal con Glosa Lateral */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 1000; }
-        .modal-content { 
-            background: var(--bg); width: 90%; max-width: 1150px; margin: 2vh auto; 
-            padding: 60px; height: 90vh; overflow-y: auto; border: 1px solid #30363d;
-        }
-        .bloque-lectura { display: grid; grid-template-columns: 1fr 80px; gap: 40px; margin-bottom: 30px; }
-        .texto-parrafo { line-height: 1.9; font-size: 1.15em; color: #d1d5db; text-align: justify; }
-        .columna-reacciones { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 10px; }
-        .btn-glosa { background: #111; border: 1px solid #333; color: #888; padding: 8px; cursor: pointer; border-radius: 4px; font-size: 0.8em; }
-        .btn-glosa:hover { color: #fff; border-color: var(--accent); }
-
-        /* Footer Multimedia */
-        .multimedia-footer {
-            background: #000; padding: 60px 40px; border-top: 1px solid var(--accent);
-            display: grid; grid-template-columns: 2fr 1fr; gap: 40px; max-width: 1400px; margin: 40px auto;
-        }
-
-        @media (max-width: 900px) {
-            .simposium-section, .multimedia-footer { grid-template-columns: 1fr; }
-            .bloque-lectura { grid-template-columns: 1fr; }
-        }
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; }
+        .modal-content { background: var(--bg); width: 90%; max-width: 1100px; margin: 2vh auto; padding: 50px; height: 90vh; overflow-y: auto; border: 1px solid #333; }
+        .bloque { display: grid; grid-template-columns: 1fr 80px; gap: 30px; margin-bottom: 25px; }
+        .texto { line-height: 1.8; font-size: 1.1em; text-align: justify; }
+        .btn-g { background: #111; border: 1px solid #333; color: #888; padding: 8px; cursor: pointer; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="admin-lock" onclick="accesoBunker()"><i class="fas fa-terminal"></i></div>
-    <h1 class="brand-logo">SINAPSIS</h1>
-    <p style="color:var(--alert); letter-spacing: 3px; font-size: 0.9em; font-weight: 600;">INTELIGENCIA ESTRATÉGICA Y PROSPECTIVA</p>
+    <div onclick="accesoBunker()" style="position:absolute; right:20px; top:20px; color:#222; cursor:pointer;"><i class="fas fa-lock"></i></div>
+    <h1 class="brand">SINAPSIS</h1>
+    <p style="color:var(--alert); font-weight:bold; letter-spacing:2px;">INTELIGENCIA Y ESTRATEGIA</p>
 </header>
 
-<section class="simposium-section">
-    <div class="simposium-info">
-        <h2>SIMPOSIO: "Nuevas Arquitecturas de la Disidencia"</h2>
-        <p style="color: var(--accent); font-weight: bold;"><i class="fas fa-calendar-day"></i> 28 DE OCTUBRE, 2025 | 19:00 HRS</p>
-        <p>Un espacio de convergencia técnica para el análisis de sistemas asimétricos. Inscríbase para formar parte de la red de inteligencia y recibir el dossier exclusivo.</p>
+<section class="simposium">
+    <div>
+        <h2 style="color:var(--alert); font-family:var(--font-serif);">SIMPOSIO 2025</h2>
+        <p>Inscríbase para acceder al capital de conocimiento de la red Sinapsis.</p>
+        <p><strong>Fecha:</strong> 28 Oct | <strong>Hora:</strong> 19:00</p>
     </div>
-    <div class="registration-form" id="reg-area">
-        <input type="text" id="reg-nombre" placeholder="Nombre y Apellido">
-        <input type="email" id="reg-email" placeholder="Correo Institucional">
-        <input type="text" id="reg-inst" placeholder="Organismo / Centro de Estudio">
-        <button class="btn-register" onclick="registrarLector()">FORMALIZAR INSCRIPCIÓN</button>
+    <div class="reg-form" id="area-reg">
+        <input type="text" id="rn" placeholder="Nombre Completo">
+        <input type="email" id="re" placeholder="Correo Institucional">
+        <input type="text" id="ri" placeholder="Organismo / Entidad">
+        <button onclick="registrarSimposio()" style="padding:12px; background:var(--alert); border:none; font-weight:bold; cursor:pointer;">INSCRIBIRSE</button>
     </div>
 </section>
 
-<div class="main-container">
-    <h2 style="font-family: var(--font-serif); border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 40px;">ARTÍCULOS DE INVESTIGACIÓN</h2>
-    <div class="article-grid" id="grid-articulos"></div>
-</div>
-
-<footer class="multimedia-footer">
-    <div style="aspect-ratio: 16/9; background: #05070a; border: 1px solid #333;">
-        <iframe width="100%" height="100%" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
-    </div>
-    <div>
-        <h3 style="color:var(--accent); font-family: var(--font-serif);">ESTACIÓN RADIOFÓNICA</h3>
-        <p style="font-size: 0.85em; color: var(--text-muted);">Frecuencia Sinapsis: Diálogos de profundidad sobre seguridad global.</p>
-        <audio controls style="width:100%; margin-top: 20px; filter: invert(1);"></audio>
-    </div>
-</footer>
+<div class="grid" id="grid-articulos"></div>
 
 <div id="modalArticulo" class="modal">
     <div class="modal-content">
-        <span onclick="cerrarLectura()" style="float:right; color:var(--alert); cursor:pointer;"><i class="fas fa-times fa-2x"></i></span>
-        <div id="contenidoArticulo"></div>
+        <span onclick="cerrar()" style="float:right; cursor:pointer; color:var(--alert); font-weight:bold;">CERRAR</span>
+        <div id="cont"></div>
     </div>
 </div>
 
@@ -136,130 +71,93 @@
     const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk';
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
-    // 1. Registro de Capital de Lectores
-    async function registrarLector() {
-        const nombre = document.getElementById('reg-nombre').value;
-        const email = document.getElementById('reg-email').value;
-        const inst = document.getElementById('reg-inst').value;
-        
-        if(!nombre || !email) return alert("Por favor complete los campos de identificación.");
+    let localArt = [];
 
-        const { error } = await _supabase.from('sinapsis_registros').insert([{ nombre, email, institucion: inst }]);
-        
+    async function cargar() {
+        const { data } = await _supabase.from('articulos').select('*').order('id', { ascending: false });
+        if (data) { localArt = data; dibujar(data); }
+    }
+
+    function dibujar(lista) {
+        document.getElementById('grid-articulos').innerHTML = lista.map((a, i) => `
+            <div class="card" onclick="abrir(${i})">
+                <div class="card-img" style="background:url('${a.Imagen_URL}') center/cover;"></div>
+                <div class="card-body">
+                    <div class="auth-badge">
+                        <img src="${a.Avatar_URL || 'https://via.placeholder.com/40'}" class="avatar">
+                        <small style="color:var(--accent)">Investigador: ${a.Autor}</small>
+                    </div>
+                    <h3 style="margin:0; font-family:var(--font-serif);">${a.Titulo}</h3>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function abrir(i) {
+        const a = localArt[i];
+        const doi = a.DOI || "10.555.sinapsis." + a.id;
+        let pTotal = a.Contenido.split('\n').map((p, idx) => p.trim() ? `
+            <div class="bloque">
+                <div class="texto">${p}</div>
+                <div style="display:flex; flex-direction:column;">
+                    <button class="btn-g" onclick="reaccionar(${a.id},${idx},'💡')">💡</button>
+                    <button class="btn-g" onclick="reaccionar(${a.id},${idx},'❓')">❓</button>
+                </div>
+            </div>` : "").join('');
+
+        const buzon = `
+            <div style="background:var(--panel); padding:30px; border:1px solid var(--accent); margin-top:40px;">
+                <h3 style="color:var(--accent); margin-top:0;">Canal de Diálogo con el Investigador</h3>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+                    <input type="text" id="m-n" placeholder="Su Nombre" style="padding:10px; background:#000; border:1px solid #333; color:#fff;">
+                    <input type="email" id="m-e" placeholder="Su Correo" style="padding:10px; background:#000; border:1px solid #333; color:#fff;">
+                </div>
+                <textarea id="m-t" placeholder="Propuesta o tesis..." style="width:100%; height:100px; background:#000; color:#fff; border:1px solid #333; padding:10px;"></textarea>
+                <button onclick="enviar(${i})" style="width:100%; padding:15px; background:var(--alert); border:none; margin-top:10px; font-weight:bold; cursor:pointer;">REGISTRAR Y ENVIAR</button>
+            </div>
+        `;
+
+        document.getElementById('cont').innerHTML = `<h1>${a.Titulo}</h1><p><small>DOI: ${doi}</small></p><hr>${pTotal}${buzon}`;
+        document.getElementById('modalArticulo').style.display = 'block';
+    }
+
+    async function enviar(i) {
+        const a = localArt[i];
+        const n = document.getElementById('m-n').value;
+        const e = document.getElementById('m-e').value;
+        const t = document.getElementById('m-t').value;
+        if(!n || !e || !t) return alert("Complete los datos.");
+
+        const { error } = await _supabase.from('sinapsis_reacciones').insert([{ 
+            artículo_id: a.id, tipo_reaccion: '💬', 
+            comentario_texto: `AUTOR: ${n} (${e}) | MSG: ${t}` 
+        }]);
+
         if(!error) {
-            document.getElementById('reg-area').innerHTML = `<h3 style="color:var(--accent)">Identificación Exitosa. Bienvenido a la Red Sinapsis.</h3>`;
+            const titSafe = a.Titulo.split(':')[0].substring(0,40);
+            const link = a.contacto_link || "mailto:redaccion@sinapsis.com";
+            const msg = encodeURIComponent(`Investigador ${a.Autor}, soy ${n} (${e}). Sobre "${titSafe}": ${t}`);
+            window.location.href = link.includes('mailto') ? `${link}?subject=Sinapsis&body=${msg}` : `${link}?text=${msg}`;
+            alert("Registrado en Búnker.");
         }
     }
 
-    // 2. Carga y Rostrificación de Artículos
-    async function obtenerArticulos() {
-        const { data, error } = await _supabase.from('articulos').select('*').order('id', { ascending: false });
-        if (data) dibujarCards(data);
+    async function registrarSimposio() {
+        const n = document.getElementById('rn').value;
+        const e = document.getElementById('re').value;
+        const i = document.getElementById('ri').value;
+        const { error } = await _supabase.from('sinapsis_registros').insert([{ nombre:n, email:e, institucion:i }]);
+        if(!error) document.getElementById('area-reg').innerHTML = "<h3>Inscripción Confirmada.</h3>";
     }
 
-    function dibujarCards(lista) {
-        const grid = document.getElementById('grid-articulos');
-        grid.innerHTML = lista.map(art => {
-            const avatar = art.Avatar_URL || `https://ui-avatars.com/api/?name=${encodeURIComponent(art.Autor)}&background=0d1117&color=58a6ff`;
-            return `
-                <div class="card" onclick='abrirLectura(${JSON.stringify(art).replace(/'/g, "&apos;")})'>
-                    <div class="card-image" style="background: url('${art.Imagen_URL}') center/cover;"></div>
-                    <div class="card-content">
-                        <div class="author-badge">
-                            <img src="${avatar}" class="avatar-img">
-                            <div style="line-height:1.2;">
-                                <span class="author-label">Investigador</span><br>
-                                <span style="color:#fff; font-weight:600; font-size:0.95em;">${art.Autor}</span>
-                            </div>
-                        </div>
-                        <h3 style="margin: 0; font-family: var(--font-serif); font-size:1.4em; color:#fff;">${art.Titulo}</h3>
-                    </div>
-                </div>
-            `;
-        }).join('');
-    }
-
-    // 3. Lectura Científica con Glosa Lateral y Aparato Formal
-    function abrirLectura(art) {
-        const modal = document.getElementById('modalArticulo');
-        const contenido = document.getElementById('contenidoArticulo');
-        const doi = art.DOI || "10.555/sinapsis.2025." + art.id;
-
-        const encabezado = `
-            <div style="border-bottom: 1px solid #333; margin-bottom: 40px; padding-bottom: 20px;">
-                <small style="color:var(--accent)">REVISTA SINAPSIS | VOL. I | 2025</small>
-                <h1 style="font-family: var(--font-serif); font-size: 2.5em; margin: 15px 0;">${art.Titulo}</h1>
-                <p><strong>Investigador:</strong> ${art.Autor} | <strong>DOI:</strong> ${doi}</p>
-                <div style="background:#161b22; padding:20px; border-left:4px solid var(--accent); margin-top:20px; font-size:0.9em; color:var(--text-muted);">
-                    <strong>Cómo citar:</strong> ${art.Autor.split(' ').pop()}, ${art.Autor[0]}. (2025). ${art.Titulo}. <i>Sinapsis: Estrategia y Seguridad</i>.
-                </div>
-            </div>
-        `;
-
-        let htmlCuerpo = art.Contenido.split('\n').map((p, i) => {
-            if(!p.trim()) return "";
-            return `
-                <div class="bloque-lectura">
-                    <div class="texto-parrafo">${p}</div>
-                    <div class="columna-reacciones">
-                        <button class="btn-glosa" onclick="reaccionar(${art.id}, ${i}, '💡')">💡</button>
-                        <button class="btn-glosa" onclick="reaccionar(${art.id}, ${i}, '⚖️')">⚖️</button>
-                        <button class="btn-glosa" onclick="reaccionar(${art.id}, ${i}, '❓')">❓</button>
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-        const buzonInterno = `
-            <div style="margin-top:60px; padding:40px; background:var(--panel); border: 1px solid var(--accent);">
-                <h3 style="color:var(--accent); font-family:var(--font-serif); margin-top:0;">Solicitud de Diálogo Crítico</h3>
-                <textarea id="comentarioAutor" placeholder="Escriba su propuesta o consulta técnica..." 
-                          style="width:100%; height:120px; background:#000; color:#fff; border:1px solid #333; padding:15px; margin-top:15px; font-family:inherit;"></textarea>
-                <button onclick="enviarMensaje(${art.id}, '${art.Autor.replace(/'/g, "\\'")}', '${art.Titulo.replace(/'/g, "\\'")}')" 
-                        style="margin-top:20px; background:var(--accent); border:none; padding:12px 30px; font-weight:bold; cursor:pointer;">
-                    TRANSMITIR APORTE
-                </button>
-            </div>
-        `;
-
-        contenido.innerHTML = encabezado + htmlCuerpo + buzonInterno;
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }
-
-    // 4. Mensajería Blindada (Fix Reloj de Arena)
-    async function enviarMensaje(artId, autor, titulo) {
-        const texto = document.getElementById('comentarioAutor').value.trim();
-        if(!texto) return;
-
-        // Registro en Búnker (Primordial)
-        await _supabase.from('sinapsis_reacciones').insert([{ artículo_id: artId, tipo_reaccion: '💬', comentario_texto: texto, parrafo_index: 0 }]);
-
-        // Mailto Blindado: Limpiamos el título de ':' y caracteres que rompen el enlace
-        const tituloSeguro = titulo.replace(/[:]/g, '').substring(0, 50);
-        const subject = encodeURIComponent(`DIÁLOGO SINAPSIS: ${tituloSeguro}`);
-        const body = encodeURIComponent(`Investigador ${autor},\n\nSe ha recibido una tesis crítica sobre su obra:\n\n"${texto}"`);
-        
-        window.location.href = `mailto:?subject=${subject}&body=${body}`;
-        alert("Aporte registrado en el Búnker y transmitido al Investigador.");
-    }
-
-    async function reaccionar(artId, pIndex, tipo) {
-        await _supabase.from('sinapsis_reacciones').insert([{ artículo_id: artId, parrafo_index: pIndex, tipo_reaccion: tipo }]);
+    async function reaccionar(id, p, t) {
+        await _supabase.from('sinapsis_reacciones').insert([{ artículo_id: id, parrafo_index: p, tipo_reaccion: t }]);
         alert("Señal registrada.");
     }
 
-    function accesoBunker() {
-        const pass = prompt("ACCESO RESTRINGIDO. INGRESE CLAVE DE COMANDO:");
-        if(pass === "admin123") window.location.href = "dashboard.html";
-    }
-
-    function cerrarLectura() {
-        document.getElementById('modalArticulo').style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-
-    obtenerArticulos();
+    function cerrar() { document.getElementById('modalArticulo').style.display='none'; }
+    function accesoBunker() { if(prompt("CLAVE:")==="admin123") window.location.href="dashboard.html"; }
+    cargar();
 </script>
 </body>
 </html>
