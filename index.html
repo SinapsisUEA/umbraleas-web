@@ -3,59 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SINAPSIS | Umbral de la Estrategia Asimétrica</title>
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>SINAPSIS | Inteligencia Estratégica</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --bg: #05070a; --panel: #0d1117; --accent: #58a6ff; --alert: #f0883e; --text: #c9d1d9; --font-serif: 'Libre Baskerville', serif; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; overflow-x: hidden; }
+        :root { --bg: #05070a; --panel: #0d1117; --blue: #58a6ff; --orange: #f0883e; --silver: #c9d1d9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--silver); margin: 0; }
         
-        header { background: #000; padding: 40px; text-align: center; border-bottom: 2px solid #30363d; position: relative; }
-        .brand { font-family: var(--font-serif); font-size: 3em; letter-spacing: 5px; color: var(--accent); margin: 0; text-decoration: none; }
+        header { background: #000; padding: 40px; text-align: center; border-bottom: 2px solid #333; }
+        .brand { font-size: 3em; letter-spacing: 5px; color: var(--blue); font-weight: bold; }
         
-        /* Simposio */
-        .simposium { max-width: 1100px; margin: 40px auto; padding: 40px; border: 1px solid var(--alert); display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: #000; border-radius: 4px; }
-        .reg-form { display: flex; flex-direction: column; gap: 10px; }
-        .reg-form input { padding: 12px; background: #111; border: 1px solid #333; color: #fff; border-radius: 4px; }
-        
-        /* Grid de Artículos */
-        .grid { max-width: 1200px; margin: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; padding: 20px; }
-        .card { background: var(--panel); border: 1px solid #333; cursor: pointer; transition: 0.3s; position: relative; height: 400px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; border-radius: 8px; }
-        .card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .card-img { position: absolute; top:0; left:0; width:100%; height:100%; opacity: 0.5; z-index:1; background-size: cover !important; }
-        .card-body { position: relative; z-index: 2; padding: 25px; background: linear-gradient(transparent, #000 70%); }
-        .auth-badge { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .avatar { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--accent); object-fit: cover; }
+        /* Estación Multimedia Recuperada */
+        .media-station { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 20px; padding: 40px; max-width: 1200px; margin: auto; 
+        }
+        .media-card { background: var(--panel); padding: 20px; border: 1px solid #333; border-radius: 8px; }
 
-        /* Modal de Lectura */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 1000; }
-        .modal-content { background: var(--bg); width: 90%; max-width: 900px; margin: 2vh auto; padding: 50px; height: 90vh; overflow-y: auto; border: 1px solid #333; position: relative; }
-        .bloque { display: grid; grid-template-columns: 1fr 60px; gap: 20px; margin-bottom: 25px; align-items: start; }
-        .texto { line-height: 1.8; font-size: 1.15em; text-align: justify; color: #d1d5db; }
-        .btn-g { background: #111; border: 1px solid #444; color: #aaa; padding: 10px; cursor: pointer; margin-bottom: 5px; border-radius: 4px; transition: 0.2s; }
-        .btn-g:hover { background: var(--accent); color: #000; }
+        /* Artículos */
+        .grid { max-width: 1200px; margin: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; padding: 20px; }
+        .card { background: var(--panel); border: 1px solid #333; cursor: pointer; height: 400px; position: relative; overflow: hidden; border-radius: 8px; }
+        .card-img { position: absolute; width: 100%; height: 100%; opacity: 0.4; background-size: cover !important; }
+        .card-body { position: relative; z-index: 2; padding: 25px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; background: linear-gradient(transparent, #000); }
+
+        /* Modal y Reacciones Corregidas */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; overflow-y: auto; }
+        .modal-content { background: var(--bg); width: 90%; max-width: 900px; margin: 5vh auto; padding: 40px; border: 1px solid #333; }
+        .parrafo-bloque { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 25px; }
+        .texto-p { flex: 1; line-height: 1.8; text-align: justify; margin: 0; }
+        .btns-reaccion { display: flex; flex-direction: column; gap: 5px; }
+        .btn-r { background: #111; border: 1px solid #333; color: #888; padding: 5px 10px; cursor: pointer; font-size: 0.8em; }
+        .btn-r:hover { border-color: var(--blue); color: #fff; }
+
+        /* Formulario Simposio */
+        .simposium-box { border: 1px solid var(--orange); padding: 30px; max-width: 1100px; margin: 40px auto; background: #000; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        input { padding: 12px; background: #111; border: 1px solid #333; color: #fff; width: 100%; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
 <header>
-    <div onclick="accesoBunker()" style="position:absolute; right:20px; top:20px; color:#1a1a1a; cursor:pointer;"><i class="fas fa-terminal"></i></div>
-    <a href="#" class="brand">SINAPSIS</a>
-    <p style="color:var(--alert); font-weight:bold; letter-spacing:3px; margin-top:10px;">Umbral de la Estrategia Asimétrica</p>
+    <div class="brand">SINAPSIS</div>
+    <p style="color:var(--orange); font-weight:bold; letter-spacing:2px;">Umbral de la Estrategia Asimétrica | 2026</p>
 </header>
 
-<section class="simposium">
-    <div>
-        <h2 style="color:var(--alert); font-family:var(--font-serif); font-size: 2em; margin-top:0;">SIMPOSIO 2025</h2>
-        <p>Regístrese para participar en las mesas de diálogo y recibir los reportes de inteligencia estratégica.</p>
-        <p style="font-size: 0.9em; color: var(--accent);"><i class="fas fa-calendar"></i> 28 de Octubre | 19:00 UTC</p>
+<section class="media-station">
+    <div class="media-card">
+        <h3><i class="fas fa-video"></i> Canal de Análisis</h3>
+        <iframe width="100%" height="200" src="https://www.youtube.com/embed/LIVE_ID" frameborder="0" allowfullscreen></iframe>
     </div>
-    <div class="reg-form" id="area-reg">
-        <input type="text" id="rn" placeholder="Nombre Completo">
-        <input type="email" id="re" placeholder="Correo Electrónico">
-        <input type="text" id="ri" placeholder="Institución / Organismo">
-        <button onclick="registrarSimposio()" style="padding:15px; background:var(--alert); border:none; font-weight:bold; cursor:pointer; color:#000; border-radius:4px; transition: 0.3s;">CONFIRMAR ASISTENCIA</button>
+    <div class="media-card">
+        <h3><i class="fas fa-podcast"></i> Podcast Estratégico</h3>
+        <audio controls style="width:100%;"><source src="URL_PODCAST" type="audio/mpeg"></audio>
+    </div>
+</section>
+
+<section class="simposium-box">
+    <div>
+        <h2 style="color:var(--orange)">SIMPOSIO INTERNACIONAL</h2>
+        <p>Complete su ficha para la base de datos de inteligencia.</p>
+    </div>
+    <div id="reg-area">
+        <input type="text" id="rn" placeholder="Nombre y Apellido" style="margin-bottom:10px;">
+        <input type="email" id="re" placeholder="Correo Institucional" style="margin-bottom:10px;">
+        <input type="text" id="ri" placeholder="Organismo / Entidad" style="margin-bottom:10px;">
+        <button onclick="registrarSimposio()" style="width:100%; padding:15px; background:var(--orange); border:none; font-weight:bold; cursor:pointer;">INSCRIBIRSE</button>
     </div>
 </section>
 
@@ -63,21 +75,20 @@
 
 <div id="modalArticulo" class="modal">
     <div class="modal-content">
-        <span onclick="cerrar()" style="position: sticky; top: 0; float:right; cursor:pointer; color:var(--alert); font-weight:bold; font-size: 1.2em; z-index:10;">[ CERRAR ]</span>
+        <span onclick="cerrar()" style="float:right; cursor:pointer; color:var(--orange); font-weight:bold;">[ CERRAR ]</span>
         <div id="cont"></div>
     </div>
 </div>
 
 <script>
-    // CONFIGURACIÓN DE NODO CENTRAL
     const SB_URL = 'https://wajivhbldplztjvqudht.supabase.co';
-    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk';
+    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk'; // Asegúrate de usar la key correcta
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
     let localArt = [];
 
     async function cargar() {
-        const { data, error } = await _supabase.from('articulos').select('*').order('id', { ascending: false });
+        const { data } = await _supabase.from('articulos').select('*').order('id', { ascending: false });
         if (data) { localArt = data; dibujar(data); }
     }
 
@@ -86,11 +97,9 @@
             <div class="card" onclick="abrir(${i})">
                 <div class="card-img" style="background:url('${a.Imagen_URL}') center/cover;"></div>
                 <div class="card-body">
-                    <div class="auth-badge">
-                        <img src="${a.Avatar_URL || 'https://ui-avatars.com/api/?name='+a.Autor}" class="avatar">
-                        <small style="color:var(--accent)">Investigador: ${a.Autor}</small>
-                    </div>
-                    <h3 style="margin:0; font-family:var(--font-serif); color:#fff; font-size:1.5em;">${a.Titulo}</h3>
+                    <img src="${a.Avatar_URL}" style="width:40px; height:40px; border-radius:50%; border:2px solid var(--blue);">
+                    <h3 style="margin:10px 0 0;">${a.Titulo}</h3>
+                    <small style="color:var(--blue)">Investigador: ${a.Autor}</small>
                 </div>
             </div>
         `).join('');
@@ -98,127 +107,71 @@
 
     function abrir(i) {
         const a = localArt[i];
-        const modal = document.getElementById('modalArticulo');
-        const doi = a.DOI || "10.555.sinapsis.2025." + a.id;
-        
+        // Desglose corregido: Párrafos y botones alineados
         let pTotal = a.Contenido.split('\n').map((p, idx) => p.trim() ? `
-            <div class="bloque">
-                <div class="texto">${p}</div>
-                <div style="display:flex; flex-direction:column;">
-                    <button title="Aporte" class="btn-g" onclick="reaccionar(${a.id},${idx},'💡')">💡</button>
-                    <button title="Duda" class="btn-g" onclick="reaccionar(${a.id},${idx},'❓')">❓</button>
+            <div class="parrafo-bloque">
+                <p class="texto-p">${p}</p>
+                <div class="btns-reaccion">
+                    <button class="btn-r" onclick="reaccionar(${a.id},${idx},'💡')">💡</button>
+                    <button class="btn-r" onclick="reaccionar(${a.id},${idx},'❓')">❓</button>
                 </div>
             </div>` : "").join('');
 
         const buzon = `
-            <div style="background:var(--panel); padding:35px; border:1px solid var(--accent); margin-top:50px; border-radius:8px;">
-                <h3 style="color:var(--accent); margin-top:0; font-family:var(--font-serif);">Solicitud de Diálogo Técnico</h3>
-                <p style="font-size:0.85em; color:#8b949e; margin-bottom:20px;">Su identidad será registrada en el Búnker para validar el aporte científico.</p>
-                
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
-                    <input type="text" id="m-n" placeholder="Su Nombre Completo" style="padding:12px; background:#000; border:1px solid #333; color:#fff;">
-                    <input type="email" id="m-e" placeholder="Correo de Contacto" style="padding:12px; background:#000; border:1px solid #333; color:#fff;">
-                </div>
-                
-                <textarea id="m-t" placeholder="Desarrolle su tesis, duda o propuesta..." style="width:100%; height:120px; background:#000; color:#fff; border:1px solid #333; padding:15px; font-family:inherit; resize:none;"></textarea>
-                
-                <div style="margin-top:15px; font-size:0.85em; color:#8b949e;">
-                    <input type="checkbox" id="chk-suscripcion" checked> 
-                    <label for="chk-suscripcion">Autorizo el registro de mis datos para el ecosistema Sinapsis.</label>
-                </div>
-
-                <button onclick="enviarFinal(${i})" style="width:100%; padding:18px; background:var(--alert); border:none; margin-top:20px; font-weight:bold; cursor:pointer; color:#000; letter-spacing:1px;">
-                    TRANSMITIR AL BÚNKER Y AL AUTOR
-                </button>
+            <div style="background:var(--panel); padding:30px; border:1px solid var(--blue); margin-top:40px;">
+                <h3><i class="fas fa-envelope"></i> Contactar al Investigador</h3>
+                <input type="text" id="m-n" placeholder="Su Nombre" style="margin-bottom:10px;">
+                <input type="email" id="m-e" placeholder="Su Correo" style="margin-bottom:10px;">
+                <textarea id="m-t" placeholder="Propuesta..." style="width:100%; height:100px; background:#000; color:#fff; border:1px solid #333; padding:10px;"></textarea>
+                <div style="margin-top:10px;"><input type="checkbox" id="chk" checked> Acepto registro en base de datos.</div>
+                <button onclick="enviarFinal(${i})" style="width:100%; padding:15px; background:var(--blue); border:none; margin-top:15px; font-weight:bold; cursor:pointer;">ENVIAR MENSAJE</button>
             </div>
         `;
 
-        document.getElementById('cont').innerHTML = `
-            <small style="color:var(--alert); letter-spacing:2px;">REVISTA SINAPSIS | VOL. I</small>
-            <h1 style="color:var(--accent); font-family:var(--font-serif); font-size:2.8em; margin:10px 0;">${a.Titulo}</h1>
-            <p style="margin-bottom:30px;"><strong>Investigador:</strong> ${a.Autor} | <strong>DOI:</strong> ${doi}</p>
-            <hr style="border:0; border-top:1px solid #333; margin-bottom:40px;">
-            ${pTotal}
-            ${buzon}
-        `;
-        
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }
-
-    async function enviarFinal(i) {
-        const a = localArt[i];
-        const n = document.getElementById('m-n').value.trim();
-        const e = document.getElementById('m-e').value.trim();
-        const t = document.getElementById('m-t').value.trim();
-        const suscrito = document.getElementById('chk-suscripcion').checked;
-
-        if(!n || !e || !t) return alert("Por favor, complete todos los campos de identificación.");
-
-        // 1. REGISTRO EN BÚNKER (Usando 'artículo_id' para coincidir con Supabase)
-        const { error: err1 } = await _supabase.from('sinapsis_reacciones').insert([{ 
-            artículo_id: a.id, 
-            tipo_reaccion: '💬', 
-            comentario_texto: `DE: ${n} (${e}) | SUSCRITO: ${suscrito} | MENSAJE: ${t}` 
-        }]);
-
-        // 2. REGISTRO EN LISTA DE ACTIVIDAD (Si aceptó)
-        if(suscrito) {
-            await _supabase.from('sinapsis_registros').insert([{ nombre: n, email: e, institucion: "Lector/Interviniente" }]);
-        }
-
-        if(!err1) {
-            // 3. CANAL DE COMUNICACIÓN (Fix para caracteres especiales)
-            const titSafe = a.Titulo.split(':')[0].substring(0,40);
-            const canal = a.contacto_link || "mailto:redaccion@sinapsis.com";
-            const cuerpo = `Estimado Investigador ${a.Autor},\n\nSoy ${n} (${e}). Le contacto desde Sinapsis sobre su obra "${titSafe}":\n\n"${t}"`;
-            
-            const linkFinal = canal.includes('mailto') 
-                ? `${canal}?subject=SINAPSIS: ${encodeURIComponent(titSafe)}&body=${encodeURIComponent(cuerpo)}` 
-                : `${canal}?text=${encodeURIComponent(cuerpo)}`;
-            
-            window.location.href = linkFinal;
-            
-            alert("Aporte registrado en el Búnker. Se ha abierto el canal de contacto.");
-            cerrar();
-        } else {
-            alert("Error de sincronización con el Búnker.");
-        }
+        document.getElementById('cont').innerHTML = `<h1>${a.Titulo}</h1><hr style="border:1px solid #333;">${pTotal}${buzon}`;
+        document.getElementById('modalArticulo').style.display = 'block';
     }
 
     async function registrarSimposio() {
         const n = document.getElementById('rn').value;
         const e = document.getElementById('re').value;
         const i = document.getElementById('ri').value;
-        if(!n || !e) return alert("Datos obligatorios.");
-
-        const { error } = await _supabase.from('sinapsis_registros').insert([{ nombre:n, email:e, institucion:i }]);
+        const { error } = await _supabase.from('sinapsis_registros').insert([{ nombre: n, email: e, institucion: i }]);
         if(!error) {
-            document.getElementById('area-reg').innerHTML = `
-                <div style="background:rgba(88,166,255,0.1); padding:20px; border-left:4px solid var(--accent);">
-                    <h3 style="color:var(--accent); margin:0;">Inscripción Exitosa</h3>
-                    <p style="margin:5px 0 0; font-size:0.9em;">Bienvenido a la red de inteligencia Sinapsis.</p>
-                </div>`;
+            document.getElementById('reg-area').innerHTML = "<h3 style='color:var(--orange)'>✓ Registro en Base de Datos Exitoso.</h3>";
+        } else { alert("Error de conexión con el Búnker."); }
+    }
+
+    async function enviarFinal(i) {
+        const a = localArt[i];
+        const n = document.getElementById('m-n').value;
+        const e = document.getElementById('m-e').value;
+        const t = document.getElementById('m-t').value;
+        if(!n || !e || !t) return alert("Complete los datos.");
+
+        // Guardar en Búnker
+        await _supabase.from('sinapsis_reacciones').insert([{ 
+            artículo_id: a.id, tipo_reaccion: '💬', comentario_texto: `DE: ${n} (${e}) | MSG: ${t}` 
+        }]);
+
+        // WhatsApp / Email (Corrección de link inexistente)
+        const msgWeb = encodeURIComponent(`Investigador ${a.Autor}, soy ${n}. Sobre su obra "${a.Titulo.substring(0,30)}": ${t}`);
+        const link = a.contacto_link || "https://wa.me/TUNUMERO"; 
+        
+        // Si es WhatsApp, aseguramos el formato de la API
+        if(link.includes('wa.me')) {
+            window.open(`${link}?text=${msgWeb}`, '_blank');
+        } else {
+            window.location.href = `mailto:${link}?subject=Sinapsis&body=${msgWeb}`;
         }
     }
 
     async function reaccionar(id, p, t) {
-        // Asegúrate de que la columna se llame 'artículo_id' en Supabase
         await _supabase.from('sinapsis_reacciones').insert([{ artículo_id: id, parrafo_index: p, tipo_reaccion: t }]);
         alert("Señal registrada.");
     }
 
-    function cerrar() { 
-        document.getElementById('modalArticulo').style.display='none'; 
-        document.body.style.overflow='auto'; 
-    }
-
-    function accesoBunker() { 
-        const pass = prompt("ACCESO RESTRINGIDO. CLAVE:");
-        if(pass === "admin123") window.location.href = "dashboard.html"; 
-    }
-    
-    // INICIO DE SISTEMA
+    function cerrar() { document.getElementById('modalArticulo').style.display='none'; }
     cargar();
 </script>
 </body>
