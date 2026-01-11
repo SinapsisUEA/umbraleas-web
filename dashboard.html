@@ -6,307 +6,135 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
     <style>
         :root { --bg: #05070a; --panel: #0d1117; --blue: #58a6ff; --orange: #f0883e; --silver: #c9d1d9; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--silver); margin: 0; padding: 20px; }
+        
         header { border-bottom: 2px solid var(--blue); padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
-        .stat-card { background: var(--panel); padding: 25px; border-radius: 10px; border: 1px solid #30363d; min-height: 550px; display: flex; flex-direction: column; }
-        .filter-bar { background: var(--panel); padding: 15px; border-radius: 10px; border: 1px solid var(--blue); margin-bottom: 20px; display: flex; gap: 15px; align-items: center; }
-        select { background: #111; color: #fff; border: 1px solid var(--blue); padding: 8px; border-radius: 5px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9em; }
-        th { border-bottom: 2px solid var(--blue); color: var(--orange); padding: 10px; text-align: left; }
-        td { padding: 10px; border-bottom: 1px solid #30363d; }
+        h1 { color: var(--blue); font-size: 1.5em; letter-spacing: 2px; }
+
+        .grid-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: var(--panel); padding: 20px; border-radius: 8px; border: 1px solid #30363d; }
+        
+        .list-container { max-height: 500px; overflow-y: auto; margin-top: 15px; }
+        .item-data { border-bottom: 1px solid #222; padding: 12px 0; font-size: 0.9em; }
+        
+        .msg-box { background: rgba(88, 166, 255, 0.03); border-left: 3px solid var(--orange); padding: 10px; margin-bottom: 10px; }
+        .msg-meta { font-size: 0.75em; color: var(--blue); margin-bottom: 5px; text-transform: uppercase; }
+
+        .btn-report { background: var(--orange); color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        
+        /* Estilos para PDF */
+        #header-pdf { display: none; text-align: center; margin-bottom: 30px; }
     </style>
 </head>
 <body>
 
-<div id="header-pdf" style="display: none; border-bottom: 3px double var(--orange); padding-bottom: 20px; margin-bottom: 30px;">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-            <h1 style="color: var(--orange); margin: 0; font-size: 28px; letter-spacing: 3px;">SIMPOSIO SINAPSIS 2025</h1>
-            <p style="color: var(--silver); margin: 5px 0; font-weight: bold; text-transform: uppercase;">Geopolítica del Pensamiento Crítico</p>
-            <p style="color: #8b949e; font-size: 12px;">UNIDAD DE INTELIGENCIA DE DATOS - REPORTE DE DISENSO</p>
-        </div>
-        <div style="border: 2px solid var(--orange); padding: 10px; text-align: center; border-radius: 50%;">
-            <span style="color: var(--orange); font-weight: bold; font-size: 20px;">Σ</span><br>
-            <span style="color: var(--orange); font-size: 8px;">VERITAS</span>
-        </div>
-    </div>
+<div id="header-pdf">
+    <h1 style="color:#000; font-size: 2.5em;">REPORTE ESTRATÉGICO SINAPSIS</h1>
+    <p style="color:#333;">Inteligencia de Red y Capital Social | Generado: <span id="pdf-fecha"></span></p>
+    <hr>
 </div>
 
 <header>
-    <h1>BÚNKER DE INTELIGENCIA</h1>
-    <button style="background:var(--blue); border:none; padding:10px; cursor:pointer; font-weight:bold;" onclick="cargarMetricas()">RECARGAR DATOS<button style="background:var(--orange); border:none; padding:10px; margin-left:10px; cursor:pointer; font-weight:bold; color:#000;" onclick="exportarPDF()">DESCARGAR REPORTE CRÍTICO</button>
+    <h1><i class="fas fa-shield-alt"></i> BÚNKER DE INTELIGENCIA</h1>
+    <div>
+        <button class="btn-report" onclick="exportarPDF()">GENERAR REPORTE PDF</button>
+    </div>
 </header>
-
-<div class="filter-bar">
-    <label>FOCO DE ANÁLISIS:</label>
-    <select id="selectorArticulo" onchange="actualizarFocoArticulo()">
-        <option value="todos">Cargando artículos...</option>
-    </select>
-</div>
 
 <div class="grid-stats">
     <div class="stat-card">
-        <h2>Impacto por Artículo</h2>
-        <div style="height:350px;"><canvas id="chartImpacto"></canvas></div>
-    </div>
-    <div class="stat-card">
-        <h2>Naturaleza del Debate</h2>
-        <div style="height:350px;"><canvas id="chartTipos"></canvas></div>
-    </div>
-
-<div class="grid-stats" style="margin-top:20px;">
-    
-    <div id="seccionControversia" class="stat-card" style="display:none; border: 1px solid var(--orange);">
-        <h2 style="color:var(--orange)">🔥 Nudos Críticos (Disenso)</h2>
-        <div id="listaParrafosCriticos"></div>
-    </div>
-
-    <div id="seccionMensajes" class="stat-card" style="display:none; border: 1px solid var(--blue);">
-        <h2 style="color:var(--blue)">📥 Buzón de Diálogo Directo</h2>
-        <div id="listaMensajesDirectos">
-            </div>
-    </div>
-
-<div class="grid-stats" style="margin-top:20px;">
-    
-    <div id="seccionControversia" class="stat-card" style="display:none; border: 1px solid var(--orange);">
-        <h2 style="color:var(--orange)">🔥 Nudos Críticos (Disenso)</h2>
-        <div id="listaParrafosCriticos"></div>
-    </div>
-
-    <div id="seccionMensajes" class="stat-card" style="display:none; border: 1px solid var(--blue);">
-        <h2 style="color:var(--blue)">📥 Buzón de Diálogo Directo</h2>
-        <div id="listaMensajesDirectos">
-            <p style="color:gray">Seleccione un artículo para filtrar los mensajes...</p>
+        <h2 style="color:var(--orange); font-size: 1em; border-bottom: 1px solid #333; padding-bottom: 10px;">
+            <i class="fas fa-users"></i> REGISTRO DE ACTORES (SIMPOSIO)
+        </h2>
+        <div id="lista-inscritos" class="list-container">
+            <p>Sincronizando capital social...</p>
         </div>
     </div>
-</div>
 
-</div>
-
-</div>
-
-<div class="stat-card" style="margin-top:20px;">
-    <h2>Hallazgos Críticos para el Simposio</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Artículo</th>
-                <th>Autor</th>
-                <th>💡 Interés</th>
-                <th>⚖️ Debate</th>
-                <th>❓ Duda</th>
-                <th>Prioridad</th>
-                <th>Acción Asimétrica</th>
-            </tr>
-        </thead>
-        <tbody id="cuerpoTabla"></tbody>
-    </table>
-</div>
-
-<div id="seccionControversia" class="stat-card" style="margin-top:20px; display:none; border: 1px solid var(--orange);">
-    <h2 style="color:var(--orange)">Análisis de Tesis en Conflicto</h2>
-    <div id="listaParrafosCriticos"></div>
-</div>
-
-<div id="debug-info" style="margin-top:20px; color:var(--orange);">Estado: Iniciando...</div>
-
-<div class="stat-card" style="margin-top:20px; border: 1px solid var(--blue);">
-    <h2 style="color:var(--blue)">📥 Buzón de Interacción: Diálogos con Autores</h2>
-    <div id="listaMensajesDirectos" style="max-height: 400px; overflow-y: auto;">
-        <p style="color:gray">Seleccione un artículo para filtrar los mensajes...</p>
+    <div class="stat-card">
+        <h2 style="color:var(--blue); font-size: 1em; border-bottom: 1px solid #333; padding-bottom: 10px;">
+            <i class="fas fa-comments"></i> INTERVENCIONES Y TESIS RECIBIDAS
+        </h2>
+        <div id="lista-mensajes" class="list-container">
+            <p>Escaneando diálogos críticos...</p>
+        </div>
     </div>
 </div>
 
 <script>
-    const SB_URL = 'https://wajivhbldplztjvqudht.supabase.co'; 
+    const SB_URL = 'https://wajivhbldplztjvqudht.supabase.co';
     const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk';
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
-    let datosGlobales = [];
-    let chart1, chart2;
+    async function actualizarBunker() {
+        console.log("Iniciando actualización de mando...");
 
-    async function cargarMetricas() {
-        const debug = document.getElementById('debug-info');
-        debug.innerText = "Conectando con la base de datos...";
-        try {
-           const { data, error } = await _supabase.from('sinapsis_reacciones').select('tipo_reaccion, articulos(id, Titulo, Autor)');
-            if (error) throw error;
-            datosGlobales = data;
-            const selector = document.getElementById('selectorArticulo');
-            const titulos = [...new Set(data.map(r => r.articulos?.Titulo).filter(t => t))];
-            selector.innerHTML = '<option value="todos">Vista General (Todos)</option>';
-            titulos.forEach(t => selector.innerHTML += `<option value="${t}">${t}</option>`);
-            procesarYMostrar('todos');
-            debug.innerText = "Conexión exitosa. Datos sincronizados.";
-        } catch (err) {
-            debug.innerText = "Error de conexión: " + err.message;
+        // 1. OBTENER MENSAJES (Sincronizado con artículo_id)
+        const { data: mensajes, error: errM } = await _supabase
+            .from('sinapsis_reacciones')
+            .select('*, articulos:artículo_id(Titulo)')
+            .eq('tipo_reaccion', '💬')
+            .order('id', { ascending: false });
+
+        if (mensajes) {
+            document.getElementById('lista-mensajes').innerHTML = mensajes.map(m => `
+                <div class="msg-box">
+                    <div class="msg-meta">ORIGEN: ${m.articulos?.Titulo || 'Referencia Externa'}</div>
+                    <div style="color:#d1d5db;">${m.comentario_texto.replace(/\|/g, '<br>')}</div>
+                </div>
+            `).join('');
+        }
+
+        // 2. OBTENER INSCRITOS (Capital Social)
+        const { data: inscritos, error: errI } = await _supabase
+            .from('sinapsis_registros')
+            .select('*')
+            .order('id', { ascending: false });
+
+        if (inscritos) {
+            document.getElementById('lista-inscritos').innerHTML = inscritos.map(i => `
+                <div class="item-data">
+                    <strong style="color:var(--orange);">${i.nombre}</strong><br>
+                    <small style="color:var(--blue);">${i.institucion || 'Independiente'}</small> | 
+                    <small style="color:#666;">${i.email}</small>
+                </div>
+            `).join('');
         }
     }
 
-    function procesarYMostrar(filtro) {
-        const conteoArt = {};
-        const conteoTipos = { '💡': 0, '⚖️': 0, '❓': 0 };
-        const resumen = {};
-        datosGlobales.forEach(r => {
-            const t = r.articulos?.Titulo || "Sin Título";
-            const aut = r.articulos?.Autor || "Anónimo";
-            if (!resumen[t]) resumen[t] = { '💡': 0, '⚖️': 0, '❓': 0, autor: aut };
-            resumen[t][r.tipo_reaccion]++;
-            if (filtro === 'todos' || filtro === t) {
-                conteoArt[t] = (conteoArt[t] || 0) + 1;
-                conteoTipos[r.tipo_reaccion]++;
-            }
-        });
-        dibujarGraficos(conteoArt, conteoTipos);
-        actualizarTabla(resumen);
-    }
+    function exportarPDF() {
+        document.getElementById('pdf-fecha').innerText = new Date().toLocaleString();
+        const header = document.getElementById('header-pdf');
+        header.style.display = 'block';
 
-    function dibujarGraficos(articulos, tipos) {
-        if (chart1) chart1.destroy();
-        if (chart2) chart2.destroy();
-        chart1 = new Chart(document.getElementById('chartImpacto'), {
-            type: 'bar',
-            data: { labels: Object.keys(articulos), datasets: [{ label: 'Reacciones', data: Object.values(articulos), backgroundColor: '#58a6ff' }] },
-            options: { 
-                responsive: true, maintainAspectRatio: false, 
-                scales: { 
-                    x: { ticks: { color: '#c9d1d9', autoSkip: false, maxRotation: 90, minRotation: 45, font: { size: 11 } }, grid: { display: false } },
-                    y: { beginAtZero: true, ticks: { color: '#c9d1d9' }, grid: { color: '#30363d' } }
-                },
-                plugins: { legend: { display: false } }
-            }
-        });
-        chart2 = new Chart(document.getElementById('chartTipos'), {
-            type: 'doughnut',
-            data: { labels: ['Interés', 'Debate', 'Duda'], datasets: [{ data: [tipos['💡'], tipos['⚖️'], tipos['❓']], backgroundColor: ['#f0883e', '#58a6ff', '#8b949e'] }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#c9d1d9' } } } }
+        const opt = {
+            margin: 10,
+            filename: 'REPORTE_INTELIGENCIA_SINAPSIS.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, backgroundColor: '#ffffff' },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        // Cambiamos temporalmente el color de fondo para el PDF (blanco para legibilidad)
+        document.body.style.background = "#fff";
+        document.body.style.color = "#000";
+
+        html2pdf().set(opt).from(document.body).save().then(() => {
+            // Restaurar ambiente Búnker
+            document.body.style.background = "#05070a";
+            document.body.style.color = "#c9d1d9";
+            header.style.display = 'none';
         });
     }
 
-    function actualizarTabla(resumen) {
-        const cuerpo = document.getElementById('cuerpoTabla');
-        cuerpo.innerHTML = Object.keys(resumen).map(t => {
-            const d = resumen[t];
-            const tieneDisenso = (d['⚖️'] + d['❓'] > 3);
-            const prioridad = tieneDisenso ? '<b style="color:var(--orange)">ALTA - DISENSO</b>' : 'Baja';
-            const botonAccion = tieneDisenso ? 
-    `<button onclick="generarInvitacion(\`${t.replace(/`/g, "'")}\`, \`${d.autor.replace(/`/g, "'")}\`, ${d['❓']}, ${d['⚖️']})" 
-     style="background:var(--blue); color:#000; border:none; padding:5px 10px; cursor:pointer; font-weight:bold; border-radius:3px;">
-     CONVOCAR
-     </button>` : '---';
-            return `<tr><td>${t}</td><td style="color:var(--blue)">${d.autor}</td><td>${d['💡']}</td><td>${d['⚖️']}</td><td>${d['❓']}</td><td>${prioridad}</td><td>${botonAccion}</td></tr>`;
-        }).join('');
-    }
-
-function generarInvitacion(titulo, autor, dudas, debates) {
-    const total = dudas + debates;
-    const asunto = encodeURIComponent(`Convocatoria Simposio: ${titulo}`);
-    const cuerpo = encodeURIComponent(`Estimado(a) ${autor},\n\nSu tesis "${titulo}" ha generado ${total} puntos de disenso crítico (Dudas y Debates). Lo convocamos al Simposio para defender sus planteamientos.\n\nAtentamente,\nCentro Sinapsis.`);
-    
-    const mailtoUrl = `mailto:?subject=${asunto}&body=${cuerpo}`;
-    
-    // Abrir en una nueva pestaña o ventana para evitar que el búnker se detenga
-    window.open(mailtoUrl, '_blank');
-}
-
-    function actualizarFocoArticulo() {
-        const seleccion = document.getElementById('selectorArticulo').value;
-        procesarYMostrar(seleccion);
-        if (seleccion !== 'todos') { mostrarDetalleControversia(seleccion); } 
-        else { document.getElementById('seccionControversia').style.display = 'none'; }
-    }
-
-    async function mostrarDetalleControversia(titulo) {
-    const seccion = document.getElementById('seccionControversia');
-    const seccionMsg = document.getElementById('seccionMensajes');
-    const listaCritica = document.getElementById('listaParrafosCriticos');
-    const listaMensajes = document.getElementById('listaMensajesDirectos');
-    
-    seccion.style.display = 'block';
-    seccionMsg.style.display = 'block';
-    listaCritica.innerHTML = "Analizando nudos críticos...";
-    listaMensajes.innerHTML = "Extrayendo mensajes directos...";
-
-    try {
-        const { data: art } = await _supabase.from('articulos').select('id, Contenido').eq('Titulo', titulo).single();
-        const parrafos = art.Contenido.split('\n');
-
-        const { data: reacciones } = await _supabase
-            .from('sinapsis_reacciones')
-            .select('parrafo_index, tipo_reaccion, comentario_texto, created_at')
-            .eq('artículo_id', art.id);
-
-        // Filtrar Mensajes Directos (💬) en color cian para lectura rápida
-        const mensajes = reacciones.filter(r => r.tipo_reaccion === '💬');
-        listaMensajes.innerHTML = mensajes.length > 0 ? mensajes.map(m => `
-            <div style="background: rgba(88, 166, 255, 0.08); padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--blue);">
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                    <span style="color:var(--blue); font-weight:bold; font-size:0.8em;">INTERLOCUTOR</span>
-                    <small style="color:gray;">${new Date(m.created_at).toLocaleDateString()}</small>
-                </div>
-                <p style="margin:0; color:#fff; font-size:0.95em;">"${m.comentario_texto}"</p>
-            </div>
-        `).join('') : "<p style='color:gray'>No hay diálogos registrados.</p>";
-
-        // Filtrar Nudos Críticos (⚖️, ❓)
-        const disenso = reacciones.filter(r => ['⚖️', '❓'].includes(r.tipo_reaccion));
-        const mapa = disenso.reduce((acc, r) => {
-            if (!acc[r.parrafo_index]) acc[r.parrafo_index] = { count: 0 };
-            acc[r.parrafo_index].count++;
-            return acc;
-        }, {});
-
-        listaCritica.innerHTML = "";
-        Object.keys(mapa).forEach(idx => {
-            listaCritica.innerHTML += `
-                <div style="border-left:4px solid var(--orange); padding:15px; margin-bottom:10px; background:rgba(255,255,255,0.05)">
-                    <p style="font-size:0.9em;"><i>"${parrafos[idx]?.substring(0,150)}..."</i></p>
-                    <small style="color:var(--orange)">Señales de fricción: ${mapa[idx].count}</small>
-                </div>`;
-        });
-
-    } catch (e) { console.error(e); }
-}
-
-function exportarPDF() {
-    const debug = document.getElementById('debug-info');
-    const headerPdf = document.getElementById('header-pdf');
-    debug.innerText = "Generando Documento de Mando con Diálogos...";
-
-    // 1. Mostrar elementos exclusivos del reporte
-    headerPdf.style.display = 'block';
-
-    const elemento = document.body;
-    const opciones = {
-        margin:       10,
-        filename:     'REPORTE_ESTRATEGICO_SINAPSIS_2025.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { 
-            scale: 2, 
-            backgroundColor: '#05070a',
-            useCORS: true,
-            scrollY: 0
-        },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
-    };
-
-    // 2. Ocultar interfaz de navegación pero MANTENER el buzón de mensajes
-    const UI = document.querySelectorAll('button, select, .filter-bar, #debug-info');
-    UI.forEach(el => el.style.visibility = 'hidden');
-
-    html2pdf().set(opciones).from(elemento).save().then(() => {
-        // 3. Restaurar sistema
-        UI.forEach(el => el.style.visibility = 'visible');
-        headerPdf.style.display = 'none';
-        debug.innerText = "Reporte con Diálogos Exportado con Éxito.";
-    });
-}
-
-    window.onload = cargarMetricas;
+    // Ejecución inicial
+    actualizarBunker();
+    // Auto-actualización cada 30 segundos
+    setInterval(actualizarBunker, 30000);
 </script>
+
 </body>
 </html>
