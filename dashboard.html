@@ -6,62 +6,61 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    
     <style>
         :root { --bg: #05070a; --panel: #0d1117; --blue: #58a6ff; --orange: #f0883e; --silver: #c9d1d9; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--silver); margin: 0; padding: 20px; }
-        
         header { border-bottom: 2px solid var(--blue); padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        h1 { color: var(--blue); font-size: 1.5em; letter-spacing: 2px; }
-
-        .grid-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: var(--panel); padding: 20px; border-radius: 8px; border: 1px solid #30363d; }
-        
-        .list-container { max-height: 500px; overflow-y: auto; margin-top: 15px; }
-        .item-data { border-bottom: 1px solid #222; padding: 12px 0; font-size: 0.9em; }
-        
-        .msg-box { background: rgba(88, 166, 255, 0.03); border-left: 3px solid var(--orange); padding: 10px; margin-bottom: 10px; }
-        .msg-meta { font-size: 0.75em; color: var(--blue); margin-bottom: 5px; text-transform: uppercase; }
-
-        .btn-report { background: var(--orange); color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 4px; }
-        
-        /* Estilos para PDF */
-        #header-pdf { display: none; text-align: center; margin-bottom: 30px; }
+        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
+        .stat-card { background: var(--panel); padding: 20px; border-radius: 10px; border: 1px solid #30363d; }
+        .stat-card h2 { color: var(--blue); font-size: 1.2em; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85em; }
+        th { border-bottom: 2px solid var(--blue); color: var(--orange); padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #30363d; }
+        .msg-box { background: rgba(88, 166, 255, 0.05); border-left: 4px solid var(--blue); padding: 10px; margin-bottom: 10px; border-radius: 4px; }
     </style>
 </head>
 <body>
 
-<div id="header-pdf">
-    <h1 style="color:#000; font-size: 2.5em;">REPORTE ESTRATÉGICO SINAPSIS</h1>
-    <p style="color:#333;">Inteligencia de Red y Capital Social | Generado: <span id="pdf-fecha"></span></p>
-    <hr>
+<div id="header-pdf" style="display: none; border-bottom: 3px double var(--orange); padding: 20px; background: #000;">
+    <h1 style="color: var(--orange); margin: 0;">SIMPOSIO SINAPSIS 2026</h1>
+    <p style="color: #fff;">REPORTE DE INTELIGENCIA Y DIÁLOGOS CRÍTICOS</p>
 </div>
 
 <header>
-    <h1><i class="fas fa-shield-alt"></i> BÚNKER DE INTELIGENCIA</h1>
+    <h1><i class="fas fa-shield-halved"></i> BÚNKER DE INTELIGENCIA</h1>
     <div>
-        <button class="btn-report" onclick="exportarPDF()">GENERAR REPORTE PDF</button>
+        <button onclick="cargarTodo()" style="background:var(--blue); border:none; padding:10px 15px; cursor:pointer; font-weight:bold; color:#000;">RECARGAR SENSOR</button>
+        <button onclick="exportarPDF()" style="background:var(--orange); border:none; padding:10px 15px; margin-left:10px; cursor:pointer; font-weight:bold; color:#000;">GENERAR REPORTE PDF</button>
     </div>
 </header>
 
 <div class="grid-stats">
     <div class="stat-card">
-        <h2 style="color:var(--orange); font-size: 1em; border-bottom: 1px solid #333; padding-bottom: 10px;">
-            <i class="fas fa-users"></i> REGISTRO DE ACTORES (SIMPOSIO)
-        </h2>
-        <div id="lista-inscritos" class="list-container">
-            <p>Sincronizando capital social...</p>
-        </div>
+        <h2><i class="fas fa-users"></i> REGISTRO DE ACTORES (SIMPOSIO)</h2>
+        <div id="lista-inscritos" style="max-height: 400px; overflow-y: auto;">Cargando agentes...</div>
     </div>
 
     <div class="stat-card">
-        <h2 style="color:var(--blue); font-size: 1em; border-bottom: 1px solid #333; padding-bottom: 10px;">
-            <i class="fas fa-comments"></i> INTERVENCIONES Y TESIS RECIBIDAS
-        </h2>
-        <div id="lista-mensajes" class="list-container">
-            <p>Escaneando diálogos críticos...</p>
-        </div>
+        <h2><i class="fas fa-comments"></i> INTERVENCIONES Y TESIS RECIBIDAS</h2>
+        <div id="lista-mensajes" style="max-height: 400px; overflow-y: auto;">Escaneando diálogos críticos...</div>
     </div>
+</div>
+
+<div class="stat-card" style="margin-top:20px;">
+    <h2>ANÁLISIS DE IMPACTO Y DISENSO</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ARTÍCULO</th>
+                <th>AUTOR</th>
+                <th>💡</th>
+                <th>⚖️</th>
+                <th>❓</th>
+                <th>ESTADO</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-impacto"></tbody>
+    </table>
 </div>
 
 <script>
@@ -69,72 +68,63 @@
     const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk';
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
-    async function actualizarBunker() {
-        console.log("Iniciando actualización de mando...");
+    async function cargarTodo() {
+        // 1. Cargar Inscritos
+        const { data: inscritos } = await _supabase.from('sinapsis_registros').select('*').order('created_at', { ascending: false });
+        document.getElementById('lista-inscritos').innerHTML = inscritos?.length ? inscritos.map(ins => `
+            <div style="border-bottom:1px solid #333; padding:10px; margin-bottom:5px;">
+                <strong style="color:var(--orange)">${ins.nombre}</strong><br>
+                <small>${ins.institucion || 'Independiente'}</small> | <small style="color:var(--blue)">${ins.email}</small>
+            </div>
+        `).join('') : "No hay actores registrados.";
 
-        // 1. OBTENER MENSAJES (Sincronizado con artículo_id)
-        const { data: mensajes, error: errM } = await _supabase
-            .from('sinapsis_reacciones')
-            .select('*, articulos:artículo_id(Titulo)')
-            .eq('tipo_reaccion', '💬')
-            .order('id', { ascending: false });
+        // 2. Cargar Diálogos y Reacciones (Unificando con Títulos)
+        const { data: reacciones } = await _supabase.from('sinapsis_reacciones').select('*, articulos(titulo, autor)').order('created_at', { ascending: false });
+        
+        // Filtrar solo mensajes (💬)
+        const mensajes = reacciones?.filter(r => r.tipo_reaccion === '💬') || [];
+        document.getElementById('lista-mensajes').innerHTML = mensajes.length ? mensajes.map(m => `
+            <div class="msg-box">
+                <small style="color:var(--orange)">REF: ${m.articulos?.titulo || 'General'}</small><br>
+                <p style="margin:5px 0; font-style:italic;">"${m.comentario_texto}"</p>
+                <small style="color:gray;">Enviado el: ${new Date(m.created_at).toLocaleDateString()}</small>
+            </div>
+        `).join('') : "Esperando tesis de los lectores...";
 
-        if (mensajes) {
-            document.getElementById('lista-mensajes').innerHTML = mensajes.map(m => `
-                <div class="msg-box">
-                    <div class="msg-meta">ORIGEN: ${m.articulos?.Titulo || 'Referencia Externa'}</div>
-                    <div style="color:#d1d5db;">${m.comentario_texto.replace(/\|/g, '<br>')}</div>
-                </div>
-            `).join('');
-        }
+        // 3. Procesar Tabla de Impacto
+        procesarImpacto(reacciones);
+    }
 
-        // 2. OBTENER INSCRITOS (Capital Social)
-        const { data: inscritos, error: errI } = await _supabase
-            .from('sinapsis_registros')
-            .select('*')
-            .order('id', { ascending: false });
+    function procesarImpacto(data) {
+        const stats = {};
+        data?.forEach(r => {
+            const tit = r.articulos?.titulo || "Desconocido";
+            if (!stats[tit]) stats[tit] = { autor: r.articulos?.autor, l:0, d:0, q:0 };
+            if (r.tipo_reaccion === '💡') stats[tit].l++;
+            if (r.tipo_reaccion === '⚖️') stats[tit].d++;
+            if (r.tipo_reaccion === '❓') stats[tit].q++;
+        });
 
-        if (inscritos) {
-            document.getElementById('lista-inscritos').innerHTML = inscritos.map(i => `
-                <div class="item-data">
-                    <strong style="color:var(--orange);">${i.nombre}</strong><br>
-                    <small style="color:var(--blue);">${i.institucion || 'Independiente'}</small> | 
-                    <small style="color:#666;">${i.email}</small>
-                </div>
-            `).join('');
-        }
+        document.getElementById('tabla-impacto').innerHTML = Object.keys(stats).map(t => {
+            const s = stats[t];
+            const disenso = s.d + s.q > 2;
+            return `<tr>
+                <td>${t}</td>
+                <td style="color:var(--blue)">${s.autor}</td>
+                <td>${s.l}</td><td>${s.d}</td><td>${s.q}</td>
+                <td style="color:${disenso ? 'var(--orange)' : 'gray'}">${disenso ? '🔥 ALTO DISENSO' : 'Estable'}</td>
+            </tr>`;
+        }).join('');
     }
 
     function exportarPDF() {
-        document.getElementById('pdf-fecha').innerText = new Date().toLocaleString();
-        const header = document.getElementById('header-pdf');
-        header.style.display = 'block';
-
-        const opt = {
-            margin: 10,
-            filename: 'REPORTE_INTELIGENCIA_SINAPSIS.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, backgroundColor: '#ffffff' },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        // Cambiamos temporalmente el color de fondo para el PDF (blanco para legibilidad)
-        document.body.style.background = "#fff";
-        document.body.style.color = "#000";
-
-        html2pdf().set(opt).from(document.body).save().then(() => {
-            // Restaurar ambiente Búnker
-            document.body.style.background = "#05070a";
-            document.body.style.color = "#c9d1d9";
-            header.style.display = 'none';
-        });
+        const head = document.getElementById('header-pdf');
+        head.style.display = 'block';
+        const opt = { margin: 10, filename: 'SINAPSIS_BUNKER_2026.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, backgroundColor: '#05070a' }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } };
+        html2pdf().set(opt).from(document.body).save().then(() => head.style.display = 'none');
     }
 
-    // Ejecución inicial
-    actualizarBunker();
-    // Auto-actualización cada 30 segundos
-    setInterval(actualizarBunker, 30000);
+    window.onload = cargarTodo;
 </script>
-
 </body>
 </html>
