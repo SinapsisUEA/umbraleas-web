@@ -3,176 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SINAPSIS | Inteligencia Estratégica</title>
+    <title>Sinapsis: Estrategia y Pensamiento Crítico</title>
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
-        :root { --bg: #05070a; --panel: #0d1117; --blue: #58a6ff; --orange: #f0883e; --silver: #c9d1d9; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--silver); margin: 0; }
+        :root { --bg: #0d1117; --card: #161b22; --blue: #58a6ff; --orange: #f0883e; --silver: #c9d1d9; --alert: #ff4444; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--silver); margin: 0; overflow-x: hidden; }
         
-        header { background: #000; padding: 40px; text-align: center; border-bottom: 2px solid #333; }
-        .brand { font-size: 3em; letter-spacing: 5px; color: var(--blue); font-weight: bold; }
-        
-        /* Estación Multimedia Recuperada */
-        .media-station { 
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-            gap: 20px; padding: 40px; max-width: 1200px; margin: auto; 
+        /* HEADER Y BUSCADOR */
+        header { background: #000; padding: 60px 20px; text-align: center; border-bottom: 1px solid #30363d; }
+        .search-box { width: 90%; max-width: 600px; padding: 15px 25px; border-radius: 30px; border: 1px solid var(--blue); background: #111; color: #fff; box-shadow: 0 0 15px rgba(88,166,255,0.2); }
+
+        /* SECCIÓN REGISTRO (EL PEAJE) */
+        #seccion-registro { background: linear-gradient(90deg, #000, #161b22); padding: 40px; text-align: center; border-bottom: 2px solid var(--orange); }
+        .form-registro { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 20px; }
+        .form-registro input { padding: 12px; border-radius: 5px; border: 1px solid #333; background: #000; color: #fff; width: 250px; }
+        .btn-registro { background: var(--orange); color: #000; border: none; padding: 12px 30px; font-weight: bold; cursor: pointer; border-radius: 5px; transition: 0.3s; }
+        .btn-registro:hover { background: #fff; transform: scale(1.05); }
+
+        /* GRID DE ARTÍCULOS */
+        .container { padding: 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; max-width: 1400px; margin: auto; }
+        .card {
+            background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #30363d; 
+            cursor: pointer; transition: 0.4s; position: relative; height: 450px; 
+            display: flex; flex-direction: column; justify-content: flex-end;
+            background-size: cover !important; background-position: center !important;
         }
-        .media-card { background: var(--panel); padding: 20px; border: 1px solid #333; border-radius: 8px; }
+        .card:hover { transform: translateY(-10px); border-color: var(--blue); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .card-info { background: linear-gradient(to top, rgba(0,0,0,1) 30%, transparent); padding: 25px; width: 100%; }
+        .avatar-autor { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--blue); object-fit: cover; margin-bottom: 10px; }
 
-        /* Artículos */
-        .grid { max-width: 1200px; margin: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; padding: 20px; }
-        .card { background: var(--panel); border: 1px solid #333; cursor: pointer; height: 400px; position: relative; overflow: hidden; border-radius: 8px; }
-        .card-img { position: absolute; width: 100%; height: 100%; opacity: 0.4; background-size: cover !important; }
-        .card-body { position: relative; z-index: 2; padding: 25px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; background: linear-gradient(transparent, #000); }
+        /* MODAL DE LECTURA */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; }
+        .modal-content { background: var(--bg); width: 95%; max-width: 1000px; margin: 30px auto; padding: 50px; border-radius: 15px; height: 85vh; overflow-y: auto; border: 1px solid var(--blue); position: relative; }
+        .cerrar-btn { position: sticky; top: -20px; float: right; color: var(--orange); font-size: 30px; cursor: pointer; background: none; border: none; }
 
-        /* Modal y Reacciones Corregidas */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; overflow-y: auto; }
-        .modal-content { background: var(--bg); width: 90%; max-width: 900px; margin: 5vh auto; padding: 40px; border: 1px solid #333; }
-        .parrafo-bloque { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 25px; }
-        .texto-p { flex: 1; line-height: 1.8; text-align: justify; margin: 0; }
-        .btns-reaccion { display: flex; flex-direction: column; gap: 5px; }
-        .btn-r { background: #111; border: 1px solid #333; color: #888; padding: 5px 10px; cursor: pointer; font-size: 0.8em; }
+        /* CAJA DE DIÁLOGO CRÍTICO */
+        .caja-dialogo { background: #0a0c10; border: 1px solid var(--orange); padding: 35px; border-radius: 12px; margin-top: 50px; box-shadow: 0 0 20px rgba(240,136,62,0.1); }
+        .btn-canal { padding: 10px 20px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; margin-right: 10px; display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; }
+        .whatsapp { background: #25d366; color: #000; }
+        .email { background: var(--blue); color: #000; }
+        
+        .reacciones-linea { display: flex; gap: 10px; margin-top: 10px; border-top: 1px solid #222; padding-top: 10px; }
+        .btn-r { background: #111; border: 1px solid #333; color: #888; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9em; }
         .btn-r:hover { border-color: var(--blue); color: #fff; }
 
-        /* Formulario Simposio */
-        .simposium-box { border: 1px solid var(--orange); padding: 30px; max-width: 1100px; margin: 40px auto; background: #000; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        input { padding: 12px; background: #111; border: 1px solid #333; color: #fff; width: 100%; box-sizing: border-box; }
+        #mensaje-exito { display: none; color: var(--orange); font-weight: bold; margin-top: 15px; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="brand">SINAPSIS</div>
-    <p style="color:var(--orange); font-weight:bold; letter-spacing:2px;">Umbral de la Estrategia Asimétrica | 2026</p>
+    <h1 style="color:var(--blue); letter-spacing: 8px; margin-bottom: 0;">SINAPSIS</h1>
+    <p style="color:var(--orange); font-weight: bold;">UMBRAL DE LA ESTRATEGIA ASIMÉTRICA</p>
+    <input type="text" class="search-box" placeholder="Escanear conocimiento estratificado...">
 </header>
 
-<section class="media-station">
-    <div class="media-card">
-        <h3><i class="fas fa-video"></i> Canal de Análisis</h3>
-        <iframe width="100%" height="200" src="https://www.youtube.com/embed/LIVE_ID" frameborder="0" allowfullscreen></iframe>
+<section id="seccion-registro">
+    <h2 style="color:#fff; margin-bottom: 5px;">SIMPOSIO INTERNACIONAL 2026</h2>
+    <p style="color:var(--silver)">Regístrese para activar los canales de diálogo crítico con los autores.</p>
+    <div class="form-registro" id="form-reg">
+        <input type="text" id="reg-nombre" placeholder="Nombre y Apellido">
+        <input type="email" id="reg-email" placeholder="Correo Electrónico">
+        <input type="text" id="reg-inst" placeholder="Institución / Afiliación">
+        <button class="btn-registro" onclick="registrarUsuario()">ACTIVAR ACCESO</button>
     </div>
-    <div class="media-card">
-        <h3><i class="fas fa-podcast"></i> Podcast Estratégico</h3>
-        <audio controls style="width:100%;"><source src="URL_PODCAST" type="audio/mpeg"></audio>
-    </div>
+    <div id="mensaje-exito">✓ Identidad verificada. Canales de comunicación activos.</div>
 </section>
 
-<section class="simposium-box">
-    <div>
-        <h2 style="color:var(--orange)">SIMPOSIO INTERNACIONAL</h2>
-        <p>Complete su ficha para la base de datos de inteligencia.</p>
-    </div>
-    <div id="reg-area">
-        <input type="text" id="rn" placeholder="Nombre y Apellido" style="margin-bottom:10px;">
-        <input type="email" id="re" placeholder="Correo Institucional" style="margin-bottom:10px;">
-        <input type="text" id="ri" placeholder="Organismo / Entidad" style="margin-bottom:10px;">
-        <button onclick="registrarSimposio()" style="width:100%; padding:15px; background:var(--orange); border:none; font-weight:bold; cursor:pointer;">INSCRIBIRSE</button>
-    </div>
-</section>
-
-<div class="grid" id="grid-articulos"></div>
+<div class="container" id="grid-articulos"></div>
 
 <div id="modalArticulo" class="modal">
     <div class="modal-content">
-        <span onclick="cerrar()" style="float:right; cursor:pointer; color:var(--orange); font-weight:bold;">[ CERRAR ]</span>
-        <div id="cont"></div>
+        <button class="cerrar-btn" onclick="cerrarLectura()">&times;</button>
+        <div id="contenidoDinamico"></div>
     </div>
 </div>
 
 <script>
     const SB_URL = 'https://wajivhbldplztjvqudht.supabase.co';
-    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk'; // Asegúrate de usar la key correcta
+    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk';
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
-    let localArt = [];
+    let usuarioActual = JSON.parse(localStorage.getItem('sinapsis_user')) || null;
 
-    async function cargar() {
-        const { data } = await _supabase.from('articulos').select('*').order('id', { ascending: false });
-        if (data) { localArt = data; dibujar(data); }
+    // Al cargar, verificar si ya está registrado
+    window.onload = () => {
+        if(usuarioActual) {
+            document.getElementById('form-reg').style.display = 'none';
+            document.getElementById('mensaje-exito').style.display = 'block';
+        }
+        obtenerArticulos();
+    };
+
+    async function registrarUsuario() {
+        const nombre = document.getElementById('reg-nombre').value;
+        const email = document.getElementById('reg-email').value;
+        const inst = document.getElementById('reg-inst').value;
+
+        if(!nombre || !email) return alert("Por favor complete su identidad.");
+
+        const { error } = await _supabase.from('sinapsis_registros').insert([{ nombre, email, institucion: inst }]);
+        
+        if(!error) {
+            usuarioActual = { nombre, email };
+            localStorage.setItem('sinapsis_user', JSON.stringify(usuarioActual));
+            document.getElementById('form-reg').style.display = 'none';
+            document.getElementById('mensaje-exito').style.display = 'block';
+            alert("Acceso concedido al Búnker de Diálogo.");
+        }
     }
 
-    function dibujar(lista) {
-        document.getElementById('grid-articulos').innerHTML = lista.map((a, i) => `
-            <div class="card" onclick="abrir(${i})">
-                <div class="card-img" style="background:url('${a.Imagen_URL}') center/cover;"></div>
-                <div class="card-body">
-                    <img src="${a.Avatar_URL}" style="width:40px; height:40px; border-radius:50%; border:2px solid var(--blue);">
-                    <h3 style="margin:10px 0 0;">${a.Titulo}</h3>
-                    <small style="color:var(--blue)">Investigador: ${a.Autor}</small>
+    async function obtenerArticulos() {
+        const { data, error } = await _supabase.from('articulos').select('*').order('id', { ascending: false });
+        if (!error) dibujarCards(data);
+    }
+
+    function dibujarCards(lista) {
+        const grid = document.getElementById('grid-articulos');
+        grid.innerHTML = lista.map(art => `
+            <div class="card" onclick='abrirLectura(${JSON.stringify(art).replace(/'/g, "&apos;")})' 
+                 style="background: url('${art.portada_url}') center/cover no-repeat;">
+                <div class="card-info">
+                    <img src="${art.autor_foto_url}" class="avatar-autor">
+                    <small style="color:var(--blue); display:block;">${art.autor}</small>
+                    <small style="color:var(--orange); font-weight:bold;">${art.afiliación || 'SINAPSIS'}</small>
+                    <h3 style="margin:10px 0; color:#fff;">${art.titulo}</h3>
                 </div>
             </div>
         `).join('');
     }
 
-    function abrir(i) {
-        const a = localArt[i];
-        // Desglose corregido: Párrafos y botones alineados
-        let pTotal = a.Contenido.split('\n').map((p, idx) => p.trim() ? `
-            <div class="parrafo-bloque">
-                <p class="texto-p">${p}</p>
-                <div class="btns-reaccion">
-                    <button class="btn-r" onclick="reaccionar(${a.id},${idx},'💡')">💡</button>
-                    <button class="btn-r" onclick="reaccionar(${a.id},${idx},'❓')">❓</button>
-                </div>
-            </div>` : "").join('');
+    function abrirLectura(art) {
+        const modal = document.getElementById('modalArticulo');
+        const cont = document.getElementById('contenidoDinamico');
 
-        const buzon = `
-            <div style="background:var(--panel); padding:30px; border:1px solid var(--blue); margin-top:40px;">
-                <h3><i class="fas fa-envelope"></i> Contactar al Investigador</h3>
-                <input type="text" id="m-n" placeholder="Su Nombre" style="margin-bottom:10px;">
-                <input type="email" id="m-e" placeholder="Su Correo" style="margin-bottom:10px;">
-                <textarea id="m-t" placeholder="Propuesta..." style="width:100%; height:100px; background:#000; color:#fff; border:1px solid #333; padding:10px;"></textarea>
-                <div style="margin-top:10px;"><input type="checkbox" id="chk" checked> Acepto registro en base de datos.</div>
-                <button onclick="enviarFinal(${i})" style="width:100%; padding:15px; background:var(--blue); border:none; margin-top:15px; font-weight:bold; cursor:pointer;">ENVIAR MENSAJE</button>
+        let párrafos = art.contenido.split('\n').map((p, i) => p.trim() ? `
+            <div style="margin-bottom:25px;">
+                <p style="line-height:1.9; font-size:1.15em; text-align:justify;">${p}</p>
+                <div class="reacciones-linea">
+                    <button class="btn-r" onclick="reaccionar(${art.id}, ${i}, '💡')">💡 Interés</button>
+                    <button class="btn-r" onclick="reaccionar(${art.id}, ${i}, '⚖️')">⚖️ Debate</button>
+                    <button class="btn-r" onclick="reaccionar(${art.id}, ${i}, '❓')">❓ Duda</button>
+                </div>
+            </div>
+        ` : '').join('');
+
+        const seccionCanales = `
+            <div class="caja-dialogo">
+                <h3 style="color:var(--orange); margin-top:0;">🎙️ DIÁLOGO CRÍTICO CON EL INVESTIGADOR</h3>
+                <p>Como usuario registrado, puede enviar sus tesis o dudas directamente al autor.</p>
+                <textarea id="texto-tesis" placeholder="Escriba aquí su intervención para el Simposio..." 
+                          style="width:100%; height:120px; background:#000; color:#fff; border:1px solid #333; padding:15px; border-radius:8px;"></textarea>
+                
+                <div style="margin-top:20px;">
+                    <button class="btn-canal email" onclick="enviarTesis(${art.id}, '${art.autor}', '${art.titulo}', 'email')">
+                        <i class="fas fa-envelope"></i> ENVIAR POR CORREO
+                    </button>
+                    <button class="btn-canal whatsapp" onclick="enviarTesis(${art.id}, '${art.autor}', '${art.titulo}', 'wa')">
+                        <i class="fab fa-whatsapp"></i> ENVIAR POR WHATSAPP
+                    </button>
+                </div>
+                <p style="font-size:0.8em; color:gray; margin-top:20px;">DOI: ${art.doi || '10.sinapsis.'+art.id}</p>
             </div>
         `;
 
-        document.getElementById('cont').innerHTML = `<h1>${a.Titulo}</h1><hr style="border:1px solid #333;">${pTotal}${buzon}`;
-        document.getElementById('modalArticulo').style.display = 'block';
+        cont.innerHTML = `
+            <h1 style="color:var(--blue); font-size:2.5em; margin-bottom:10px;">${art.titulo}</h1>
+            <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px; border-bottom:1px solid #333; padding-bottom:20px;">
+                <img src="${art.autor_foto_url}" style="width:60px; height:60px; border-radius:50%; border:2px solid var(--orange);">
+                <div>
+                    <strong style="color:var(--orange); display:block;">${art.autor}</strong>
+                    <small>${art.afiliación || 'Investigador Sinapsis'}</small>
+                </div>
+            </div>
+            ${párrafos}
+            ${seccionCanales}
+        `;
+        
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
     }
 
-    async function registrarSimposio() {
-        const n = document.getElementById('rn').value;
-        const e = document.getElementById('re').value;
-        const i = document.getElementById('ri').value;
-        const { error } = await _supabase.from('sinapsis_registros').insert([{ nombre: n, email: e, institucion: i }]);
-        if(!error) {
-            document.getElementById('reg-area').innerHTML = "<h3 style='color:var(--orange)'>✓ Registro en Base de Datos Exitoso.</h3>";
-        } else { alert("Error de conexión con el Búnker."); }
-    }
+    async function enviarTesis(artId, autor, titulo, canal) {
+        if(!usuarioActual) return alert("Debe identificarse en la sección superior para interactuar.");
 
-    async function enviarFinal(i) {
-        const a = localArt[i];
-        const n = document.getElementById('m-n').value;
-        const e = document.getElementById('m-e').value;
-        const t = document.getElementById('m-t').value;
-        if(!n || !e || !t) return alert("Complete los datos.");
+        const mensaje = document.getElementById('texto-tesis').value;
+        if(!mensaje) return alert("Por favor escriba su tesis o intervención.");
 
-        // Guardar en Búnker
-        await _supabase.from('sinapsis_reacciones').insert([{ 
-            artículo_id: a.id, tipo_reaccion: '💬', comentario_texto: `DE: ${n} (${e}) | MSG: ${t}` 
+        // 1. Guardar en el Búnker (Base de Datos)
+        await _supabase.from('sinapsis_reacciones').insert([{
+            artículo_id: artId,
+            tipo_reaccion: '💬',
+            comentario_texto: `DE: ${usuarioActual.nombre} | MSG: ${mensaje}`,
+            parrafo_index: 0
         }]);
 
-        // WhatsApp / Email (Corrección de link inexistente)
-        const msgWeb = encodeURIComponent(`Investigador ${a.Autor}, soy ${n}. Sobre su obra "${a.Titulo.substring(0,30)}": ${t}`);
-        const link = a.contacto_link || "https://wa.me/TUNUMERO"; 
+        // 2. Ejecutar Canal Externo
+        const textoFinal = `Diálogo Sinapsis de ${usuarioActual.nombre}:\nRef: ${titulo}\n\n"${mensaje}"`;
         
-        // Si es WhatsApp, aseguramos el formato de la API
-        if(link.includes('wa.me')) {
-            window.open(`${link}?text=${msgWeb}`, '_blank');
+        if(canal === 'email') {
+            window.location.href = `mailto:?subject=Tesis Sinapsis: ${titulo}&body=${encodeURIComponent(textoFinal)}`;
         } else {
-            window.location.href = `mailto:${link}?subject=Sinapsis&body=${msgWeb}`;
+            // WhatsApp (El link se puede ajustar con el número real del autor en la BD)
+            window.open(`https://wa.me/?text=${encodeURIComponent(textoFinal)}`, '_blank');
         }
+
+        alert("Intervención registrada en el Búnker y canal externo abierto.");
     }
 
-    async function reaccionar(id, p, t) {
-        await _supabase.from('sinapsis_reacciones').insert([{ artículo_id: id, parrafo_index: p, tipo_reaccion: t }]);
-        alert("Señal registrada.");
+    async function reaccionar(artId, pIdx, tipo) {
+        const { error } = await _supabase.from('sinapsis_reacciones').insert([{ artículo_id: artId, parrafo_index: pIdx, tipo_reaccion: tipo }]);
+        if(!error) alert("Señal registrada en el Búnker.");
     }
 
-    function cerrar() { document.getElementById('modalArticulo').style.display='none'; }
-    cargar();
+    function cerrarLectura() {
+        document.getElementById('modalArticulo').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
 </script>
 </body>
 </html>
