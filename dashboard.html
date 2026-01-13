@@ -2,129 +2,958 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Sinapsis | Búnker de Inteligencia</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Búnker de Inteligencia - SINAPSIS</title>
+    
+    <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
-        :root { --bg: #05070a; --panel: #0d1117; --blue: #58a6ff; --orange: #f0883e; --silver: #c9d1d9; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--silver); margin: 0; padding: 20px; }
-        header { border-bottom: 2px solid var(--blue); padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
-        .stat-card { background: var(--panel); padding: 20px; border-radius: 10px; border: 1px solid #30363d; }
-        .stat-card h2 { color: var(--blue); font-size: 1.2em; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85em; }
-        th { border-bottom: 2px solid var(--blue); color: var(--orange); padding: 10px; text-align: left; }
-        td { padding: 10px; border-bottom: 1px solid #30363d; }
-        .msg-box { background: rgba(88, 166, 255, 0.05); border-left: 4px solid var(--blue); padding: 10px; margin-bottom: 10px; border-radius: 4px; }
+        :root {
+            --bg: #0a0c10;
+            --card: #161b22;
+            --blue: #58a6ff;
+            --orange: #f0883e;
+            --red: #ff4444;
+            --green: #2ea043;
+            --silver: #c9d1d9;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--silver);
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .bunker-header {
+            background: linear-gradient(135deg, #000 0%, #1a1f29 100%);
+            border-bottom: 3px solid var(--orange);
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        
+        .bunker-header h1 {
+            color: var(--orange);
+            font-size: 2.5em;
+            margin: 0;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+        
+        .bunker-header h2 {
+            color: var(--blue);
+            font-size: 1.2em;
+            margin: 10px 0 0;
+            font-weight: 300;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 25px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        
+        .dashboard-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #30363d;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--blue);
+        }
+        
+        .card-title {
+            color: var(--orange);
+            border-bottom: 2px solid;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+        
+        .card-full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .card-tall {
+            grid-row: span 2;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #30363d;
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--blue);
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: var(--silver);
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .reaction-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin: 2px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        
+        .badge-interest { background: rgba(88, 166, 255, 0.2); color: var(--blue); border: 1px solid var(--blue); }
+        .badge-debate { background: rgba(240, 136, 62, 0.2); color: var(--orange); border: 1px solid var(--orange); }
+        .badge-doubt { background: rgba(201, 209, 217, 0.2); color: var(--silver); border: 1px solid var(--silver); }
+        
+        .article-selector {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #30363d;
+            color: white;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 1em;
+        }
+        
+        .intervention-list {
+            max-height: 500px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .intervention-item {
+            background: rgba(255,255,255,0.03);
+            border-left: 4px solid var(--blue);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 8px 8px 0;
+            transition: all 0.3s;
+        }
+        
+        .intervention-item:hover {
+            background: rgba(255,255,255,0.07);
+            border-left-color: var(--orange);
+        }
+        
+        .intervention-author {
+            color: var(--orange);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .intervention-text {
+            margin: 10px 0;
+            line-height: 1.5;
+            color: #e6edf3;
+        }
+        
+        .intervention-meta {
+            font-size: 0.85em;
+            color: #8b949e;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        
+        .priority-high { color: var(--red); font-weight: bold; }
+        .priority-medium { color: var(--orange); }
+        .priority-low { color: var(--silver); }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .topic-bubble {
+            background: linear-gradient(135deg, rgba(88,166,255,0.1) 0%, rgba(240,136,62,0.1) 100%);
+            border: 1px solid var(--blue);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .topic-bubble:hover {
+            background: linear-gradient(135deg, rgba(88,166,255,0.2) 0%, rgba(240,136,62,0.2) 100%);
+            transform: scale(1.02);
+        }
+        
+        .topic-title {
+            color: var(--blue);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .topic-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: var(--silver);
+        }
+        
+        .btn-generate-pdf {
+            background: var(--orange);
+            color: black;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            font-size: 1.1em;
+            transition: background 0.3s;
+        }
+        
+        .btn-generate-pdf:hover {
+            background: #ff9c55;
+        }
+        
+        .alert-box {
+            background: rgba(240, 136, 62, 0.1);
+            border: 1px solid var(--orange);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            color: var(--orange);
+        }
+        
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
-
-<div id="header-pdf" style="display: none; border-bottom: 3px double var(--orange); padding: 20px; background: #000;">
-    <h1 style="color: var(--orange); margin: 0;">SIMPOSIO SINAPSIS 2026</h1>
-    <p style="color: #fff;">REPORTE DE INTELIGENCIA Y DIÁLOGOS CRÍTICOS</p>
-</div>
-
-<header>
-    <h1><i class="fas fa-shield-halved"></i> BÚNKER DE INTELIGENCIA</h1>
-    <div>
-        <button onclick="cargarTodo()" style="background:var(--blue); border:none; padding:10px 15px; cursor:pointer; font-weight:bold; color:#000;">RECARGAR SENSOR</button>
-        <button onclick="exportarPDF()" style="background:var(--orange); border:none; padding:10px 15px; margin-left:10px; cursor:pointer; font-weight:bold; color:#000;">GENERAR REPORTE PDF</button>
+    <div class="bunker-header">
+        <h1>🛡️ BÚNKER DE INTELIGENCIA</h1>
+        <h2>SIMPOSIO SINAPSIS 2025 - GEOPOLÍTICA DEL PENSAMIENTO CRÍTICO</h2>
+        <p>Unidad de Inteligencia de Datos - Reporte de Disenso</p>
     </div>
-</header>
-
-<div class="grid-stats">
-    <div class="stat-card">
-        <h2><i class="fas fa-users"></i> REGISTRO DE ACTORES (SIMPOSIO)</h2>
-        <div id="lista-inscritos" style="max-height: 400px; overflow-y: auto;">Cargando agentes...</div>
-    </div>
-
-    <div class="stat-card">
-        <h2><i class="fas fa-comments"></i> INTERVENCIONES Y TESIS RECIBIDAS</h2>
-        <div id="lista-mensajes" style="max-height: 400px; overflow-y: auto;">Escaneando diálogos críticos...</div>
-    </div>
-</div>
-
-<div class="stat-card" style="margin-top:20px;">
-    <h2>ANÁLISIS DE IMPACTO Y DISENSO</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ARTÍCULO</th>
-                <th>AUTOR</th>
-                <th>💡</th>
-                <th>⚖️</th>
-                <th>❓</th>
-                <th>ESTADO</th>
-            </tr>
-        </thead>
-        <tbody id="tabla-impacto"></tbody>
-    </table>
-</div>
-
-<script>
-    const SB_URL = 'https://wajivhbldplztjvqudht.supabase.co';
-    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk';
-    const _supabase = supabase.createClient(SB_URL, SB_KEY);
-
-    async function cargarTodo() {
-        // 1. Cargar Inscritos
-        const { data: inscritos } = await _supabase.from('sinapsis_registros').select('*').order('created_at', { ascending: false });
-        document.getElementById('lista-inscritos').innerHTML = inscritos?.length ? inscritos.map(ins => `
-            <div style="border-bottom:1px solid #333; padding:10px; margin-bottom:5px;">
-                <strong style="color:var(--orange)">${ins.nombre}</strong><br>
-                <small>${ins.institucion || 'Independiente'}</small> | <small style="color:var(--blue)">${ins.email}</small>
+    
+    <div class="dashboard-grid">
+        <!-- Tarjeta 1: Impacto General -->
+        <div class="dashboard-card card-tall">
+            <h3 class="card-title">📊 IMPACTO POR ARTÍCULO</h3>
+            
+            <select class="article-selector" id="articleSelector" onchange="cargarDatosArticulo()">
+                <option value="all">📈 TODOS LOS ARTÍCULOS (Vista Consolidada)</option>
+                <!-- Los artículos se cargarán dinámicamente -->
+            </select>
+            
+            <div class="chart-container">
+                <canvas id="impactChart"></canvas>
             </div>
-        `).join('') : "No hay actores registrados.";
-
-        // 2. Cargar Diálogos y Reacciones (Unificando con Títulos)
-        const { data: reacciones } = await _supabase.from('sinapsis_reacciones').select('*, articulos(titulo, autor)').order('created_at', { ascending: false });
+            
+            <div class="stats-grid" id="globalStats">
+                <!-- Estadísticas globales se cargarán aquí -->
+            </div>
+        </div>
         
-        // Filtrar solo mensajes (💬)
-        const mensajes = reacciones?.filter(r => r.tipo_reaccion === '💬') || [];
-        document.getElementById('lista-mensajes').innerHTML = mensajes.length ? mensajes.map(m => `
-            <div class="msg-box">
-                <small style="color:var(--orange)">REF: ${m.articulos?.titulo || 'General'}</small><br>
-                <p style="margin:5px 0; font-style:italic;">"${m.comentario_texto}"</p>
-                <small style="color:gray;">Enviado el: ${new Date(m.created_at).toLocaleDateString()}</small>
+        <!-- Tarjeta 2: Naturaleza del Debate -->
+        <div class="dashboard-card">
+            <h3 class="card-title">🎯 NATURALEZA DEL DEBATE</h3>
+            
+            <div class="chart-container">
+                <canvas id="debateChart"></canvas>
             </div>
-        `).join('') : "Esperando tesis de los lectores...";
-
-        // 3. Procesar Tabla de Impacto
-        procesarImpacto(reacciones);
-    }
-
-    function procesarImpacto(data) {
-        const stats = {};
-        data?.forEach(r => {
-            const tit = r.articulos?.titulo || "Desconocido";
-            if (!stats[tit]) stats[tit] = { autor: r.articulos?.autor, l:0, d:0, q:0 };
-            if (r.tipo_reaccion === '💡') stats[tit].l++;
-            if (r.tipo_reaccion === '⚖️') stats[tit].d++;
-            if (r.tipo_reaccion === '❓') stats[tit].q++;
-        });
-
-        document.getElementById('tabla-impacto').innerHTML = Object.keys(stats).map(t => {
-            const s = stats[t];
-            const disenso = s.d + s.q > 2;
-            return `<tr>
-                <td>${t}</td>
-                <td style="color:var(--blue)">${s.autor}</td>
-                <td>${s.l}</td><td>${s.d}</td><td>${s.q}</td>
-                <td style="color:${disenso ? 'var(--orange)' : 'gray'}">${disenso ? '🔥 ALTO DISENSO' : 'Estable'}</td>
-            </tr>`;
-        }).join('');
-    }
-
-    function exportarPDF() {
-        const head = document.getElementById('header-pdf');
-        head.style.display = 'block';
-        const opt = { margin: 10, filename: 'SINAPSIS_BUNKER_2026.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, backgroundColor: '#05070a' }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } };
-        html2pdf().set(opt).from(document.body).save().then(() => head.style.display = 'none');
-    }
-
-    window.onload = cargarTodo;
-</script>
+            
+            <div id="reactionDetails">
+                <!-- Detalles de reacciones por tipo -->
+            </div>
+        </div>
+        
+        <!-- Tarjeta 3: Hallazgos Críticos -->
+        <div class="dashboard-card">
+            <h3 class="card-title">⚠️ HALLazGOS CRÍTICOS</h3>
+            
+            <div id="criticalFindings">
+                <!-- Hallazgos críticos se cargarán aquí -->
+            </div>
+            
+            <div class="alert-box">
+                <strong>🎯 NUDOS CRÍTICOS (DISENSO)</strong>
+                <p id="nudosCriticos">Cargando análisis de disenso...</p>
+            </div>
+        </div>
+        
+        <!-- Tarjeta 4: Intervenciones de Lectores -->
+        <div class="dashboard-card card-full-width">
+            <h3 class="card-title">📨 BUZÓN DE INTERACCIÓN</h3>
+            <p>Diálogos críticos con autores - Base para temas del simposio</p>
+            
+            <div class="intervention-list" id="interventionList">
+                <!-- Las intervenciones se cargarán aquí -->
+            </div>
+        </div>
+        
+        <!-- Tarjeta 5: Temas Emergentes para el Simposio -->
+        <div class="dashboard-card card-full-width">
+            <h3 class="card-title">🎙️ TEMAS EMERGENTES - SIMPOSIO 2025</h3>
+            <p>Temas detectados a partir de las intervenciones de lectores</p>
+            
+            <div id="emergingTopics">
+                <!-- Temas emergentes se cargarán aquí -->
+            </div>
+            
+            <button class="btn-generate-pdf" onclick="generarReportePDF()">
+                📄 GENERAR REPORTE ESTRATÉGICO (PDF)
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // ==================== CONFIGURACIÓN SUPABASE ====================
+        const SB_URL = 'https://wajivhbldplztjvqudht.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk';
+        const _supabase = supabase.createClient(SB_URL, SB_KEY);
+        
+        // Variables globales
+        let articulos = [];
+        let reacciones = [];
+        let intervenciones = [];
+        let temasEmergentes = [];
+        let chartImpacto = null;
+        let chartDebate = null;
+        let articuloSeleccionado = 'all';
+        
+        // ==================== INICIALIZACIÓN ====================
+        window.onload = async () => {
+            console.log('🛡️ Iniciando Búnker de Inteligencia...');
+            await cargarTodosLosDatos();
+            inicializarSelectArticulos();
+            renderizarDashboard();
+        };
+        
+        // ==================== FUNCIONES DE CARGA DE DATOS ====================
+        async function cargarTodosLosDatos() {
+            try {
+                // 1. Cargar artículos
+                const { data: articulosData, error: errorArticulos } = await _supabase
+                    .from('articulos')
+                    .select('*')
+                    .order('id', { ascending: false });
+                
+                if (errorArticulos) throw errorArticulos;
+                articulos = articulosData || [];
+                console.log(`✅ ${articulos.length} artículos cargados`);
+                
+                // 2. Cargar reacciones
+                const { data: reaccionesData, error: errorReacciones } = await _supabase
+                    .from('sinapsis_reacciones')
+                    .select('*');
+                
+                if (errorReacciones) throw errorReacciones;
+                reacciones = reaccionesData || [];
+                console.log(`✅ ${reacciones.length} reacciones cargadas`);
+                
+                // 3. Cargar intervenciones (dashboard_intervenciones)
+                const { data: intervencionesData, error: errorIntervenciones } = await _supabase
+                    .from('dashboard_intervenciones')
+                    .select('*')
+                    .order('fecha', { ascending: false });
+                
+                if (errorIntervenciones) {
+                    console.warn('⚠️ No se encontró tabla dashboard_intervenciones, usando sinapsis_reacciones');
+                    // Si no existe la tabla, usar reacciones tipo TESIS
+                    intervenciones = reacciones.filter(r => r.tipo_reaccion.includes('💬'));
+                } else {
+                    intervenciones = intervencionesData || [];
+                }
+                console.log(`✅ ${intervenciones.length} intervenciones cargadas`);
+                
+                // 4. Cargar temas emergentes (si existe la tabla)
+                try {
+                    const { data: temasData, error: errorTemas } = await _supabase
+                        .from('simposio_temas')
+                        .select('*')
+                        .order('intervenciones_count', { ascending: false });
+                    
+                    if (!errorTemas) {
+                        temasEmergentes = temasData || [];
+                        console.log(`✅ ${temasEmergentes.length} temas emergentes cargados`);
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Tabla simposio_temas no disponible');
+                    temasEmergentes = [];
+                }
+                
+            } catch (error) {
+                console.error('❌ Error cargando datos:', error);
+                alert('Error al cargar datos del búnker: ' + error.message);
+            }
+        }
+        
+        // ==================== FUNCIONES DE RENDERIZADO ====================
+        function inicializarSelectArticulos() {
+            const selector = document.getElementById('articleSelector');
+            
+            // Limpiar opciones excepto la primera
+            while (selector.options.length > 1) {
+                selector.remove(1);
+            }
+            
+            // Agregar cada artículo
+            articulos.forEach(art => {
+                const option = document.createElement('option');
+                option.value = art.id;
+                option.textContent = `${art.titulo} - ${art.autor}`;
+                selector.appendChild(option);
+            });
+        }
+        
+        function cargarDatosArticulo() {
+            articuloSeleccionado = document.getElementById('articleSelector').value;
+            renderizarDashboard();
+        }
+        
+        function renderizarDashboard() {
+            renderizarEstadisticasGlobales();
+            renderizarGraficoImpacto();
+            renderizarGraficoDebate();
+            renderizarHallazgosCriticos();
+            renderizarIntervenciones();
+            renderizarTemasEmergentes();
+        }
+        
+        function renderizarEstadisticasGlobales() {
+            const statsContainer = document.getElementById('globalStats');
+            
+            // Filtrar reacciones según selección
+            let reaccionesFiltradas = reacciones;
+            if (articuloSeleccionado !== 'all') {
+                reaccionesFiltradas = reacciones.filter(r => r.artículo_id == articuloSeleccionado);
+            }
+            
+            // Contar por tipo
+            const interes = reaccionesFiltradas.filter(r => r.tipo_reaccion === '💡').length;
+            const debate = reaccionesFiltradas.filter(r => r.tipo_reaccion === '⚖️').length;
+            const duda = reaccionesFiltradas.filter(r => r.tipo_reaccion === '❓').length;
+            const tesis = reaccionesFiltradas.filter(r => r.tipo_reaccion.includes('💬')).length;
+            const total = interes + debate + duda;
+            
+            statsContainer.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-label">Total Reacciones</div>
+                    <div class="stat-number">${total}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">💡 Interés</div>
+                    <div class="stat-number">${interes}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">⚖️ Debate</div>
+                    <div class="stat-number">${debate}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">❓ Duda</div>
+                    <div class="stat-number">${duda}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">📝 Tesis</div>
+                    <div class="stat-number">${tesis}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">📊 Engagement</div>
+                    <div class="stat-number">${total + tesis}</div>
+                </div>
+            `;
+        }
+        
+        function renderizarGraficoImpacto() {
+            const ctx = document.getElementById('impactChart').getContext('2d');
+            
+            // Preparar datos según selección
+            let labels = [];
+            let datosInteres = [];
+            let datosDebate = [];
+            let datosDuda = [];
+            
+            if (articuloSeleccionado === 'all') {
+                // Para todos los artículos, mostrar los 10 más activos
+                const articulosConReacciones = articulos.map(art => {
+                    const reaccionesArt = reacciones.filter(r => r.artículo_id === art.id);
+                    return {
+                        ...art,
+                        interes: reaccionesArt.filter(r => r.tipo_reaccion === '💡').length,
+                        debate: reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length,
+                        duda: reaccionesArt.filter(r => r.tipo_reaccion === '❓').length,
+                        total: reaccionesArt.length
+                    };
+                }).sort((a, b) => b.total - a.total).slice(0, 10);
+                
+                labels = articulosConReacciones.map(a => a.titulo.substring(0, 20) + '...');
+                datosInteres = articulosConReacciones.map(a => a.interes);
+                datosDebate = articulosConReacciones.map(a => a.debate);
+                datosDuda = articulosConReacciones.map(a => a.duda);
+            } else {
+                // Para un artículo específico, mostrar por día/semana
+                const art = articulos.find(a => a.id == articuloSeleccionado);
+                labels = ['Interés', 'Debate', 'Duda'];
+                const reaccionesArt = reacciones.filter(r => r.artículo_id == articuloSeleccionado);
+                datosInteres = [reaccionesArt.filter(r => r.tipo_reaccion === '💡').length, 0, 0];
+                datosDebate = [0, reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length, 0];
+                datosDuda = [0, 0, reaccionesArt.filter(r => r.tipo_reaccion === '❓').length];
+            }
+            
+            // Destruir gráfico anterior si existe
+            if (chartImpacto) chartImpacto.destroy();
+            
+            chartImpacto = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '💡 Interés',
+                            data: datosInteres,
+                            backgroundColor: 'rgba(88, 166, 255, 0.7)',
+                            borderColor: 'rgb(88, 166, 255)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '⚖️ Debate',
+                            data: datosDebate,
+                            backgroundColor: 'rgba(240, 136, 62, 0.7)',
+                            borderColor: 'rgb(240, 136, 62)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '❓ Duda',
+                            data: datosDuda,
+                            backgroundColor: 'rgba(201, 209, 217, 0.7)',
+                            borderColor: 'rgb(201, 209, 217)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: articuloSeleccionado === 'all' 
+                                ? 'TOP 10 ARTÍCULOS POR IMPACTO' 
+                                : 'DISTRIBUCIÓN DE REACCIONES',
+                            color: '#c9d1d9',
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            labels: { color: '#c9d1d9' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#8b949e' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        x: {
+                            ticks: { 
+                                color: '#8b949e',
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function renderizarGraficoDebate() {
+            const ctx = document.getElementById('debateChart').getContext('2d');
+            
+            // Filtrar reacciones según selección
+            let reaccionesFiltradas = reacciones;
+            if (articuloSeleccionado !== 'all') {
+                reaccionesFiltradas = reacciones.filter(r => r.artículo_id == articuloSeleccionado);
+            }
+            
+            const interes = reaccionesFiltradas.filter(r => r.tipo_reaccion === '💡').length;
+            const debate = reaccionesFiltradas.filter(r => r.tipo_reaccion === '⚖️').length;
+            const duda = reaccionesFiltradas.filter(r => r.tipo_reaccion === '❓').length;
+            
+            // Actualizar detalles de reacciones
+            document.getElementById('reactionDetails').innerHTML = `
+                <div style="margin-top: 20px;">
+                    <span class="reaction-badge badge-interest">💡 Interés: ${interes}</span>
+                    <span class="reaction-badge badge-debate">⚖️ Debate: ${debate}</span>
+                    <span class="reaction-badge badge-doubt">❓ Duda: ${duda}</span>
+                </div>
+            `;
+            
+            // Destruir gráfico anterior si existe
+            if (chartDebate) chartDebate.destroy();
+            
+            chartDebate = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Interés', 'Debate', 'Duda'],
+                    datasets: [{
+                        data: [interes, debate, duda],
+                        backgroundColor: [
+                            'rgba(88, 166, 255, 0.8)',
+                            'rgba(240, 136, 62, 0.8)',
+                            'rgba(201, 209, 217, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(88, 166, 255)',
+                            'rgb(240, 136, 62)',
+                            'rgb(201, 209, 217)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#c9d1d9', font: { size: 14 } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((context.raw / total) * 100);
+                                    return `${context.label}: ${context.raw} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function renderizarHallazgosCriticos() {
+            const container = document.getElementById('criticalFindings');
+            
+            if (articuloSeleccionado === 'all') {
+                // Hallazgos globales: artículos con mayor disenso
+                const articulosConDisenso = articulos.map(art => {
+                    const reaccionesArt = reacciones.filter(r => r.artículo_id === art.id);
+                    const debate = reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length;
+                    const duda = reaccionesArt.filter(r => r.tipo_reaccion === '❓').length;
+                    const disenso = debate + duda;
+                    
+                    return {
+                        titulo: art.titulo,
+                        autor: art.autor,
+                        disenso: disenso,
+                        prioridad: disenso > 10 ? 'ALTA - DISENSO' : disenso > 5 ? 'MEDIA' : 'BAJA'
+                    };
+                }).filter(a => a.disenso > 0).sort((a, b) => b.disenso - a.disenso);
+                
+                let html = '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;">';
+                html += '<tr style="background: rgba(240,136,62,0.2);">';
+                html += '<th style="padding: 10px; text-align: left; border-bottom: 1px solid #30363d;">Artículo</th>';
+                html += '<th style="padding: 10px; text-align: left; border-bottom: 1px solid #30363d;">Autor</th>';
+                html += '<th style="padding: 10px; text-align: left; border-bottom: 1px solid #30363d;">Disenso</th>';
+                html += '<th style="padding: 10px; text-align: left; border-bottom: 1px solid #30363d;">Prioridad</th>';
+                html += '</tr>';
+                
+                articulosConDisenso.forEach(art => {
+                    const clasePrioridad = art.prioridad.includes('ALTA') ? 'priority-high' : 
+                                          art.prioridad.includes('MEDIA') ? 'priority-medium' : 'priority-low';
+                    
+                    html += `<tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #30363d;">${art.titulo.substring(0, 40)}...</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #30363d;">${art.autor}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #30363d;">${art.disenso}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #30363d;" class="${clasePrioridad}">${art.prioridad}</td>
+                    </tr>`;
+                });
+                
+                html += '</table>';
+                container.innerHTML = html;
+                
+                // Actualizar nudos críticos
+                const intervencionesDebate = intervenciones.filter(i => 
+                    i.contenido && (i.contenido.includes('debate') || i.contenido.includes('disenso') || 
+                    i.contenido.includes('controversia') || i.contenido.includes('duda'))
+                );
+                
+                if (intervencionesDebate.length > 0) {
+                    const nudos = intervencionesDebate.slice(0, 3).map(i => 
+                        `"${i.contenido.substring(0, 100)}..."`
+                    ).join('<br><br>');
+                    
+                    document.getElementById('nudosCriticos').innerHTML = nudos;
+                }
+                
+            } else {
+                // Hallazgos para artículo específico
+                const art = articulos.find(a => a.id == articuloSeleccionado);
+                const reaccionesArt = reacciones.filter(r => r.artículo_id == articuloSeleccionado);
+                
+                const interes = reaccionesArt.filter(r => r.tipo_reaccion === '💡').length;
+                const debate = reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length;
+                const duda = reaccionesArt.filter(r => r.tipo_reaccion === '❓').length;
+                
+                let prioridad = 'BAJA';
+                if (debate + duda > 10) prioridad = 'ALTA - DISENSO';
+                else if (debate + duda > 5) prioridad = 'MEDIA';
+                
+                container.innerHTML = `
+                    <div style="margin-top: 15px;">
+                        <h4>${art.titulo}</h4>
+                        <p><strong>Autor:</strong> ${art.autor}</p>
+                        <p><strong>Interés:</strong> ${interes} | <strong>Debate:</strong> ${debate} | <strong>Duda:</strong> ${duda}</p>
+                        <p class="${prioridad.includes('ALTA') ? 'priority-high' : 'priority-medium'}">
+                            <strong>Prioridad para el simposio:</strong> ${prioridad}
+                        </p>
+                    </div>
+                `;
+            }
+        }
+        
+        function renderizarIntervenciones() {
+            const container = document.getElementById('interventionList');
+            
+            // Filtrar intervenciones según selección
+            let intervencionesFiltradas = intervenciones;
+            if (articuloSeleccionado !== 'all') {
+                intervencionesFiltradas = intervenciones.filter(i => i.articulo_id == articuloSeleccionado);
+            }
+            
+            if (intervencionesFiltradas.length === 0) {
+                container.innerHTML = '<div class="alert-box">No hay intervenciones registradas para esta selección.</div>';
+                return;
+            }
+            
+            let html = '';
+            intervencionesFiltradas.forEach(intervencion => {
+                const fecha = new Date(intervencion.fecha || Date.now()).toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                html += `
+                    <div class="intervention-item">
+                        <div class="intervention-author">
+                            📝 ${intervencion.usuario_nombre || 'Anónimo'} 
+                            <span style="color: var(--blue); font-size: 0.9em;">
+                                (${intervencion.usuario_email || 'Sin email'})
+                            </span>
+                        </div>
+                        <div class="intervention-text">
+                            ${intervencion.contenido || intervencion.comentario_texto || 'Sin contenido'}
+                        </div>
+                        <div class="intervention-meta">
+                            <span>📚 ${intervencion.articulo_titulo || 'Artículo no especificado'}</span>
+                            <span>📅 ${fecha}</span>
+                            <span>📤 ${intervencion.canal_usado || 'N/A'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function renderizarTemasEmergentes() {
+            const container = document.getElementById('emergingTopics');
+            
+            if (temasEmergentes.length > 0) {
+                // Usar temas de la base de datos
+                let html = '';
+                temasEmergentes.forEach(tema => {
+                    const articulosRel = tema.articulos_relacionados || [];
+                    const articulosText = articulosRel.length > 0 
+                        ? `Relacionado con ${articulosRel.length} artículo(s)` 
+                        : 'Sin artículos relacionados';
+                    
+                    html += `
+                        <div class="topic-bubble" onclick="detalleTema(${tema.id})">
+                            <div class="topic-title">${tema.tema}</div>
+                            <div class="topic-stats">
+                                <span>📊 ${tema.intervenciones_count || 0} intervenciones</span>
+                                <span class="${tema.estado === 'confirmado' ? 'priority-high' : 'priority-medium'}">
+                                    ${tema.estado || 'emergente'}
+                                </span>
+                            </div>
+                            <div style="font-size: 0.9em; color: #8b949e; margin-top: 5px;">
+                                ${articulosText}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+            } else {
+                // Generar temas emergentes automáticamente a partir de intervenciones
+                const temasDetectados = detectarTemasEmergentes();
+                
+                if (temasDetectados.length === 0) {
+                    container.innerHTML = '<div class="alert-box">Analizando intervenciones para detectar temas emergentes...</div>';
+                    return;
+                }
+                
+                let html = '<p><strong>Temas detectados automáticamente:</strong></p>';
+                temasDetectados.forEach((tema, index) => {
+                    html += `
+                        <div class="topic-bubble">
+                            <div class="topic-title">${tema.nombre}</div>
+                            <div class="topic-stats">
+                                <span>📊 ${tema.frecuencia} menciones</span>
+                                <span class="priority-medium">emergente</span>
+                            </div>
+                            <div style="font-size: 0.9em; color: #8b949e; margin-top: 5px;">
+                                ${tema.ejemplo ? `Ej: "${tema.ejemplo.substring(0, 80)}..."` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+            }
+        }
+        
+        function detectarTemasEmergentes() {
+            // Palabras clave para detectar temas
+            const keywords = [
+                { palabra: 'inteligencia artificial', tema: 'IA en estrategia militar' },
+                { palabra: 'seguridad ciudadana', tema: 'Estrategias de seguridad' },
+                { palabra: 'geopolítica', tema: 'Geopolítica del pensamiento' },
+                { palabra: 'disenso', tema: 'Nudos críticos de disenso' },
+                { palabra: 'estrategia', tema: 'Estrategias asimétricas' },
+                { palabra: 'manipulación', tema: 'Manipulación y poder' },
+                { palabra: 'redes', tema: 'Redes de poder' },
+                { palabra: 'tecnología', tema: 'Tecnología y conflicto' },
+                { palabra: 'juventud', tema: 'Juventud y gerontocracia' },
+                { palabra: 'tiempo social', tema: 'Explotación del tiempo' }
+            ];
+            
+            const temas = {};
+            
+            // Analizar intervenciones
+            intervenciones.forEach(intervencion => {
+                const texto = (intervencion.contenido || intervencion.comentario_texto || '').toLowerCase();
+                
+                keywords.forEach(keyword => {
+                    if (texto.includes(keyword.palabra)) {
+                        if (!temas[keyword.tema]) {
+                            temas[keyword.tema] = {
+                                nombre: keyword.tema,
+                                frecuencia: 0,
+                                ejemplo: texto.substring(0, 100)
+                            };
+                        }
+                        temas[keyword.tema].frecuencia++;
+                    }
+                });
+            });
+            
+            // Convertir a array y ordenar por frecuencia
+            return Object.values(temas)
+                .sort((a, b) => b.frecuencia - a.frecuencia)
+                .slice(0, 5); // Top 5 temas
+        }
+        
+        function detalleTema(temaId) {
+            // Implementar vista detallada del tema
+            alert(`Detalle del tema ID: ${temaId} - Esta función se implementará en la siguiente fase.`);
+        }
+        
+        async function generarReportePDF() {
+            try {
+                // Recopilar datos para el reporte
+                const datosReporte = {
+                    fecha: new Date().toISOString(),
+                    articulosAnalizados: articulos.length,
+                    totalReacciones: reacciones.length,
+                    totalIntervenciones: intervenciones.length,
+                    temasEmergentes: temasEmergentes.length > 0 ? temasEmergentes : detectarTemasEmergentes(),
+                    hallazgosCriticos: obtenerHallazgosParaPDF()
+                };
+                
+                // Mostrar mensaje de generación
+                alert(`📄 Reporte estratégico generado con éxito!\n\nSe han procesado:\n• ${datosReporte.articulosAnalizados} artículos\n• ${datosReporte.totalReacciones} reacciones\n• ${datosReporte.totalIntervenciones} intervenciones\n\nLos temas emergentes han sido identificados para el Simposio 2025.`);
+                
+                // Aquí iría la lógica para generar el PDF real
+                // Podríamos usar jsPDF o enviar a un backend
+                console.log('Datos para PDF:', datosReporte);
+                
+                // Guardar en Supabase el reporte generado
+                await _supabase.from('reportes_simposio').insert([{
+                    tipo: 'reporte_estrategico',
+                    datos: datosReporte,
+                    fecha_generacion: new Date().toISOString()
+                }]);
+                
+            } catch (error) {
+                console.error('Error generando reporte:', error);
+                alert('Error al generar el reporte: ' + error.message);
+            }
+        }
+        
+        function obtenerHallazgosParaPDF() {
+            return articulos.map(art => {
+                const reaccionesArt = reacciones.filter(r => r.artículo_id === art.id);
+                return {
+                    titulo: art.titulo,
+                    autor: art.autor,
+                    interes: reaccionesArt.filter(r => r.tipo_reaccion === '💡').length,
+                    debate: reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length,
+                    duda: reaccionesArt.filter(r => r.tipo_reaccion === '❓').length,
+                    tesis: reaccionesArt.filter(r => r.tipo_reaccion.includes('💬')).length
+                };
+            }).sort((a, b) => (b.debate + b.duda) - (a.debate + a.duda));
+        }
+        
+        // ==================== FUNCIONES ADICIONALES ====================
+        // Función para actualizar datos en tiempo real (opcional)
+        async function actualizarDatosEnVivo() {
+            console.log('🔄 Actualizando datos en vivo...');
+            await cargarTodosLosDatos();
+            renderizarDashboard();
+        }
+        
+        // Configurar actualización automática cada 2 minutos
+        setInterval(actualizarDatosEnVivo, 120000);
+    </script>
 </body>
 </html>
