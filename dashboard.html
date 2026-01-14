@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+f<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -130,8 +130,8 @@
             font-weight: bold;
         }
         
-        .badge-interest { background: rgba(88, 166, 255, 0.2); color: var(--blue); border: 1px solid var(--blue); }
-        .badge-debate { background: rgba(240, 136, 62, 0.2); color: var(--orange); border: 1px solid var(--orange); }
+        .badge-Interesantet { background: rgba(88, 166, 255, 0.2); color: var(--blue); border: 1px solid var(--blue); }
+        .badge-Debatible { background: rgba(240, 136, 62, 0.2); color: var(--orange); border: 1px solid var(--orange); }
         .badge-doubt { background: rgba(201, 209, 217, 0.2); color: var(--silver); border: 1px solid var(--silver); }
         
         .article-selector {
@@ -289,12 +289,12 @@
             </div>
         </div>
         
-        <!-- Tarjeta 2: Naturaleza del Debate -->
+        <!-- Tarjeta 2: Naturaleza del Debatible -->
         <div class="dashboard-card">
-            <h3 class="card-title">🎯 NATURALEZA DEL DEBATE</h3>
+            <h3 class="card-title">🎯 NATURALEZA DEL Debatible</h3>
             
             <div class="chart-container">
-                <canvas id="debateChart"></canvas>
+                <canvas id="DebatibleChart"></canvas>
             </div>
             
             <div id="reactionDetails">
@@ -353,7 +353,7 @@
         let intervenciones = [];
         let temasEmergentes = [];
         let chartImpacto = null;
-        let chartDebate = null;
+        let chartDebatible = null;
         let articuloSeleccionado = 'all';
         
         // ==================== INICIALIZACIÓN ====================
@@ -449,7 +449,7 @@
         function renderizarDashboard() {
             renderizarEstadisticasGlobales();
             renderizarGraficoImpacto();
-            renderizarGraficoDebate();
+            renderizarGraficoDebatible();
             renderizarHallazgosCriticos();
             renderizarIntervenciones();
             renderizarTemasEmergentes();
@@ -465,11 +465,11 @@
             }
             
             // Contar por tipo
-            const interes = reaccionesFiltradas.filter(r => r.tipo_reaccion === '💡').length;
-            const debate = reaccionesFiltradas.filter(r => r.tipo_reaccion === '⚖️').length;
-            const duda = reaccionesFiltradas.filter(r => r.tipo_reaccion === '❓').length;
+            const Interesanteante = reaccionesFiltradas.filter(r => r.tipo_reaccion === '💡').length;
+            const Debatible = reaccionesFiltradas.filter(r => r.tipo_reaccion === '⚖️').length;
+            const Duda = reaccionesFiltradas.filter(r => r.tipo_reaccion === '❓').length;
             const tesis = reaccionesFiltradas.filter(r => r.tipo_reaccion.includes('💬')).length;
-            const total = interes + debate + duda;
+            const total = Interesante + Debatible + Duda;
             
             statsContainer.innerHTML = `
                 <div class="stat-item">
@@ -477,16 +477,16 @@
                     <div class="stat-number">${total}</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">💡 Interés</div>
-                    <div class="stat-number">${interes}</div>
+                    <div class="stat-label">💡 Interesanteante</div>
+                    <div class="stat-number">${Interesante}</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">⚖️ Debate</div>
-                    <div class="stat-number">${debate}</div>
+                    <div class="stat-label">⚖️ Debatible</div>
+                    <div class="stat-number">${Debatible}</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">❓ Duda</div>
-                    <div class="stat-number">${duda}</div>
+                    <div class="stat-number">${Duda}</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">📝 Tesis</div>
@@ -504,8 +504,8 @@
             
             // Preparar datos según selección
             let labels = [];
-            let datosInteres = [];
-            let datosDebate = [];
+            let datosInteresanteante = [];
+            let datosDebatible = [];
             let datosDuda = [];
             
             if (articuloSeleccionado === 'all') {
@@ -514,24 +514,24 @@
                     const reaccionesArt = reacciones.filter(r => r.artículo_id === art.id);
                     return {
                         ...art,
-                        interes: reaccionesArt.filter(r => r.tipo_reaccion === '💡').length,
-                        debate: reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length,
-                        duda: reaccionesArt.filter(r => r.tipo_reaccion === '❓').length,
+                        Interesanteante: reaccionesArt.filter(r => r.tipo_reaccion === '💡').length,
+                        Debatible: reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length,
+                        Duda: reaccionesArt.filter(r => r.tipo_reaccion === '❓').length,
                         total: reaccionesArt.length
                     };
                 }).sort((a, b) => b.total - a.total).slice(0, 10);
                 
                 labels = articulosConReacciones.map(a => a.titulo.substring(0, 20) + '...');
-                datosInteres = articulosConReacciones.map(a => a.interes);
-                datosDebate = articulosConReacciones.map(a => a.debate);
-                datosDuda = articulosConReacciones.map(a => a.duda);
+                datosInteresanteante = articulosConReacciones.map(a => a.Interesante);
+                datosDebatible = articulosConReacciones.map(a => a.Debatible);
+                datosDuda = articulosConReacciones.map(a => a.Duda);
             } else {
                 // Para un artículo específico, mostrar por día/semana
                 const art = articulos.find(a => a.id == articuloSeleccionado);
-                labels = ['Interés', 'Debate', 'Duda'];
+                labels = ['Interesanteanteante', 'Debatible', 'Duda'];
                 const reaccionesArt = reacciones.filter(r => r.artículo_id == articuloSeleccionado);
-                datosInteres = [reaccionesArt.filter(r => r.tipo_reaccion === '💡').length, 0, 0];
-                datosDebate = [0, reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length, 0];
+                datosInteresanteante = [reaccionesArt.filter(r => r.tipo_reaccion === '💡').length, 0, 0];
+                datosDebatible = [0, reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length, 0];
                 datosDuda = [0, 0, reaccionesArt.filter(r => r.tipo_reaccion === '❓').length];
             }
             
@@ -544,15 +544,15 @@
                     labels: labels,
                     datasets: [
                         {
-                            label: '💡 Interés',
-                            data: datosInteres,
+                            label: '💡 Interesanteante',
+                            data: datosInteresanteante,
                             backgroundColor: 'rgba(88, 166, 255, 0.7)',
                             borderColor: 'rgb(88, 166, 255)',
                             borderWidth: 1
                         },
                         {
-                            label: '⚖️ Debate',
-                            data: datosDebate,
+                            label: '⚖️ Debatible',
+                            data: datosDebatible,
                             backgroundColor: 'rgba(240, 136, 62, 0.7)',
                             borderColor: 'rgb(240, 136, 62)',
                             borderWidth: 1
@@ -601,8 +601,8 @@
             });
         }
         
-        function renderizarGraficoDebate() {
-            const ctx = document.getElementById('debateChart').getContext('2d');
+        function renderizarGraficoDebatible() {
+            const ctx = document.getElementById('DebatibleChart').getContext('2d');
             
             // Filtrar reacciones según selección
             let reaccionesFiltradas = reacciones;
@@ -610,28 +610,28 @@
                 reaccionesFiltradas = reacciones.filter(r => r.artículo_id == articuloSeleccionado);
             }
             
-            const interes = reaccionesFiltradas.filter(r => r.tipo_reaccion === '💡').length;
-            const debate = reaccionesFiltradas.filter(r => r.tipo_reaccion === '⚖️').length;
-            const duda = reaccionesFiltradas.filter(r => r.tipo_reaccion === '❓').length;
+            const Interesanteante = reaccionesFiltradas.filter(r => r.tipo_reaccion === '💡').length;
+            const Debatible = reaccionesFiltradas.filter(r => r.tipo_reaccion === '⚖️').length;
+            const Duda = reaccionesFiltradas.filter(r => r.tipo_reaccion === '❓').length;
             
             // Actualizar detalles de reacciones
             document.getElementById('reactionDetails').innerHTML = `
                 <div style="margin-top: 20px;">
-                    <span class="reaction-badge badge-interest">💡 Interés: ${interes}</span>
-                    <span class="reaction-badge badge-debate">⚖️ Debate: ${debate}</span>
-                    <span class="reaction-badge badge-doubt">❓ Duda: ${duda}</span>
+                    <span class="reaction-badge badge-Interesanteante">💡 Interesanteante: ${Interesante}</span>
+                    <span class="reaction-badge badge-Debatible">⚖️ Debatible: ${Debatible}</span>
+                    <span class="reaction-badge badge-doubt">❓ Duda: ${Duda}</span>
                 </div>
             `;
             
             // Destruir gráfico anterior si existe
-            if (chartDebate) chartDebate.destroy();
+            if (chartDebatible) chartDebatible.destroy();
             
-            chartDebate = new Chart(ctx, {
+            chartDebatible = new Chart(ctx, {
                 type: 'pie',
                 data: {
-                    labels: ['Interés', 'Debate', 'Duda'],
+                    labels: ['Interesanteante', 'Debatible', 'Duda'],
                     datasets: [{
-                        data: [interes, debate, duda],
+                        data: [Interesanteante, Debatible, Duda],
                         backgroundColor: [
                             'rgba(88, 166, 255, 0.8)',
                             'rgba(240, 136, 62, 0.8)',
@@ -674,9 +674,9 @@
                 // Hallazgos globales: artículos con mayor disenso
                 const articulosConDisenso = articulos.map(art => {
                     const reaccionesArt = reacciones.filter(r => r.artículo_id === art.id);
-                    const debate = reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length;
-                    const duda = reaccionesArt.filter(r => r.tipo_reaccion === '❓').length;
-                    const disenso = debate + duda;
+                    const Debatible = reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length;
+                    const Duda = reaccionesArt.filter(r => r.tipo_reaccion === '❓').length;
+                    const disenso = Debatible + Duda;
                     
                     return {
                         titulo: art.titulo,
@@ -710,13 +710,13 @@
                 container.innerHTML = html;
                 
                 // Actualizar nudos críticos
-                const intervencionesDebate = intervenciones.filter(i => 
-                    i.contenido && (i.contenido.includes('debate') || i.contenido.includes('disenso') || 
-                    i.contenido.includes('controversia') || i.contenido.includes('duda'))
+                const intervencionesDebatible = intervenciones.filter(i => 
+                    i.contenido && (i.contenido.includes('Debatible') || i.contenido.includes('disenso') || 
+                    i.contenido.includes('controversia') || i.contenido.includes('Duda'))
                 );
                 
-                if (intervencionesDebate.length > 0) {
-                    const nudos = intervencionesDebate.slice(0, 3).map(i => 
+                if (intervencionesDebatible.length > 0) {
+                    const nudos = intervencionesDebatible.slice(0, 3).map(i => 
                         `"${i.contenido.substring(0, 100)}..."`
                     ).join('<br><br>');
                     
@@ -728,19 +728,19 @@
                 const art = articulos.find(a => a.id == articuloSeleccionado);
                 const reaccionesArt = reacciones.filter(r => r.artículo_id == articuloSeleccionado);
                 
-                const interes = reaccionesArt.filter(r => r.tipo_reaccion === '💡').length;
-                const debate = reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length;
-                const duda = reaccionesArt.filter(r => r.tipo_reaccion === '❓').length;
+                const Interesanteante = reaccionesArt.filter(r => r.tipo_reaccion === '💡').length;
+                const Debatible = reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length;
+                const Duda = reaccionesArt.filter(r => r.tipo_reaccion === '❓').length;
                 
                 let prioridad = 'BAJA';
-                if (debate + duda > 10) prioridad = 'ALTA - DISENSO';
-                else if (debate + duda > 5) prioridad = 'MEDIA';
+                if (Debatible + Duda > 10) prioridad = 'ALTA - DISENSO';
+                else if (Debatible + Duda > 5) prioridad = 'MEDIA';
                 
                 container.innerHTML = `
                     <div style="margin-top: 15px;">
                         <h4>${art.titulo}</h4>
                         <p><strong>Autor:</strong> ${art.autor}</p>
-                        <p><strong>Interés:</strong> ${interes} | <strong>Debate:</strong> ${debate} | <strong>Duda:</strong> ${duda}</p>
+                        <p><strong>Interesanteante:</strong> ${Interesante} | <strong>Debatible:</strong> ${Debatible} | <strong>Duda:</strong> ${Duda}</p>
                         <p class="${prioridad.includes('ALTA') ? 'priority-high' : 'priority-medium'}">
                             <strong>Prioridad para el simposio:</strong> ${prioridad}
                         </p>
@@ -936,12 +936,12 @@
                 return {
                     titulo: art.titulo,
                     autor: art.autor,
-                    interes: reaccionesArt.filter(r => r.tipo_reaccion === '💡').length,
-                    debate: reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length,
-                    duda: reaccionesArt.filter(r => r.tipo_reaccion === '❓').length,
+                    Interesanteante: reaccionesArt.filter(r => r.tipo_reaccion === '💡').length,
+                    Debatible: reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length,
+                    Duda: reaccionesArt.filter(r => r.tipo_reaccion === '❓').length,
                     tesis: reaccionesArt.filter(r => r.tipo_reaccion.includes('💬')).length
                 };
-            }).sort((a, b) => (b.debate + b.duda) - (a.debate + a.duda));
+            }).sort((a, b) => (b.Debatible + b.Duda) - (a.Debatible + a.Duda));
         }
         
         // ==================== FUNCIONES ADICIONALES ====================
