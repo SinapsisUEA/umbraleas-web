@@ -12,10 +12,32 @@
         :root {
             --bg: #0d1117; --card: #161b22; --blue: #58a6ff; --orange: #f0883e; --silver: #c9d1d9; --alert: #ff4444;
         }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--silver); margin: 0; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg); 
+            color: var(--silver); 
+            margin: 0; 
+            padding: 0;
+        }
         
-        header { background: #000; padding: 50px 20px; text-align: center; border-bottom: 1px solid #30363d; position: relative; }
-        .search-box { width: 90%; max-width: 600px; padding: 12px 20px; border-radius: 20px; border: 1px solid var(--blue); background: #111; color: #fff; }
+        header { 
+            background: #000; 
+            padding: 50px 20px; 
+            text-align: center; 
+            border-bottom: 1px solid #30363d; 
+            position: relative; 
+        }
+        
+        .search-box { 
+            width: 90%; 
+            max-width: 600px; 
+            padding: 12px 20px; 
+            border-radius: 20px; 
+            border: 1px solid var(--blue); 
+            background: #111; 
+            color: #fff; 
+            margin-top: 20px;
+        }
 
         /* Enlace al Dashboard */
         .dashboard-link {
@@ -30,56 +52,170 @@
             border-radius: 5px;
             border: 1px solid var(--orange);
             transition: all 0.3s;
+            z-index: 100;
         }
         .dashboard-link:hover {
             background: rgba(240, 136, 62, 0.3);
             transform: scale(1.05);
         }
 
-        /* SECCIÓN REGISTRO (EL PEAJE) */
-        #seccion-registro { background: linear-gradient(90deg, #000, #161b22); padding: 40px; text-align: center; border-bottom: 2px solid var(--orange); }
-        .form-registro { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 20px; }
-        .form-registro input { padding: 12px; border-radius: 5px; border: 1px solid #333; background: #000; color: #fff; width: 250px; }
-        .btn-registro { background: var(--orange); color: #000; border: none; padding: 12px 30px; font-weight: bold; cursor: pointer; border-radius: 5px; transition: 0.3s; }
-        .btn-registro:hover { background: #fff; transform: scale(1.05); }
+        /* SECCIÓN REGISTRO */
+        #seccion-registro { 
+            background: linear-gradient(90deg, #000, #161b22); 
+            padding: 40px 20px; 
+            text-align: center; 
+            border-bottom: 2px solid var(--orange);
+            margin: 0 auto;
+            max-width: 1200px;
+        }
+        .form-registro { 
+            display: flex; 
+            justify-content: center; 
+            gap: 15px; 
+            flex-wrap: wrap; 
+            margin-top: 20px; 
+        }
+        .form-registro input { 
+            padding: 12px; 
+            border-radius: 5px; 
+            border: 1px solid #333; 
+            background: #000; 
+            color: #fff; 
+            width: 250px; 
+            box-sizing: border-box;
+        }
+        .btn-registro { 
+            background: var(--orange); 
+            color: #000; 
+            border: none; 
+            padding: 12px 30px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            border-radius: 5px; 
+            transition: 0.3s; 
+            margin-top: 10px;
+        }
+        .btn-registro:hover { 
+            background: #fff; 
+            transform: scale(1.05); 
+        }
 
         .media-station {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;
-            background: var(--card); border: 1px solid var(--blue);
-            padding: 20px; border-radius: 15px; margin: 20px auto;
-            max-width: 1200px; width: 90%;
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 20px;
+            background: var(--card); 
+            border: 1px solid var(--blue);
+            padding: 20px; 
+            border-radius: 15px; 
+            margin: 30px auto;
+            max-width: 1200px; 
+            width: 90%;
         }
-        @media (min-width: 900px) { .media-station { grid-template-columns: 2fr 1fr; } }
         
-        .player-container { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 8px; overflow: hidden; }
+        @media (min-width: 900px) { 
+            .media-station { 
+                grid-template-columns: 2fr 1fr; 
+            } 
+        }
+        
+        .player-container { 
+            position: relative; 
+            width: 100%; 
+            aspect-ratio: 16 / 9; 
+            background: #000; 
+            border-radius: 8px; 
+            overflow: hidden; 
+        }
 
-        .container { padding: 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; max-width: 1400px; margin: auto; }
+        .container { 
+            padding: 40px 20px; 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            gap: 30px; 
+            max-width: 1400px; 
+            margin: auto; 
+        }
 
         .card {
-            background: var(--card); border-radius: 12px; overflow: hidden;
-            border: 1px solid #30363d; cursor: pointer; transition: 0.3s;
-            position: relative; height: 420px; display: flex; flex-direction: column; justify-content: flex-end;
-            background-size: cover !important; background-position: center !important;
+            background: var(--card); 
+            border-radius: 12px; 
+            overflow: hidden;
+            border: 1px solid #30363d; 
+            cursor: pointer; 
+            transition: 0.3s;
+            position: relative; 
+            height: 420px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: flex-end;
         }
-        .card:hover { transform: translateY(-10px); border-color: var(--blue); }
+        .card:hover { 
+            transform: translateY(-10px); 
+            border-color: var(--blue); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
         
         .card-info { 
             background: linear-gradient(to top, rgba(13,17,23,1) 40%, rgba(13,17,23,0.7) 80%, transparent); 
-            padding: 20px; width: 100%; box-sizing: border-box;
+            padding: 20px; 
+            width: 100%; 
+            box-sizing: border-box;
         }
-        .avatar-real { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--blue); object-fit: cover; background: #000; }
+        .avatar-real { 
+            width: 45px; 
+            height: 45px; 
+            border-radius: 50%; 
+            border: 2px solid var(--blue); 
+            object-fit: cover; 
+            background: #000; 
+        }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; }
-        .modal-content { background: var(--bg); width: 90%; max-width: 900px; margin: 50px auto; padding: 40px; border-radius: 15px; height: 80vh; overflow-y: auto; border: 1px solid var(--blue); }
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.95); 
+            z-index: 1000; 
+            overflow-y: auto;
+        }
+        .modal-content { 
+            background: var(--bg); 
+            width: 90%; 
+            max-width: 900px; 
+            margin: 50px auto; 
+            padding: 40px; 
+            border-radius: 15px; 
+            max-height: 85vh;
+            overflow-y: auto; 
+            border: 1px solid var(--blue);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
         
-        .btn-reaction { background: none; border: 1px solid #333; color: #fff; padding: 10px; cursor: pointer; border-radius: 5px; margin-right: 5px; }
-        .btn-reaction:hover { border-color: var(--orange); }
+        .btn-reaction { 
+            background: none; 
+            border: 1px solid #333; 
+            color: #fff; 
+            padding: 8px 15px; 
+            cursor: pointer; 
+            border-radius: 5px; 
+            margin-right: 5px; 
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+        .btn-reaction:hover { 
+            border-color: var(--orange); 
+            background: rgba(240, 136, 62, 0.1);
+        }
 
-        /* CAJA DE DIÁLOGO CRÍTICO - MEJORADA */
+        /* CAJA DE DIÁLOGO CRÍTICO */
         .caja-dialogo { 
             background: #0a0c10; 
             border: 1px solid var(--orange); 
-            padding: 30px; 
+            padding: 25px; 
             border-radius: 10px; 
             margin-top: 40px; 
             box-shadow: 0 5px 15px rgba(240, 136, 62, 0.1);
@@ -91,10 +227,10 @@
             font-weight: bold; 
             cursor: pointer; 
             margin-right: 10px; 
+            margin-bottom: 10px;
             display: inline-flex; 
             align-items: center; 
             gap: 8px; 
-            margin-top: 10px; 
             transition: all 0.3s;
         }
         .btn-canal:hover {
@@ -109,14 +245,17 @@
             display: none; 
             color: var(--orange); 
             font-weight: bold; 
-            margin-top: 15px; 
+            margin-top: 20px; 
             padding: 15px;
             background: rgba(240, 136, 62, 0.1);
             border-radius: 8px;
             border: 1px solid rgba(240, 136, 62, 0.3);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        /* Notificaciones flotantes */
+        /* Notificaciones */
         .notification {
             position: fixed;
             bottom: 20px;
@@ -128,12 +267,28 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
             z-index: 10000;
             display: none;
-            max-width: 300px;
+            max-width: 350px;
             animation: slideIn 0.5s ease;
         }
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Mensajes de carga y error */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--blue);
+        }
+        .error-message {
+            text-align: center;
+            padding: 40px;
+            color: var(--alert);
+            border: 1px solid var(--alert);
+            border-radius: 10px;
+            margin: 20px;
+            background: rgba(255, 68, 68, 0.1);
         }
     </style>
 </head>
@@ -145,17 +300,18 @@
 </a>
 
 <header>
-    <h1 style="color:var(--blue); letter-spacing: 5px;">SINAPSIS</h1>
-    <p style="color:var(--orange)">Revista de Estrategia Asimétrica y Pensamiento Crítico</p>
-    <input type="text" class="search-box" placeholder="Buscar en el umbral...">
+    <h1 style="color:var(--blue); letter-spacing: 5px; margin: 0;">SINAPSIS</h1>
+    <p style="color:var(--orange); margin: 10px 0 0;">Umbral de la Estrategia Asimétrica</p>
+    <p style="color:var(--orange); margin: 9px 0 0;">Revista Interdisciplinaria de Seguridad Ciudadana y de la Nación</p>
+    <input type="text" class="search-box" placeholder="Buscar en el umbral..." id="searchInput">
 </header>
 
 <section id="seccion-registro">
-    <h2 style="color:#fff;">SIMPOSIO INTERNACIONAL 2026</h2>
-    <p>Regístrese para activar los canales de diálogo crítico con los autores.</p>
+    <h2 style="color:#fff; margin-top: 0;">SIMPOSIO INTERNACIONAL 2026</h2>
+    <p style="max-width: 800px; margin: 0 auto;">Regístrese para activar los canales de diálogo crítico con los autores y participar en la definición de temas estratégicos.</p>
     <div class="form-registro" id="form-reg">
-        <input type="text" id="reg-nombre" placeholder="Nombre y Apellido">
-        <input type="email" id="reg-email" placeholder="Correo Electrónico">
+        <input type="text" id="reg-nombre" placeholder="Nombre y Apellido" required>
+        <input type="email" id="reg-email" placeholder="Correo Electrónico" required>
         <input type="text" id="reg-inst" placeholder="Institución / Afiliación">
         <button class="btn-registro" onclick="registrarUsuario()">ACTIVAR ACCESO</button>
     </div>
@@ -179,7 +335,11 @@
     </div>
 </section>
 
-<div class="container" id="grid-articulos"></div>
+<div class="container" id="grid-articulos">
+    <div class="loading" id="loadingArticles">
+        <i class="fas fa-spinner fa-spin"></i> Cargando artículos...
+    </div>
+</div>
 
 <!-- Notificación flotante -->
 <div class="notification" id="globalNotification">
@@ -188,7 +348,7 @@
 
 <div id="modalArticulo" class="modal">
     <div class="modal-content">
-        <button onclick="cerrarLectura()" style="float:right; background:none; border:none; color:var(--orange); font-size:20px; cursor:pointer;">&times; CERRAR</button>
+        <button onclick="cerrarLectura()" style="float:right; background:none; border:none; color:var(--orange); font-size:24px; cursor:pointer; padding: 5px 10px;">&times;</button>
         <div id="contenidoArticulo"></div>
     </div>
 </div>
@@ -197,11 +357,24 @@
     // ==================== CONFIGURACIÓN SUPABASE ====================
     const SB_URL = 'https://wajivhbldplztjvqudht.supabase.co';
     const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk';
+    
+    // Verificar que Supabase esté disponible
+    if (typeof supabase === 'undefined') {
+        document.getElementById('grid-articulos').innerHTML = `
+            <div class="error-message">
+                <h3>Error de configuración</h3>
+                <p>No se pudo cargar la biblioteca Supabase. Verifica tu conexión a internet.</p>
+            </div>
+        `;
+        throw new Error("Supabase no está disponible");
+    }
+    
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
-
+    
+    // Variable global para usuario
     let usuarioActual = JSON.parse(localStorage.getItem('sinapsis_user')) || null;
-
-    // ==================== FUNCIONES DE NOTIFICACIÓN ====================
+    
+    // ==================== FUNCIONES DE UTILIDAD ====================
     function mostrarNotificacion(mensaje, tipo = 'info') {
         const notification = document.getElementById('globalNotification');
         const text = document.getElementById('notificationText');
@@ -215,39 +388,76 @@
             notification.style.display = 'none';
         }, 4000);
     }
-
+    
+    function mostrarError(mensaje) {
+        document.getElementById('grid-articulos').innerHTML = `
+            <div class="error-message" style="grid-column: 1/-1;">
+                <h3>Error al cargar contenido</h3>
+                <p>${mensaje}</p>
+                <button onclick="obtenerArticulos()" style="margin-top: 15px; padding: 10px 20px; background: var(--orange); color: black; border: none; border-radius: 5px; cursor: pointer;">
+                    Reintentar
+                </button>
+            </div>
+        `;
+    }
+    
     // ==================== FUNCIONES PRINCIPALES ====================
-    window.onload = () => {
+    window.onload = async () => {
+        console.log("🔄 Iniciando aplicación Sinapsis...");
+        
+        // Configurar usuario si ya está registrado
         if(usuarioActual) {
             document.getElementById('form-reg').style.display = 'none';
             document.getElementById('mensaje-exito').style.display = 'block';
+            console.log("👤 Usuario encontrado:", usuarioActual.nombre);
         }
-        obtenerArticulos();
+        
+        // Cargar artículos
+        await obtenerArticulos();
+        
+        // Configurar búsqueda
+        document.getElementById('searchInput').addEventListener('input', buscarArticulos);
+        
+        console.log("✅ Aplicación iniciada correctamente");
     };
-
+    
     async function registrarUsuario() {
-        const nombre = document.getElementById('reg-nombre').value;
-        const email = document.getElementById('reg-email').value;
-        const inst = document.getElementById('reg-inst').value;
-
+        const nombre = document.getElementById('reg-nombre').value.trim();
+        const email = document.getElementById('reg-email').value.trim();
+        const inst = document.getElementById('reg-inst').value.trim();
+        
         if(!nombre || !email) {
-            mostrarNotificacion("Por favor complete su identidad.", 'error');
+            mostrarNotificacion("Por favor complete nombre y correo electrónico", 'error');
             return;
         }
-
+        
+        if(!email.includes('@')) {
+            mostrarNotificacion("Ingrese un correo electrónico válido", 'error');
+            return;
+        }
+        
         try {
-            // 1. Guardar en sinapsis_registros (tabla original)
+            console.log("📝 Registrando usuario:", nombre);
+            
+            // 1. Guardar en sinapsis_registros
             const { error: errorRegistro } = await _supabase
                 .from('sinapsis_registros')
                 .insert([{ 
-                    nombre, 
-                    email, 
+                    nombre: nombre, 
+                    email: email, 
                     institucion: inst || null 
                 }]);
-
-            if (errorRegistro) throw errorRegistro;
-
-            // 2. Guardar o actualizar en contactos_simposio (para dashboard y eventos)
+            
+            if (errorRegistro) {
+                if (errorRegistro.code === '23505') {
+                    // Usuario ya existe
+                    mostrarNotificacion("Este correo ya está registrado. Acceso activado.", 'info');
+                } else {
+                    throw errorRegistro;
+                }
+            }
+            
+            // 2. Guardar en contactos_simposio (para eventos)
             const { error: errorContacto } = await _supabase
                 .from('contactos_simposio')
                 .upsert({
@@ -262,210 +472,275 @@
                     onConflict: 'email',
                     ignoreDuplicates: false 
                 });
-
+            
             if (errorContacto) console.warn("⚠️ Error en contactos_simposio:", errorContacto);
-
-            // 3. Guardar en dashboard_intervenciones como acción de registro
+            
+            // 3. Guardar en dashboard_intervenciones
             const { error: errorDashboard } = await _supabase
                 .from('dashboard_intervenciones')
                 .insert([{
                     usuario_nombre: nombre,
                     usuario_email: email,
                     usuario_institucion: inst || null,
-                    tipo_accion: 'registro_simposio',
-                    contenido: 'Usuario registrado para el Simposio 2026',
+                    tipo_accion: 'registro',
+                    contenido: 'Registro en el Simposio 2026',
                     fecha: new Date().toISOString(),
                     metadata: {
-                        institucion: inst || null,
-                        para_pdf: true,
-                        simposio_tema: false,
-                        prioridad: 'baja'
+                        fuente: 'formulario_registro',
+                        para_pdf: true
                     }
                 }]);
-
+            
             if (errorDashboard) console.warn("⚠️ Error en dashboard_intervenciones:", errorDashboard);
-
-            // 4. Actualizar estado local
-            usuarioActual = { nombre, email, institucion: inst };
+            
+            // 4. Actualizar estado local y UI
+            usuarioActual = { nombre: nombre, email: email, institucion: inst };
             localStorage.setItem('sinapsis_user', JSON.stringify(usuarioActual));
             
-            // 5. Actualizar UI
             document.getElementById('form-reg').style.display = 'none';
             document.getElementById('mensaje-exito').style.display = 'block';
             
-            mostrarNotificacion("✓ Acceso concedido al Búnker de Diálogo", 'success');
+            mostrarNotificacion("✅ Registro exitoso. Acceso concedido al Simposio 2026", 'success');
             
         } catch (error) {
             console.error("❌ Error en registro:", error);
-            mostrarNotificacion("Error en el registro: " + error.message, 'error');
+            mostrarNotificacion(`Error: ${error.message}`, 'error');
         }
     }
-
+    
     async function obtenerArticulos() {
         try {
+            console.log("📚 Solicitando artículos desde Supabase...");
+            
             const { data, error } = await _supabase
                 .from('articulos')
                 .select('*')
                 .order('id', { ascending: false });
             
-            if (error) throw error;
+            if (error) {
+                console.error("❌ Error en consulta:", error);
+                throw error;
+            }
+            
+            console.log(`✅ ${data ? data.length : 0} artículos recibidos`);
+            
+            if (!data || data.length === 0) {
+                mostrarError("No se encontraron artículos en la base de datos.");
+                return;
+            }
             
             dibujarCards(data);
             
         } catch (error) {
             console.error("❌ Error cargando artículos:", error);
-            mostrarNotificacion("Error cargando artículos", 'error');
+            mostrarError(`Error al conectar con la base de datos: ${error.message}`);
         }
     }
     
-    function dibujarCards(lista) {
+    function dibujarCards(articulos) {
         const grid = document.getElementById('grid-articulos');
         
-        if (!lista || lista.length === 0) {
+        // Limpiar mensaje de carga
+        grid.innerHTML = '';
+        
+        if (!articulos || articulos.length === 0) {
             grid.innerHTML = `
                 <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
-                    <h3 style="color: var(--orange)">No hay artículos disponibles</h3>
+                    <h3 style="color: var(--orange)">No hay artículos publicados</h3>
                     <p>Próximamente se publicarán nuevos contenidos.</p>
                 </div>
             `;
             return;
         }
         
-        grid.innerHTML = lista.map(art => {
+        articulos.forEach(art => {
+            // Preparar datos
+            const titulo = art.titulo || 'Sin título';
+            const autor = art.autor || 'Autor desconocido';
+            const afiliacion = art.afiliacion || 'Sin afiliación';
             const portada = art.portada_url || 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800';
-            const fotoAutor = art.autor_foto_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(art.autor || 'Anónimo')}&background=random&color=fff`;
+            const fotoAutor = art.autor_foto_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(autor)}&background=random&color=fff`;
             
-            // Escapar caracteres para onclick
-            const artJSON = JSON.stringify(art)
-                .replace(/'/g, "\\'")
-                .replace(/"/g, '&quot;');
+            // Crear card
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.background = `url('${portada}') center/cover no-repeat`;
             
-            return `
-                <div class="card" onclick='abrirLectura(${artJSON})' 
-                     style="background: url('${portada}') center/cover no-repeat;">
-                    <div class="card-info">
-                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-                            <img src="${fotoAutor}" class="avatar-real" 
-                                 onerror="this.src='https://ui-avatars.com/api/?name=Autor&background=333&color=fff'">
-                            <small style="color:var(--blue); font-weight:bold;">${art.autor || 'Autor'}</small>
-                        </div>
-                        <small style="color:var(--orange); font-weight:bold; text-transform:uppercase;">${art.afiliación || 'SINAPSIS'}</small>
-                        <h3 style="margin: 5px 0; color:#fff; font-size:1.4em;">${art.titulo || 'Sin título'}</h3>
+            card.innerHTML = `
+                <div class="card-info">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                        <img src="${fotoAutor}" class="avatar-real" 
+                             onerror="this.src='https://ui-avatars.com/api/?name=A&background=333&color=fff'">
+                        <small style="color:var(--blue); font-weight:bold;">${autor}</small>
                     </div>
+                    <small style="color:var(--orange); font-weight:bold; text-transform:uppercase;">${afiliacion}</small>
+                    <h3 style="margin: 5px 0; color:#fff; font-size:1.4em; line-height:1.3;">${titulo}</h3>
                 </div>
             `;
-        }).join('');
+            
+            // Agregar evento click
+            card.addEventListener('click', () => abrirLectura(art));
+            
+            grid.appendChild(card);
+        });
+        
+        console.log(`🎨 ${articulos.length} tarjetas dibujadas`);
     }
-
+    
+    function buscarArticulos() {
+        const termino = document.getElementById('searchInput').value.toLowerCase();
+        const cards = document.querySelectorAll('.card');
+        
+        cards.forEach(card => {
+            const titulo = card.querySelector('h3').textContent.toLowerCase();
+            const autor = card.querySelector('small[style*="color:var(--blue)"]').textContent.toLowerCase();
+            const afiliacion = card.querySelector('small[style*="color:var(--orange)"]').textContent.toLowerCase();
+            
+            const coincide = titulo.includes(termino) || autor.includes(termino) || afiliacion.includes(termino);
+            card.style.display = coincide ? 'flex' : 'none';
+        });
+    }
+    
     function abrirLectura(art) {
+        console.log("📖 Abriendo artículo:", art.titulo);
+        
         const modal = document.getElementById('modalArticulo');
         const contenido = document.getElementById('contenidoArticulo');
         
-        // Dividir contenido en párrafos para reacciones
+        // Preparar contenido del artículo
+        const titulo = art.titulo || 'Sin título';
+        const autor = art.autor || 'Autor desconocido';
+        const afiliacion = art.afiliacion || 'Sin afiliación';
+        const doi = art.doi || 'No disponible';
+        const contacto = art.contacto_link || '';
+        const fotoAutor = art.autor_foto_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(autor)}&background=random&color=fff`;
+        
+        // Dividir contenido en párrafos
         let htmlParrafos = '';
         if (art.contenido) {
-            htmlParrafos = art.contenido.split('\n').map((p, i) => {
-                if (p.trim()) {
-                    return `
-                        <div class="parrafo-container" style="margin-bottom:20px;">
-                            <p style="line-height:1.8; font-size:1.1em; text-align:justify;">${p}</p>
-                            <div class="reacciones">
-                                <button class="btn-reaction" onclick="reaccionar(${art.id}, ${i}, '💡', ${JSON.stringify(art.titulo)}, ${JSON.stringify(art.autor)})">💡 Interés</button>
-                                <button class="btn-reaction" onclick="reaccionar(${art.id}, ${i}, '⚖️', ${JSON.stringify(art.titulo)}, ${JSON.stringify(art.autor)})">⚖️ Debate</button>
-                                <button class="btn-reaction" onclick="reaccionar(${art.id}, ${i}, '❓', ${JSON.stringify(art.titulo)}, ${JSON.stringify(art.autor)})">❓ Duda</button>
-                            </div>
+            const parrafos = art.contenido.split('\n').filter(p => p.trim());
+            htmlParrafos = parrafos.map((parrafo, index) => {
+                return `
+                    <div class="parrafo-container" style="margin-bottom: 25px;">
+                        <p style="line-height: 1.8; font-size: 1.1em; text-align: justify;">${parrafo}</p>
+                        <div class="reacciones">
+                            <button class="btn-reaction" onclick="reaccionar(${art.id}, ${index}, '💡', '${titulo.replace(/'/g, "\\'")}', '${autor.replace(/'/g, "\\'")}')">
+                                💡 Interés
+                            </button>
+                            <button class="btn-reaction" onclick="reaccionar(${art.id}, ${index}, '⚖️', '${titulo.replace(/'/g, "\\'")}', '${autor.replace(/'/g, "\\'")}')">
+                                ⚖️ Debate
+                            </button>
+                            <button class="btn-reaction" onclick="reaccionar(${art.id}, ${index}, '❓', '${titulo.replace(/'/g, "\\'")}', '${autor.replace(/'/g, "\\'")}')">
+                                ❓ Duda
+                            </button>
                         </div>
-                    `;
-                }
-                return '';
+                    </div>
+                `;
             }).join('');
         } else {
             htmlParrafos = '<p style="color: var(--silver); font-style: italic;">Este artículo no tiene contenido disponible.</p>';
         }
-
-        // Usar contacto_link del artículo si existe
-        const contactoLink = art.contacto_link || '';
         
+        // Caja de diálogo
         const buzonInteraccion = `
             <div class="caja-dialogo">
-                <h3 style="color:var(--orange)">🎙️ Diálogo Crítico con ${art.autor || 'el autor'}</h3>
+                <h3 style="color:var(--orange); margin-top: 0;">🎙️ Diálogo Crítico con ${autor}</h3>
                 <p>Envíe su tesis o pregunta sobre este artículo para el Simposio 2026</p>
                 
-                <textarea id="texto-tesis" placeholder="Escriba aquí su tesis o intervención..." 
-                          style="width:100%; height:100px; background:#000; color:#fff; border:1px solid #333; padding:10px; margin-top:10px;"></textarea>
+                <textarea id="texto-tesis" placeholder="Escriba aquí su tesis o intervención crítica..." 
+                          style="width:100%; height: 120px; background:#000; color:#fff; border:1px solid #333; padding:12px; margin-top:10px; border-radius: 5px; font-family: inherit; resize: vertical;"></textarea>
                 
-                <div style="margin-top:15px;">
-                    <button class="btn-canal email" onclick="enviarTesisAutor(${art.id}, '${art.autor || ''}', '${art.titulo || ''}', 'email', '${contactoLink}')">
+                <div style="margin-top: 20px;">
+                    <button class="btn-canal email" onclick="enviarTesis(${art.id}, '${autor.replace(/'/g, "\\'")}', '${titulo.replace(/'/g, "\\'")}', 'email', '${contacto}')">
                         <i class="fas fa-envelope"></i> ENVIAR POR CORREO
                     </button>
-                    <button class="btn-canal whatsapp" onclick="enviarTesisAutor(${art.id}, '${art.autor || ''}', '${art.titulo || ''}', 'whatsapp', '${contactoLink}')">
-                        <i class="fab fa-whatsapp"></i> ENVIAR POR WHATSAPP
+                    <button class="btn-canal whatsapp" onclick="enviarTesis(${art.id}, '${autor.replace(/'/g, "\\'")}', '${titulo.replace(/'/g, "\\'")}', 'whatsapp', '${contacto}')">
+                        <i class="fab fa-whatsapp"></i> WHATSAPP
                     </button>
-                    <button class="btn-canal telegram" onclick="enviarTesisAutor(${art.id}, '${art.autor || ''}', '${art.titulo || ''}', 'telegram', '${contactoLink}')">
-                        <i class="fab fa-telegram"></i> ENVIAR POR TELEGRAM
+                    <button class="btn-canal telegram" onclick="enviarTesis(${art.id}, '${autor.replace(/'/g, "\\'")}', '${titulo.replace(/'/g, "\\'")}', 'telegram', '${contacto}')">
+                        <i class="fab fa-telegram"></i> TELEGRAM
                     </button>
                 </div>
                 
-                <p style="font-size:0.8em; color:gray; margin-top:15px;">
-                    <i class="fas fa-chart-line"></i> Su intervención será incluida en el análisis del Simposio 2026
-                    <br>DOI: ${art.doi || 'N/A'}
-                </p>
-            </div>
-        `;
-
-        contenido.innerHTML = `
-            <h1 style="color:var(--blue)">${art.titulo || 'Artículo sin título'}</h1>
-            <div style="display:flex; align-items:center; gap:15px; margin-bottom:20px;">
-                <img src="${art.autor_foto_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(art.autor || 'A') + '&background=random&color=fff'}" 
-                     style="width:60px; height:60px; border-radius:50%; border:2px solid var(--orange);">
-                <div>
-                    <h3 style="color:var(--orange); margin:0;">${art.autor || 'Autor'}</h3>
-                    <p style="margin:5px 0; color:var(--silver);">${art.afiliación || 'Afiliación no especificada'}</p>
+                <div style="margin-top: 15px; font-size: 0.9em; color: #8b949e;">
+                    <p><i class="fas fa-chart-line"></i> Su intervención será incluida en el análisis del Simposio 2026</p>
+                    <p><i class="fas fa-fingerprint"></i> DOI: ${doi}</p>
                 </div>
             </div>
-            <hr style="border:1px solid #333;">
+        `;
+        
+        // Contenido completo del modal
+        contenido.innerHTML = `
+            <h1 style="color:var(--blue); margin-top: 0;">${titulo}</h1>
+            
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #30363d;">
+                <img src="${fotoAutor}" 
+                     style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--orange); object-fit: cover;"
+                     onerror="this.src='https://ui-avatars.com/api/?name=A&background=333&color=fff'">
+                <div>
+                    <h3 style="color:var(--orange); margin: 0;">${autor}</h3>
+                    <p style="margin: 5px 0 0; color:var(--silver);">${afiliacion}</p>
+                </div>
+            </div>
+            
             ${htmlParrafos}
+            
             ${buzonInteraccion}
         `;
         
+        // Mostrar modal
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
+        
+        console.log("✅ Modal de artículo abierto");
     }
-
-    async function enviarTesisAutor(artId, autor, titulo, canal, contactoLink = '') {
-        if(!usuarioActual) {
-            mostrarNotificacion("Debe registrarse primero para participar", 'error');
+    
+    async function enviarTesis(articuloId, autor, titulo, canal, contactoLink = '') {
+        if (!usuarioActual) {
+            mostrarNotificacion("Debe registrarse primero para participar en el diálogo", 'error');
             document.getElementById('seccion-registro').scrollIntoView({ behavior: 'smooth' });
             return;
         }
-
-        const mensaje = document.getElementById('texto-tesis').value;
-        if(!mensaje || mensaje.trim().length < 10) {
+        
+        const textarea = document.getElementById('texto-tesis');
+        const mensaje = textarea.value.trim();
+        
+        if (!mensaje || mensaje.length < 10) {
             mostrarNotificacion("Escriba una intervención significativa (mínimo 10 caracteres)", 'error');
+            textarea.focus();
             return;
         }
-
+        
+        if (mensaje.length > 2000) {
+            mostrarNotificacion("El mensaje es demasiado largo (máximo 2000 caracteres)", 'error');
+            return;
+        }
+        
         try {
-            // 1. Guardar en sinapsis_reacciones (tabla original)
+            console.log(`📤 Enviando tesis para artículo ${articuloId} por ${canal}`);
+            
+            // 1. Guardar en sinapsis_reacciones
             const { error: errorReaccion } = await _supabase
                 .from('sinapsis_reacciones')
                 .insert([{
-                    artículo_id: artId,
-                    tipo_reaccion: '💬 TESIS',
+                    articulo_id: articuloId,
+                    tipo_reaccion: '💬',
                     comentario_texto: `DE: ${usuarioActual.nombre} (${usuarioActual.email}) | MSG: ${mensaje}`,
-                    parrafo_index: 0
+                    usuario_nombre: usuarioActual.nombre,
+                    usuario_email: usuarioActual.email,
+                    canal: canal
                 }]);
-
+            
             if (errorReaccion) throw errorReaccion;
-
-            // 2. Guardar en dashboard_intervenciones (para el simposio)
+            
+            // 2. Guardar en dashboard_intervenciones
             const { error: errorDashboard } = await _supabase
                 .from('dashboard_intervenciones')
                 .insert([{
                     usuario_nombre: usuarioActual.nombre,
                     usuario_email: usuarioActual.email,
                     usuario_institucion: usuarioActual.institucion || null,
-                    articulo_id: artId,
+                    articulo_id: articuloId,
                     articulo_titulo: titulo,
                     articulo_autor: autor,
                     tipo_accion: 'tesis',
@@ -476,40 +751,34 @@
                         para_pdf: true,
                         simposio_tema: true,
                         prioridad: 'media',
-                        longitud: mensaje.length
+                        longitud_caracteres: mensaje.length
                     }
                 }]);
-
+            
             if (errorDashboard) console.warn("⚠️ Error en dashboard_intervenciones:", errorDashboard);
-
-            // 3. Actualizar contactos_simposio (añadir artículo intervenido)
-            const { data: contactoExistente } = await _supabase
-                .from('contactos_simposio')
-                .select('articulos_intervenidos, total_intervenciones')
-                .eq('email', usuarioActual.email)
-                .single();
-
-            let articulosIntervenidos = contactoExistente?.articulos_intervenidos || [];
-            if (!articulosIntervenidos.includes(artId)) {
-                articulosIntervenidos.push(artId);
+            
+            // 3. Actualizar contactos_simposio
+            const { error: errorContacto } = await _supabase.rpc('incrementar_intervenciones', {
+                user_email: usuarioActual.email,
+                articulo_id: articuloId
+            });
+            
+            if (errorContacto) {
+                console.warn("⚠️ Error actualizando contactos:", errorContacto);
+                // Intentar método alternativo
+                await _supabase
+                    .from('contactos_simposio')
+                    .update({
+                        ultima_intervencion: new Date().toISOString()
+                    })
+                    .eq('email', usuarioActual.email);
             }
-
-            const totalIntervenciones = (contactoExistente?.total_intervenciones || 0) + 1;
-
-            await _supabase
-                .from('contactos_simposio')
-                .update({
-                    articulos_intervenidos: articulosIntervenidos,
-                    total_intervenciones: totalIntervenciones,
-                    ultima_intervencion: new Date().toISOString()
-                })
-                .eq('email', usuarioActual.email);
-
-            // 4. Preparar texto para enviar al autor
-            const textoFinal = `TESIS SINAPSIS - Diálogo Crítico
+            
+            // 4. Preparar y abrir canal de comunicación
+            const textoParaEnviar = `Tesis Sinapsis 2026
 
 De: ${usuarioActual.nombre}
-Email: ${usuarioActual.email}
+Correo: ${usuarioActual.email}
 Institución: ${usuarioActual.institucion || 'No especificada'}
 
 Artículo: "${titulo}"
@@ -520,54 +789,58 @@ Intervención crítica:
 
 ---
 Enviado desde Sinapsis: Umbral de la Estrategia Asimétrica
-Esta tesis será considerada para el Simposio Internacional 2026`;
-
-            // 5. Abrir el canal seleccionado
-            if(canal === 'email') {
-                window.location.href = `mailto:${contactoLink || ''}?subject=Tesis Sinapsis: "${titulo}"&body=${encodeURIComponent(textoFinal)}`;
-            } else if(canal === 'whatsapp') {
-                if(contactoLink && contactoLink.includes('wa.me/')) {
-                    window.open(`${contactoLink}?text=${encodeURIComponent(textoFinal)}`, '_blank');
-                } else {
-                    window.open(`https://wa.me/?text=${encodeURIComponent(textoFinal)}`, '_blank');
-                }
-            } else if(canal === 'telegram') {
-                if(contactoLink && contactoLink.includes('t.me/')) {
-                    window.open(`${contactoLink}?text=${encodeURIComponent(textoFinal)}`, '_blank');
-                } else {
-                    window.open(`https://t.me/?text=${encodeURIComponent(textoFinal)}`, '_blank');
-                }
+Esta intervención será considerada para el Simposio Internacional 2026`;
+            
+            // Abrir el canal correspondiente
+            if (canal === 'email') {
+                const mailtoLink = contactoLink && contactoLink.includes('@') 
+                    ? contactoLink 
+                    : '';
+                window.location.href = `mailto:${mailtoLink}?subject=Tesis sobre "${titulo}"&body=${encodeURIComponent(textoParaEnviar)}`;
+            } else if (canal === 'whatsapp') {
+                window.open(`https://wa.me/?text=${encodeURIComponent(textoParaEnviar)}`, '_blank');
+            } else if (canal === 'telegram') {
+                window.open(`https://t.me/share/url?url=&text=${encodeURIComponent(textoParaEnviar)}`, '_blank');
             }
-
-            // 6. Mostrar confirmación y limpiar
-            mostrarNotificacion("✓ Tesis registrada para el Simposio 2026", 'success');
-            document.getElementById('texto-tesis').value = "";
-
+            
+            // 5. Mostrar confirmación y limpiar
+            mostrarNotificacion("✅ Tesis registrada para el análisis del Simposio 2026", 'success');
+            textarea.value = '';
+            
+            // Cerrar modal después de 2 segundos
+            setTimeout(() => {
+                cerrarLectura();
+            }, 2000);
+            
         } catch (error) {
             console.error("❌ Error enviando tesis:", error);
-            mostrarNotificacion("Error al enviar la tesis: " + error.message, 'error');
+            mostrarNotificacion(`Error: ${error.message}`, 'error');
         }
     }
-
-    async function reaccionar(artId, pIndex, tipo, titulo, autor) {
-        if(!usuarioActual) {
+    
+    async function reaccionar(articuloId, parrafoIndex, tipo, titulo, autor) {
+        if (!usuarioActual) {
             mostrarNotificacion("Regístrese para registrar sus reacciones", 'error');
             return;
         }
-
+        
         try {
-            // 1. Guardar en sinapsis_reacciones (tabla original)
+            console.log(`🔄 Registrando reacción ${tipo} en artículo ${articuloId}`);
+            
+            // 1. Guardar en sinapsis_reacciones
             const { error: errorReaccion } = await _supabase
                 .from('sinapsis_reacciones')
-                .insert([{ 
-                    artículo_id: artId, 
-                    parrafo_index: pIndex, 
-                    tipo_reaccion: tipo 
+                .insert([{
+                    articulo_id: articuloId,
+                    tipo_reaccion: tipo,
+                    parrafo_index: parrafoIndex,
+                    usuario_nombre: usuarioActual.nombre,
+                    usuario_email: usuarioActual.email
                 }]);
-
+            
             if (errorReaccion) throw errorReaccion;
-
-            // 2. Guardar en dashboard_intervenciones (para estadísticas del simposio)
+            
+            // 2. Guardar en dashboard_intervenciones
             const tipoTexto = tipo === '💡' ? 'Interés' : tipo === '⚖️' ? 'Debate' : 'Duda';
             
             const { error: errorDashboard } = await _supabase
@@ -576,34 +849,53 @@ Esta tesis será considerada para el Simposio Internacional 2026`;
                     usuario_nombre: usuarioActual.nombre,
                     usuario_email: usuarioActual.email,
                     usuario_institucion: usuarioActual.institucion || null,
-                    articulo_id: artId,
+                    articulo_id: articuloId,
                     articulo_titulo: titulo,
                     articulo_autor: autor,
                     tipo_accion: 'reaccion',
                     contenido: tipoTexto,
                     fecha: new Date().toISOString(),
                     metadata: {
-                        parrafo_index: pIndex,
-                        para_pdf: false,
-                        prioridad: 'baja',
-                        tipo_emoji: tipo
+                        parrafo_index: parrafoIndex,
+                        emoji: tipo,
+                        para_pdf: false
                     }
                 }]);
-
+            
             if (errorDashboard) console.warn("⚠️ Error en dashboard_intervenciones:", errorDashboard);
-
-            mostrarNotificacion(`✓ Reacción registrada (${tipoTexto})`, 'success');
-
+            
+            mostrarNotificacion(`✅ Reacción registrada: ${tipoTexto}`, 'success');
+            
         } catch (error) {
-            console.error("❌ Error en reacción:", error);
+            console.error("❌ Error registrando reacción:", error);
             mostrarNotificacion("Error al registrar reacción", 'error');
         }
     }
-
+    
     function cerrarLectura() {
         document.getElementById('modalArticulo').style.display = 'none';
         document.body.style.overflow = 'auto';
+        console.log("📕 Modal cerrado");
     }
+    
+    // ==================== FUNCIÓN SQL ADICIONAL ====================
+    // Esta función debe ejecutarse en el SQL Editor de Supabase una vez
+    /*
+    CREATE OR REPLACE FUNCTION incrementar_intervenciones(user_email TEXT, articulo_id INT)
+    RETURNS void AS $$
+    BEGIN
+        UPDATE contactos_simposio 
+        SET 
+            total_intervenciones = total_intervenciones + 1,
+            ultima_intervencion = NOW(),
+            articulos_intervenidos = array_append(
+                COALESCE(articulos_intervenidos, ARRAY[]::INT[]),
+                articulo_id
+            )
+        WHERE email = user_email;
+    END;
+    $$ LANGUAGE plpgsql;
+    */
 </script>
 </body>
 </html>
