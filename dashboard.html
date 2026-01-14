@@ -395,4 +395,566 @@
                 
                 if (errorIntervenciones) {
                     console.warn('⚠️ No se encontró tabla dashboard_intervenciones, usando sinapsis_reacciones');
-                    // Si no existe la tabla
+                    // Si no existe la tabla, usar reacciones tipo TESIS
+                    intervenciones = reacciones.filter(r => r.tipo_reaccion.includes('💬'));
+                } else {
+                    intervenciones = intervencionesData || [];
+                }
+                console.log(`✅ ${intervenciones.length} intervenciones cargadas`);
+                
+                // 4. Cargar temas emergentes (si existe la tabla)
+                try {
+                    const { data: temasData, error: errorTemas } = await _supabase
+                        .from('simposio_temas')
+                        .select('*')
+                        .order('intervenciones_count', { ascending: false });
+                    
+                    if (!errorTemas) {
+                        temasEmergentes = temasData || [];
+                        console.log(`✅ ${temasEmergentes.length} temas emergentes cargados`);
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Tabla simposio_temas no disponible');
+                    temasEmergentes = [];
+                }
+                
+            } catch (error) {
+                console.error('❌ Error cargando datos:', error);
+                alert('Error al cargar datos del búnker: ' + error.message);
+            }
+        }
+        
+        // ==================== FUNCIONES DE RENDERIZADO ====================
+        function inicializarSelectArticulos() {
+            const selector = document.getElementById('articleSelector');
+            
+            // Limpiar opciones excepto la primera
+            while (selector.options.length > 1) {
+                selector.remove(1);
+            }
+            
+            // Agregar cada artículo
+            articulos.forEach(art => {
+                const option = document.createElement('option');
+                option.value = art.id;
+                option.textContent = `${art.titulo} - ${art.autor}`;
+                selector.appendChild(option);
+            });
+        }
+        
+        function cargarDatosArticulo() {
+            articuloSeleccionado = document.getElementById('articleSelector').value;
+            renderizarDashboard();
+        }
+        
+        function renderizarDashboard() {
+            renderizarEstadisticasGlobales();
+            renderizarGraficoImpacto();
+            renderizarGraficoDebatible();
+            renderizarHallazgosCriticos();
+            renderizarIntervenciones();
+            renderizarTemasEmergentes();
+        }
+        
+        function renderizarEstadisticasGlobales() {
+            const statsContainer = document.getElementById('globalStats');
+            
+            // Filtrar reacciones según selección
+            let reaccionesFiltradas = reacciones;
+            if (articuloSeleccionado !== 'all') {
+                reaccionesFiltradas = reacciones.filter(r => r.articulo_id == articuloSeleccionado);
+            }
+            
+            // Contar por tipo (Usando los Emojis como fuente de verdad)
+            const Interesante = reaccionesFiltradas.filter(r => r.tipo_reaccion === '💡').length;
+            const Debatible = reaccionesFiltradas.filter(r => r.tipo_reaccion === '⚖️').length;
+            const Duda = reaccionesFiltradas.filter(r => r.tipo_reaccion === '❓').length;
+            const tesis = reaccionesFiltradas.filter(r => r.tipo_reaccion.includes('💬')).length;
+            const total = Interesante + Debatible + Duda;
+            
+            statsContainer.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-label">Total Reacciones</div>
+                    <div class="stat-number">${total}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">💡 Interesante</div>
+                    <div class="stat-number">${Interesante}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">⚖️ Debatible</div>
+                    <div class="stat-number">${Debatible}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">❓ Duda</div>
+                    <div class="stat-number">${Duda}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">📝 Tesis</div>
+                    <div class="stat-number">${tesis}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">📊 Engagement</div>
+                    <div class="stat-number">${total + tesis}</div>
+                </div>
+            `;
+        }
+        
+        function renderizarGraficoImpacto() {
+            const ctx = document.getElementById('impactChart').getContext('2d');
+            
+            // Preparar datos según selección
+            let labels = [];
+            let datosInteresante = [];
+            let datosDebatible = [];
+            let datosDuda = [];
+            
+            if (articuloSeleccionado === 'all') {
+                // Para todos los artículos, mostrar los 10 más activos
+                const articulosConReacciones = articulos.map(art => {
+                    const reaccionesArt = reacciones.filter(r => r.articulo_id === art.id);
+                    return {
+                        ...art,
+                        Interesante: reaccionesArt.filter(r => r.tipo_reaccion === '💡').length,
+                        Debatible: reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length,
+                        Duda: reaccionesArt.filter(r => r.tipo_reaccion === '❓').length,
+                        total: reaccionesArt.length
+                    };
+                }).sort((a, b) => b.total - a.total).slice(0, 10);
+                
+                labels = articulosConReacciones.map(a => a.titulo.substring(0, 20) + '...');
+                datosInteresante = articulosConReacciones.map(a => a.Interesante);
+                datosDebatible = articulosConReacciones.map(a => a.Debatible);
+                datosDuda = articulosConReacciones.map(a => a.Duda);
+            } else {
+                // Para un artículo específico, mostrar por día/semana
+                const art = articulos.find(a => a.id == articuloSeleccionado);
+                labels = ['Interesante', 'Debatible', 'Duda'];
+                const reaccionesArt = reacciones.filter(r => r.articulo_id == articuloSeleccionado);
+                datosInteresante = [reaccionesArt.filter(r => r.tipo_reaccion === '💡').length, 0, 0];
+                datosDebatible = [0, reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length, 0];
+                datosDuda = [0, 0, reaccionesArt.filter(r => r.tipo_reaccion === '❓').length];
+            }
+            
+            // Destruir gráfico anterior si existe
+            if (chartImpacto) chartImpacto.destroy();
+            
+            chartImpacto = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '💡 Interesante',
+                            data: datosInteresante,
+                            backgroundColor: 'rgba(88, 166, 255, 0.7)',
+                            borderColor: 'rgb(88, 166, 255)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '⚖️ Debatible',
+                            data: datosDebatible,
+                            backgroundColor: 'rgba(240, 136, 62, 0.7)',
+                            borderColor: 'rgb(240, 136, 62)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '❓ Duda',
+                            data: datosDuda,
+                            backgroundColor: 'rgba(201, 209, 217, 0.7)',
+                            borderColor: 'rgb(201, 209, 217)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: articuloSeleccionado === 'all' 
+                                ? 'TOP 10 ARTÍCULOS POR IMPACTO' 
+                                : 'DISTRIBUCIÓN DE REACCIONES',
+                            color: '#c9d1d9',
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            labels: { color: '#c9d1d9' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#8b949e' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        x: {
+                            ticks: { 
+                                color: '#8b949e',
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function renderizarGraficoDebatible() {
+            const ctx = document.getElementById('DebatibleChart').getContext('2d');
+            
+            // Filtrar reacciones según selección
+            let reaccionesFiltradas = reacciones;
+            if (articuloSeleccionado !== 'all') {
+                reaccionesFiltradas = reacciones.filter(r => r.articulo_id == articuloSeleccionado);
+            }
+            
+            const Interesante = reaccionesFiltradas.filter(r => r.tipo_reaccion === '💡').length;
+            const Debatible = reaccionesFiltradas.filter(r => r.tipo_reaccion === '⚖️').length;
+            const Duda = reaccionesFiltradas.filter(r => r.tipo_reaccion === '❓').length;
+            
+            // Actualizar detalles de reacciones
+            document.getElementById('reactionDetails').innerHTML = `
+                <div style="margin-top: 20px;">
+                    <span class="reaction-badge badge-Interesante">💡 Interesante: ${Interesante}</span>
+                    <span class="reaction-badge badge-Debatible">⚖️ Debatible: ${Debatible}</span>
+                    <span class="reaction-badge badge-Duda">❓ Duda: ${Duda}</span>
+                </div>
+            `;
+            
+            // Destruir gráfico anterior si existe
+            if (chartDebatible) chartDebatible.destroy();
+            
+            chartDebatible = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Interesante', 'Debatible', 'Duda'],
+                    datasets: [{
+                        data: [Interesante, Debatible, Duda],
+                        backgroundColor: [
+                            'rgba(88, 166, 255, 0.8)',
+                            'rgba(240, 136, 62, 0.8)',
+                            'rgba(201, 209, 217, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(88, 166, 255)',
+                            'rgb(240, 136, 62)',
+                            'rgb(201, 209, 217)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#c9d1d9', font: { size: 14 } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((context.raw / total) * 100);
+                                    return `${context.label}: ${context.raw} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function renderizarHallazgosCriticos() {
+            const container = document.getElementById('criticalFindings');
+            
+            if (articuloSeleccionado === 'all') {
+                // Hallazgos globales: artículos con mayor disenso
+                const articulosConDisenso = articulos.map(art => {
+                    const reaccionesArt = reacciones.filter(r => r.articulo_id === art.id);
+                    const Debatible = reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length;
+                    const Duda = reaccionesArt.filter(r => r.tipo_reaccion === '❓').length;
+                    const disenso = Debatible + Duda;
+                    
+                    return {
+                        titulo: art.titulo,
+                        autor: art.autor,
+                        disenso: disenso,
+                        prioridad: disenso > 10 ? 'ALTA - DISENSO' : disenso > 5 ? 'MEDIA' : 'BAJA'
+                    };
+                }).filter(a => a.disenso > 0).sort((a, b) => b.disenso - a.disenso);
+                
+                let html = '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;">';
+                html += '<tr style="background: rgba(240,136,62,0.2);">';
+                html += '<th style="padding: 10px; text-align: left; border-bottom: 1px solid #30363d;">Artículo</th>';
+                html += '<th style="padding: 10px; text-align: left; border-bottom: 1px solid #30363d;">Autor</th>';
+                html += '<th style="padding: 10px; text-align: left; border-bottom: 1px solid #30363d;">Disenso</th>';
+                html += '<th style="padding: 10px; text-align: left; border-bottom: 1px solid #30363d;">Prioridad</th>';
+                html += '</tr>';
+                
+                articulosConDisenso.forEach(art => {
+                    const clasePrioridad = art.prioridad.includes('ALTA') ? 'priority-high' : 
+                                          art.prioridad.includes('MEDIA') ? 'priority-medium' : 'priority-low';
+                    
+                    html += `<tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #30363d;">${art.titulo.substring(0, 40)}...</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #30363d;">${art.autor}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #30363d;">${art.disenso}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #30363d;" class="${clasePrioridad}">${art.prioridad}</td>
+                    </tr>`;
+                });
+                
+                html += '</table>';
+                container.innerHTML = html;
+                
+                // Actualizar nudos críticos
+                const intervencionesDebatible = intervenciones.filter(i => 
+                    i.contenido && (i.contenido.includes('Debatible') || i.contenido.includes('disenso') || 
+                    i.contenido.includes('controversia') || i.contenido.includes('Duda'))
+                );
+                
+                if (intervencionesDebatible.length > 0) {
+                    const nudos = intervencionesDebatible.slice(0, 3).map(i => 
+                        `"${i.contenido.substring(0, 100)}..."`
+                    ).join('<br><br>');
+                    
+                    document.getElementById('nudosCriticos').innerHTML = nudos;
+                }
+                
+            } else {
+                // Hallazgos para artículo específico
+                const art = articulos.find(a => a.id == articuloSeleccionado);
+                const reaccionesArt = reacciones.filter(r => r.articulo_id == articuloSeleccionado);
+                
+                const Interesante = reaccionesArt.filter(r => r.tipo_reaccion === '💡').length;
+                const Debatible = reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length;
+                const Duda = reaccionesArt.filter(r => r.tipo_reaccion === '❓').length;
+                
+                let prioridad = 'BAJA';
+                if (Debatible + Duda > 10) prioridad = 'ALTA - DISENSO';
+                else if (Debatible + Duda > 5) prioridad = 'MEDIA';
+                
+                container.innerHTML = `
+                    <div style="margin-top: 15px;">
+                        <h4>${art.titulo}</h4>
+                        <p><strong>Autor:</strong> ${art.autor}</p>
+                        <p><strong>Interesante:</strong> ${Interesante} | <strong>Debatible:</strong> ${Debatible} | <strong>Duda:</strong> ${Duda}</p>
+                        <p class="${prioridad.includes('ALTA') ? 'priority-high' : 'priority-medium'}">
+                            <strong>Prioridad para el simposio:</strong> ${prioridad}
+                        </p>
+                    </div>
+                `;
+            }
+        }
+        
+        function renderizarIntervenciones() {
+            const container = document.getElementById('interventionList');
+            
+            // Filtrar intervenciones según selección
+            let intervencionesFiltradas = intervenciones;
+            if (articuloSeleccionado !== 'all') {
+                intervencionesFiltradas = intervenciones.filter(i => i.articulo_id == articuloSeleccionado);
+            }
+            
+            if (intervencionesFiltradas.length === 0) {
+                container.innerHTML = '<div class="alert-box">No hay intervenciones registradas para esta selección.</div>';
+                return;
+            }
+            
+            let html = '';
+            intervencionesFiltradas.forEach(intervencion => {
+                const fecha = new Date(intervencion.fecha || Date.now()).toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                html += `
+                    <div class="intervention-item">
+                        <div class="intervention-author">
+                            📝 ${intervencion.usuario_nombre || 'Anónimo'} 
+                            <span style="color: var(--blue); font-size: 0.9em;">
+                                (${intervencion.usuario_email || 'Sin email'})
+                            </span>
+                        </div>
+                        <div class="intervention-text">
+                            ${intervencion.contenido || intervencion.comentario_texto || 'Sin contenido'}
+                        </div>
+                        <div class="intervention-meta">
+                            <span>📚 ${intervencion.articulo_titulo || 'Artículo no especificado'}</span>
+                            <span>📅 ${fecha}</span>
+                            <span>📤 ${intervencion.canal_usado || 'N/A'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function renderizarTemasEmergentes() {
+            const container = document.getElementById('emergingTopics');
+            
+            if (temasEmergentes.length > 0) {
+                // Usar temas de la base de datos
+                let html = '';
+                temasEmergentes.forEach(tema => {
+                    const articulosRel = tema.articulos_relacionados || [];
+                    const articulosText = articulosRel.length > 0 
+                        ? `Relacionado con ${articulosRel.length} artículo(s)` 
+                        : 'Sin artículos relacionados';
+                    
+                    html += `
+                        <div class="topic-bubble" onclick="detalleTema(${tema.id})">
+                            <div class="topic-title">${tema.tema}</div>
+                            <div class="topic-stats">
+                                <span>📊 ${tema.intervenciones_count || 0} intervenciones</span>
+                                <span class="${tema.estado === 'confirmado' ? 'priority-high' : 'priority-medium'}">
+                                    ${tema.estado || 'emergente'}
+                                </span>
+                            </div>
+                            <div style="font-size: 0.9em; color: #8b949e; margin-top: 5px;">
+                                ${articulosText}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+            } else {
+                // Generar temas emergentes automáticamente a partir de intervenciones
+                const temasDetectados = detectarTemasEmergentes();
+                
+                if (temasDetectados.length === 0) {
+                    container.innerHTML = '<div class="alert-box">Analizando intervenciones para detectar temas emergentes...</div>';
+                    return;
+                }
+                
+                let html = '<p><strong>Temas detectados automáticamente:</strong></p>';
+                temasDetectados.forEach((tema, index) => {
+                    html += `
+                        <div class="topic-bubble">
+                            <div class="topic-title">${tema.nombre}</div>
+                            <div class="topic-stats">
+                                <span>📊 ${tema.frecuencia} menciones</span>
+                                <span class="priority-medium">emergente</span>
+                            </div>
+                            <div style="font-size: 0.9em; color: #8b949e; margin-top: 5px;">
+                                ${tema.ejemplo ? `Ej: "${tema.ejemplo.substring(0, 80)}..."` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+            }
+        }
+        
+        function detectarTemasEmergentes() {
+            // Palabras clave para detectar temas
+            const keywords = [
+                { palabra: 'inteligencia artificial', tema: 'IA en estrategia militar' },
+                { palabra: 'seguridad ciudadana', tema: 'Estrategias de seguridad' },
+                { palabra: 'geopolítica', tema: 'Geopolítica del pensamiento' },
+                { palabra: 'disenso', tema: 'Nudos críticos de disenso' },
+                { palabra: 'estrategia', tema: 'Estrategias asimétricas' },
+                { palabra: 'manipulación', tema: 'Manipulación y poder' },
+                { palabra: 'redes', tema: 'Redes de poder' },
+                { palabra: 'tecnología', tema: 'Tecnología y conflicto' },
+                { palabra: 'juventud', tema: 'Juventud y gerontocracia' },
+                { palabra: 'tiempo social', tema: 'Explotación del tiempo' }
+            ];
+            
+            const temas = {};
+            
+            // Analizar intervenciones
+            intervenciones.forEach(intervencion => {
+                const texto = (intervencion.contenido || intervencion.comentario_texto || '').toLowerCase();
+                
+                keywords.forEach(keyword => {
+                    if (texto.includes(keyword.palabra)) {
+                        if (!temas[keyword.tema]) {
+                            temas[keyword.tema] = {
+                                nombre: keyword.tema,
+                                frecuencia: 0,
+                                ejemplo: texto.substring(0, 100)
+                            };
+                        }
+                        temas[keyword.tema].frecuencia++;
+                    }
+                });
+            });
+            
+            // Convertir a array y ordenar por frecuencia
+            return Object.values(temas)
+                .sort((a, b) => b.frecuencia - a.frecuencia)
+                .slice(0, 5); // Top 5 temas
+        }
+        
+        function detalleTema(temaId) {
+            // Implementar vista detallada del tema
+            alert(`Detalle del tema ID: ${temaId} - Esta función se implementará en la siguiente fase.`);
+        }
+        
+        async function generarReportePDF() {
+            try {
+                // Recopilar datos para el reporte
+                const datosReporte = {
+                    fecha: new Date().toISOString(),
+                    articulosAnalizados: articulos.length,
+                    totalReacciones: reacciones.length,
+                    totalIntervenciones: intervenciones.length,
+                    temasEmergentes: temasEmergentes.length > 0 ? temasEmergentes : detectarTemasEmergentes(),
+                    hallazgosCriticos: obtenerHallazgosParaPDF()
+                };
+                
+                // Mostrar mensaje de generación
+                alert(`📄 Reporte estratégico generado con éxito!\n\nSe han procesado:\n• ${datosReporte.articulosAnalizados} artículos\n• ${datosReporte.totalReacciones} reacciones\n• ${datosReporte.totalIntervenciones} intervenciones\n\nLos temas emergentes han sido identificados para el Simposio 2025.`);
+                
+                // Aquí iría la lógica para generar el PDF real
+                // Podríamos usar jsPDF o enviar a un backend
+                console.log('Datos para PDF:', datosReporte);
+                
+                // Guardar en Supabase el reporte generado
+                await _supabase.from('reportes_simposio').insert([{
+                    tipo: 'reporte_estrategico',
+                    datos: datosReporte,
+                    fecha_generacion: new Date().toISOString()
+                }]);
+                
+            } catch (error) {
+                console.error('Error generando reporte:', error);
+                alert('Error al generar el reporte: ' + error.message);
+            }
+        }
+        
+        function obtenerHallazgosParaPDF() {
+            return articulos.map(art => {
+                const reaccionesArt = reacciones.filter(r => r.articulo_id === art.id);
+                return {
+                    titulo: art.titulo,
+                    autor: art.autor,
+                    Interesante: reaccionesArt.filter(r => r.tipo_reaccion === '💡').length,
+                    Debatible: reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length,
+                    Duda: reaccionesArt.filter(r => r.tipo_reaccion === '❓').length,
+                    tesis: reaccionesArt.filter(r => r.tipo_reaccion.includes('💬')).length
+                };
+            }).sort((a, b) => (b.Debatible + b.Duda) - (a.Debatible + a.Duda));
+        }
+        
+        // ==================== FUNCIONES ADICIONALES ====================
+        // Función para actualizar datos en tiempo real (opcional)
+        async function actualizarDatosEnVivo() {
+            console.log('🔄 Actualizando datos en vivo...');
+            await cargarTodosLosDatos();
+            renderizarDashboard();
+        }
+        
+        // Configurar actualización automática cada 2 minutos
+        setInterval(actualizarDatosEnVivo, 120000);
+    </script>
+</body>
+</html>
