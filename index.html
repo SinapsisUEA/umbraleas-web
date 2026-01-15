@@ -21,177 +21,176 @@
         }
         
         /* Estilos para contenido rico (Tablas e Imágenes) */
-.article-content table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    font-size: 0.95em;
-    background: #161b22;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-}
+        .article-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95em;
+            background: #161b22;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
 
-.article-content th, 
-.article-content td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #30363d;
-}
+        .article-content th, .article-content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #30363d;
+        }
 
-.article-content th {
-    background-color: var(--blue);
-    color: #000;
-    font-weight: bold;
-    text-transform: uppercase;
-}
+        .article-content th {
+            background-color: var(--blue);
+            color: #000;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
 
-.article-content tr:hover {
-    background-color: rgba(88, 166, 255, 0.05);
-}
+        .article-content tr:hover {
+            background-color: rgba(88, 166, 255, 0.05);
+        }
 
-.article-content img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin: 20px 0;
-    border: 1px solid #30363d;
-}
+        .article-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #30363d;
+        }
 
-/* LAYOUT DE PÁRRAFO INTELIGENTE */
-.paragraph-row {
-    display: grid;
-    grid-template-columns: 1fr auto; /* Texto ocupa espacio, botones al final */
-    gap: 20px;
-    align-items: start;
-    margin-bottom: 30px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    padding-bottom: 20px;
-    transition: 0.3s;
-}
+        /* LAYOUT DE PÁRRAFO INTELIGENTE */
+        .paragraph-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 20px;
+            align-items: start;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 20px;
+            transition: 0.3s;
+        }
 
-.paragraph-row:hover {
-    border-bottom-color: var(--orange);
-    background: linear-gradient(90deg, transparent 0%, rgba(240, 136, 62, 0.02) 100%);
-}
+        .paragraph-row:hover {
+            border-bottom-color: var(--orange);
+            background: linear-gradient(90deg, transparent 0%, rgba(240, 136, 62, 0.02) 100%);
+        }
 
-.p-text {
-    font-size: 1.15em;
-    line-height: 1.8;
-    text-align: justify;
-    color: #d1d5db;
-}
+        .p-text {
+            font-size: 1.15em;
+            line-height: 1.8;
+            text-align: justify;
+            color: #d1d5db;
+        }
 
-/* Barra lateral de botones (Sticky) */
-.p-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    position: sticky;
-    top: 100px; /* Se queda fijo al hacer scroll */
-}
+        /* Barra lateral de botones (Sticky) */
+        .p-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: sticky;
+            top: 100px;
+        }
 
-.btn-reaction-compact {
-    background: transparent;
-    border: 1px solid #333;
-    color: #8b949e;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1em;
-    transition: all 0.2s;
-    position: relative;
-}
+        .btn-reaction-compact {
+            background: transparent;
+            border: 1px solid #333;
+            color: #8b949e;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
+            transition: all 0.2s;
+            position: relative;
+        }
 
-.btn-reaction-compact:hover {
-    background: var(--orange);
-    color: #000;
-    transform: scale(1.1);
-    border-color: var(--orange);
-}
+        .btn-reaction-compact:hover {
+            background: var(--orange);
+            color: #000;
+            transform: scale(1.1);
+            border-color: var(--orange);
+        }
 
-/* Tooltip simple */
-.btn-reaction-compact::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    right: 50px;
-    background: #000;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 0.8em;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: 0.2s;
-    border: 1px solid #333;
-}
-.btn-reaction-compact:hover::after { opacity: 1; }
+        /* Tooltip simple */
+        .btn-reaction-compact::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            right: 50px;
+            background: #000;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.2s;
+            border: 1px solid #333;
+        }
+        .btn-reaction-compact:hover::after { opacity: 1; }
 
-/* Estilos específicos para Bibliografía */
-.biblio-section {
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 2px solid var(--blue);
-}
+        /* Estilos específicos para Bibliografía */
+        .biblio-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid var(--blue);
+        }
 
-.biblio-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(255,255,255,0.02);
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    border: 1px solid transparent;
-    transition: 0.3s;
-}
+        .biblio-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.02);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            transition: 0.3s;
+        }
 
-.biblio-item:hover {
-    border-color: var(--blue);
-    background: rgba(88, 166, 255, 0.05);
-}
+        .biblio-item:hover {
+            border-color: var(--blue);
+            background: rgba(88, 166, 255, 0.05);
+        }
 
-.biblio-text {
-    font-family: 'Times New Roman', serif;
-    font-size: 1.1em;
-    font-style: italic;
-}
+        .biblio-text {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.1em;
+            font-style: italic;
+        }
 
-.biblio-actions button {
-    background: none;
-    border: 1px solid #333;
-    color: var(--silver);
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-left: 5px;
-    font-size: 0.8em;
-}
-.biblio-actions button:hover {
-    background: var(--blue);
-    color: #000;
-}
+        .biblio-actions button {
+            background: none;
+            border: 1px solid #333;
+            color: var(--silver);
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 5px;
+            font-size: 0.8em;
+        }
+        .biblio-actions button:hover {
+            background: var(--blue);
+            color: #000;
+        }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .paragraph-row {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-    .p-actions {
-        flex-direction: row;
-        justify-content: flex-end;
-        position: static;
-        margin-top: 10px;
-        border-top: 1px solid #222;
-        padding-top: 10px;
-    }
-    .btn-reaction-compact::after { display: none; } /* Ocultar tooltips en móvil */
-}
+        /* Responsive */
+        @media (max-width: 768px) {
+            .paragraph-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .p-actions {
+                flex-direction: row;
+                justify-content: flex-end;
+                position: static;
+                margin-top: 10px;
+                border-top: 1px solid #222;
+                padding-top: 10px;
+            }
+            .btn-reaction-compact::after { display: none; }
+        }
 
         body { 
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
@@ -276,11 +275,7 @@
             box-shadow: 0 0 15px var(--orange);
         }
 
-        /* SECCIONES */
-        section {
-            position: relative;
-            z-index: 2;
-        }
+        section { position: relative; z-index: 2; }
 
         #seccion-registro { 
             background: var(--glass); 
@@ -460,24 +455,6 @@
             position: relative;
         }
 
-        .btn-reaction { 
-            background: rgba(255,255,255,0.05); 
-            border: 1px solid #333; 
-            color: #fff; 
-            padding: 8px 15px; 
-            cursor: pointer; 
-            border-radius: 20px; 
-            margin-right: 5px; 
-            margin-top: 10px;
-            transition: 0.3s;
-            font-size: 0.9em;
-        }
-        .btn-reaction:hover { 
-            border-color: var(--orange); 
-            background: rgba(240, 136, 62, 0.2);
-            transform: scale(1.1);
-        }
-
         /* CAJA DE DIÁLOGO */
         .caja-dialogo { 
             background: rgba(10, 12, 16, 0.8); 
@@ -603,7 +580,6 @@
 
 <section class="media-station">
     <div class="player-container">
-        <!-- Video placeholder temático -->
         <iframe id="mainVideo" width="100%" height="100%" src="https://www.youtube.com/embed/dQw4w9WgXcQ?controls=0&showinfo=0&rel=0&autoplay=0&loop=1&mute=1" frameborder="0" allowfullscreen></iframe>
     </div>
     <div class="media-sidebar">
@@ -643,19 +619,17 @@
     let width, height;
     let particles = [];
     
-    // Configuración de la red
     const config = {
-        particleCount: 0, // Se calcula según el tamaño
+        particleCount: 0,
         connectionDistance: 150,
         mouseDistance: 200,
-        color: 'rgba(88, 166, 255, 0.5)', // Azul tenue
+        color: 'rgba(88, 166, 255, 0.5)',
         particleSpeed: 0.5
     };
 
     function resize() {
         width = canvas.width = window.innerWidth;
         height = canvas.height = window.innerHeight;
-        // Ajustar cantidad de partículas según resolución
         config.particleCount = Math.floor((width * height) / 15000);
         initParticles();
     }
@@ -673,11 +647,9 @@
             this.x += this.vx;
             this.y += this.vy;
 
-            // Rebote en bordes
             if (this.x < 0 || this.x > width) this.vx *= -1;
             if (this.y < 0 || this.y > height) this.vy *= -1;
 
-            // Interacción con mouse
             const dx = mouse.x - this.x;
             const dy = mouse.y - this.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
@@ -726,7 +698,6 @@
             particles[i].update();
             particles[i].draw();
 
-            // Dibujar conexiones
             for (let j = i; j < particles.length; j++) {
                 const dx = particles[i].x - particles[j].x;
                 const dy = particles[i].y - particles[j].y;
@@ -750,7 +721,6 @@
     animate();
 
     // ==================== CONFIGURACIÓN SUPABASE ====================
-    // NOTA: En producción usa variables de entorno. Aquí se usan las del código original.
     const SB_URL = 'https://wajivhbldplztjvqudht.supabase.co';
     const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk';
     
@@ -761,14 +731,13 @@
     }
     
     let usuarioActual = JSON.parse(localStorage.getItem('sinapsis_user')) || null;
-    let allArticulos = []; // Caché local para búsqueda eficiente
+    let allArticulos = []; 
 
     // ==================== FUNCIONES DE UTILIDAD ====================
     function mostrarNotificacion(mensaje, tipo = 'info') {
         const notification = document.getElementById('globalNotification');
         const text = document.getElementById('notificationText');
         
-        // Reset clases
         notification.classList.remove('error', 'success');
         if(tipo === 'error') notification.classList.add('error');
         if(tipo === 'success') notification.classList.add('success');
@@ -809,7 +778,6 @@
         
         await obtenerArticulos();
         
-        // Búsqueda en tiempo real
         document.getElementById('searchInput').addEventListener('input', (e) => {
             filtrarArticulos(e.target.value);
         });
@@ -823,21 +791,18 @@
         if(!nombre || !email) return mostrarNotificacion("Complete nombre y correo", 'error');
         if(!email.includes('@')) return mostrarNotificacion("Correo inválido", 'error');
         
-        // Feedback visual de carga
         const btn = document.querySelector('.btn-registro');
         const originalText = btn.innerText;
         btn.innerText = "PROCESANDO...";
         btn.disabled = true;
 
         try {
-            // 1. sinapsis_registros
             const { error: errorReg } = await _supabase.from('sinapsis_registros').insert([{ nombre, email, institucion: inst }]);
             
-            if (errorReg && errorReg.code !== '23505') { // 23505 es duplicado
+            if (errorReg && errorReg.code !== '23505') { 
                 throw errorReg;
             }
 
-            // 2. contactos_simposio (Upsert requiere que 'email' sea UNIQUE en la DB)
             const { error: errorContacto } = await _supabase
                 .from('contactos_simposio')
                 .upsert({
@@ -846,9 +811,8 @@
                     ultima_intervencion: new Date().toISOString(),
                     interes_simposio: true,
                     fecha_registro: new Date().toISOString()
-                }, { onConflict: 'email' }); // Asegúrate de que la columna email sea unique
+                }, { onConflict: 'email' });
 
-            // 3. dashboard_intervenciones
             await _supabase.from('dashboard_intervenciones').insert([{
                 usuario_nombre: nombre,
                 usuario_email: email,
@@ -948,240 +912,205 @@
     }
     
     function abrirLectura(art) {
-    const modal = document.getElementById('modalArticulo');
-    const contenido = document.getElementById('contenidoArticulo');
-    
-    const fotoAutor = art.autor_foto_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(art.autor)}&background=333&color=fff`;
-    
-    // --- 1. CABECERA DEL ARTÍCULO ---
-    let headerHTML = `
-        <h1 style="color:var(--blue); margin-top: 0; line-height: 1.2;">${escapeHtml(art.titulo)}</h1>
-        <div style="display: flex; align-items: center; gap: 20px; margin: 30px 0; padding-bottom: 20px; border-bottom: 1px solid #30363d;">
-            <img src="${fotoAutor}" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--orange); object-fit: cover;">
-            <div>
-                <h3 style="color:var(--orange); margin: 0;">${escapeHtml(art.autor)}</h3>
-                <p style="margin: 5px 0 0; color:var(--silver);">${escapeHtml(art.afiliacion)}</p>
-            </div>
-        </div>
-    `;
-
-    // --- 2. PROCESAMIENTO INTELIGENTE DEL CONTENIDO ---
-    let bodyHTML = '<div class="article-content">';
-    
-    const rawContent = art.contenido || "Contenido no disponible.";
-    
-    // Estrategia: Dividir por doble salto de línea para intentar detectar bloques
-    // Nota: Si el contenido tiene HTML tags (tablas), es mejor no dividir agresivamente,
-    // pero asumiremos formato de texto plano o Markdown simple convertido a HTML.
-    
-    // Flags de estado
-    let inAbstract = false;
-    let inBiblio = false;
-    
-    // Dividimos en bloques lógicos (párrafos separados por \n\n)
-    const blocks = rawContent.split(/\n\s*\n/);
-
-    blocks.forEach(block => {
-        let cleanBlock = block.trim().replace(/\n/g, '<br>'); // Convertir saltos de línea simples a <br>
+        const modal = document.getElementById('modalArticulo');
+        const contenido = document.getElementById('contenidoArticulo');
         
-        if (!cleanBlock) return;
+        const fotoAutor = art.autor_foto_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(art.autor)}&background=333&color=fff`;
+        
+        let headerHTML = `
+            <h1 style="color:var(--blue); margin-top: 0; line-height: 1.2;">${escapeHtml(art.titulo)}</h1>
+            <div style="display: flex; align-items: center; gap: 20px; margin: 30px 0; padding-bottom: 20px; border-bottom: 1px solid #30363d;">
+                <img src="${fotoAutor}" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--orange); object-fit: cover;">
+                <div>
+                    <h3 style="color:var(--orange); margin: 0;">${escapeHtml(art.autor)}</h3>
+                    <p style="margin: 5px 0 0; color:var(--silver);">${escapeHtml(art.afiliacion)}</p>
+                </div>
+            </div>
+        `;
 
-        // --- DETECCIÓN DE BIBLIOGRAFÍA ---
-        if (cleanBlock.toLowerCase().includes('bibliografía') || cleanBlock.toLowerCase().includes('references')) {
-            inBiblio = true;
-            bodyHTML += `<h2 style="color:var(--blue); margin-top: 40px;">Bibliografía y Fuentes de Inteligencia</h2>`;
-            bodyHTML += `<p class="text-muted" style="font-size:0.9em; margin-bottom:20px;">Evalúe la pertinencia de las fuentes citadas por el autor.</p>`;
-            return;
-        }
+        let bodyHTML = '<div class="article-content">';
+        const rawContent = art.contenido || "Contenido no disponible.";
+        const blocks = rawContent.split(/\n\s*\n/);
 
-        // --- RENDERIZADO DE BIBLIOGRAFÍA ---
-        if (inBiblio) {
-            // Asumimos que cada entrada de bibliografía está en una línea o bloque separado
+        let inAbstract = false;
+        let inBiblio = false;
+
+        blocks.forEach(block => {
+            let cleanBlock = block.trim().replace(/\n/g, '<br>'); 
+            if (!cleanBlock) return;
+
+            if (cleanBlock.toLowerCase().includes('bibliografía') || cleanBlock.toLowerCase().includes('references')) {
+                inBiblio = true;
+                bodyHTML += `<h2 style="color:var(--blue); margin-top: 40px;">Bibliografía y Fuentes de Inteligencia</h2>`;
+                bodyHTML += `<p class="text-muted" style="font-size:0.9em; margin-bottom:20px;">Evalúe la pertinencia de las fuentes citadas por el autor.</p>`;
+                return;
+            }
+
+            if (inBiblio) {
+                bodyHTML += `
+                    <div class="biblio-item">
+                        <span class="biblio-text">${cleanBlock}</span>
+                        <div class="biblio-actions">
+                            <button onclick="reactBiblio(${art.id}, 'pertinente', '${cleanBlock.substring(0, 20)}...')">
+                                <i class="fas fa-check"></i> Interesante
+                            </button>
+                            <button onclick="reactBiblio(${art.id}, 'obsoleto', '${cleanBlock.substring(0, 20)}...')">
+                                <i class="fas fa-times"></i> Debatible
+                            </button>
+                            <button onclick="reactBiblio(${art.id}, 'fundamental', '${cleanBlock.substring(0, 20)}...')">
+                                <i class="fas fa-star"></i> Duda
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const lowerBlock = cleanBlock.toLowerCase();
+            if (lowerBlock.includes('resumen') || lowerBlock.includes('abstract') || 
+                lowerBlock.includes('palabras clave') || lowerBlock.includes('keywords')) {
+                inAbstract = true;
+                bodyHTML += `
+                    <div style="background: rgba(0,0,0,0.3); padding: 20px; border-left: 4px solid var(--silver); margin-bottom: 30px; border-radius: 0 8px 8px 0;">
+                        <h4 style="margin:0 0 10px 0; color: #fff;">${cleanBlock}</h4>
+                    </div>`;
+                return;
+            }
+
+            if (cleanBlock.includes('<table') || cleanBlock.includes('<img')) {
+                bodyHTML += `<div class="media-block" style="margin-bottom: 30px;">${cleanBlock}</div>`;
+                return;
+            }
+
             bodyHTML += `
-                <div class="biblio-item">
-                    <span class="biblio-text">${cleanBlock}</span>
-                    <div class="biblio-actions">
-                        <button onclick="reactBiblio(${art.id}, 'pertinente', '${cleanBlock.substring(0, 20)}...')">
-                            <i class="fas fa-check"></i> Interesante
+                <div class="paragraph-row">
+                    <div class="p-text">${cleanBlock}</div>
+                    <div class="p-actions">
+                        <button class="btn-reaction-compact" onclick="reaccionar(${art.id}, 'texto', '💡', '${escapeHtml(art.titulo.replace(/'/g, "\\'"))}', '${escapeHtml(art.autor.replace(/'/g, "\\'"))}')" data-tooltip="Interés">
+                            <i class="far fa-lightbulb"></i>
                         </button>
-                        <button onclick="reactBiblio(${art.id}, 'obsoleto', '${cleanBlock.substring(0, 20)}...')">
-                            <i class="fas fa-times"></i> Debatible
+                        <button class="btn-reaction-compact" onclick="reaccionar(${art.id}, 'texto', '⚖️', '${escapeHtml(art.titulo.replace(/'/g, "\\'"))}', '${escapeHtml(art.autor.replace(/'/g, "\\'"))}')" data-tooltip="Debate">
+                            <i class="fas fa-balance-scale"></i>
                         </button>
-                        <button onclick="reactBiblio(${art.id}, 'fundamental', '${cleanBlock.substring(0, 20)}...')">
-                            <i class="fas fa-star"></i> Duda
+                        <button class="btn-reaction-compact" onclick="reaccionar(${art.id}, 'texto', '🔍', '${escapeHtml(art.titulo.replace(/'/g, "\\'"))}', '${escapeHtml(art.autor.replace(/'/g, "\\'"))}')" data-tooltip="Verificar dato">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <button class="btn-reaction-compact" onclick="abrirTesisPrompt(${art.id}, '${escapeHtml(art.titulo.replace(/'/g, "\\'"))}')" data-tooltip="Redactar Tesis" style="border-color: var(--orange); color: var(--orange);">
+                            <i class="fas fa-pen"></i>
                         </button>
                     </div>
                 </div>
             `;
-            return;
-        }
+        });
 
-        // --- DETECCIÓN DE RESUMEN/PALABRAS CLAVE (Excluir reacciones) ---
-        const lowerBlock = cleanBlock.toLowerCase();
-        if (lowerBlock.includes('resumen') || lowerBlock.includes('abstract') || 
-            lowerBlock.includes('palabras clave') || lowerBlock.includes('keywords')) {
-            
-            inAbstract = true;
-            bodyHTML += `
-                <div style="background: rgba(0,0,0,0.3); padding: 20px; border-left: 4px solid var(--silver); margin-bottom: 30px; border-radius: 0 8px 8px 0;">
-                    <h4 style="margin:0 0 10px 0; color: #fff;">${cleanBlock}</h4>
-                </div>`;
-            return;
-        }
+        bodyHTML += '</div>'; 
 
-        // --- DETECCIÓN DE TABLAS O IMÁGENES (Contenido Rico) ---
-        // Si el bloque contiene tags HTML de tabla o imagen, lo renderizamos tal cual (confiamos en el input)
-        if (cleanBlock.includes('<table') || cleanBlock.includes('<img')) {
-            // Para tablas/gráficos, tal vez sí queremos reaccionar? 
-            // Por ahora, mostramos el elemento sin botones de párrafo para no romper el layout
-            bodyHTML += `<div class="media-block" style="margin-bottom: 30px;">${cleanBlock}</div>`;
-            return;
-        }
-
-        // --- PÁRRAFOS NORMALES (CON REACCIONES LATERALES) ---
-        // Si estamos en modo "Resumen" pero ya pasamos el título, tratamos el texto como parte del resumen pero sin botones
-        // Si es texto normal:
-        bodyHTML += `
-            <div class="paragraph-row">
-                <div class="p-text">${cleanBlock}</div>
-                <div class="p-actions">
-                    <button class="btn-reaction-compact" onclick="reaccionar(${art.id}, 'texto', '💡', '${escapeHtml(art.titulo.replace(/'/g, "\\'"))}', '${escapeHtml(art.autor.replace(/'/g, "\\'"))}')" data-tooltip="Interés">
-                        <i class="far fa-lightbulb"></i>
-                    </button>
-                    <button class="btn-reaction-compact" onclick="reaccionar(${art.id}, 'texto', '⚖️', '${escapeHtml(art.titulo.replace(/'/g, "\\'"))}', '${escapeHtml(art.autor.replace(/'/g, "\\'"))}')" data-tooltip="Debate">
-                        <i class="fas fa-balance-scale"></i>
-                    </button>
-                    <button class="btn-reaction-compact" onclick="reaccionar(${art.id}, 'texto', '🔍', '${escapeHtml(art.titulo.replace(/'/g, "\\'"))}', '${escapeHtml(art.autor.replace(/'/g, "\\'"))}')" data-tooltip="Verificar dato">
-                        <i class="fas fa-search"></i>
-                    </button>
-                    <button class="btn-reaction-compact" onclick="abrirTesisPrompt(${art.id}, '${escapeHtml(art.titulo.replace(/'/g, "\\'"))}')" data-tooltip="Redactar Tesis" style="border-color: var(--orange); color: var(--orange);">
-                        <i class="fas fa-pen"></i>
+        const dialogBox = `
+            <div class="caja-dialogo" id="tesis-box-${art.id}" style="display:none; animation: slideIn 0.5s;">
+                <h3 style="color:var(--orange); margin-top: 0;">🎙️ Búnker de Análisis</h3>
+                <p>Redacte su tesis completa o intervención estratégica sobre el artículo.</p>
+                <textarea id="tesis-input-${art.id}" placeholder="Escriba su análisis estratégico..." 
+                          style="width:100%; height: 120px; background:#000; color:#fff; border:1px solid #333; padding:15px; margin-top:10px; border-radius: 8px; font-family: inherit;"></textarea>
+                <div style="margin-top: 15px; text-align: right;">
+                    <button class="btn-cancel" onclick="document.getElementById('tesis-box-${art.id}').style.display='none'" style="background:none; border:none; color:#fff; cursor:pointer; margin-right: 15px;">Cancelar</button>
+                    <button class="btn-canal email" onclick="enviarTesisCompleta(${art.id}, '${escapeHtml(art.autor.replace(/'/g, "\\'"))}', '${escapeHtml(art.titulo.replace(/'/g, "\\'"))}')">
+                        <i class="fas fa-paper-plane"></i> Enviar a Inteligencia
                     </button>
                 </div>
             </div>
         `;
-    });
 
-    bodyHTML += '</div>'; // Cierre article-content
-
-    // --- 3. CAJA DE DIÁLOGO CRÍTICO (Al final) ---
-    const dialogBox = `
-        <div class="caja-dialogo" id="tesis-box-${art.id}" style="display:none; animation: slideIn 0.5s;">
-            <h3 style="color:var(--orange); margin-top: 0;">🎙️ Búnker de Análisis</h3>
-            <p>Redacte su tesis completa o intervención estratégica sobre el artículo.</p>
-            <textarea id="tesis-input-${art.id}" placeholder="Escriba su análisis estratégico..." 
-                      style="width:100%; height: 120px; background:#000; color:#fff; border:1px solid #333; padding:15px; margin-top:10px; border-radius: 8px; font-family: inherit;"></textarea>
-            <div style="margin-top: 15px; text-align: right;">
-                <button class="btn-cancel" onclick="document.getElementById('tesis-box-${art.id}').style.display='none'" style="background:none; border:none; color:#fff; cursor:pointer; margin-right: 15px;">Cancelar</button>
-                <button class="btn-canal email" onclick="enviarTesisCompleta(${art.id}, '${escapeHtml(art.autor.replace(/'/g, "\\'"))}', '${escapeHtml(art.titulo.replace(/'/g, "\\'"))}')">
-                    <i class="fas fa-paper-plane"></i> Enviar a Inteligencia
-                </button>
-            </div>
-        </div>
-    `;
-
-    contenido.innerHTML = headerHTML + bodyHTML + dialogBox;
-    modal.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-}
-
-// --- NUEVAS FUNCIONES DE INTERACCIÓN ---
-
-// Mostrar el cuadro de texto para tesis (se invoca desde el icono de lápiz)
-function abrirTesisPrompt(id, titulo) {
-    const box = document.getElementById(`tesis-box-${id}`);
-    if(box) {
-        box.style.display = 'block';
-        box.scrollIntoView({behavior: "smooth"});
-        document.getElementById(`tesis-input-${id}`).focus();
+        contenido.innerHTML = headerHTML + bodyHTML + dialogBox;
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
     }
-}
 
-// Reacción rápida a párrafo (Icono)
-    // AJUSTE DE COHERENCIA EN EL INDEX
-async function reaccionar(id, tipo) {
-    if (!usuarioActual) return mostrarNotificación("Debe registrarse para intervenir", 'error');
-
-    // Mapeo estricto para coherencia con Dashboard
-    const mapeoEmojis = {
-        'interesante': '💡',
-        'debatible': '⚖️',
-        'duda': '❓'
-    };
-    
-    const emojiCorrecto = mapeoEmojis[tipo] || tipo;
-
-    const { error } = await _supabase
-        .from('sinapsis_reacciones')
-        .insert([{
-            articulo_id: id,
-            tipo_reaccion: emojiCorrecto, // Ahora coincide con el filtro del Dashboard
-            usuario_nombre: usuarioActual.nombre,
-            usuario_email: usuarioActual.email
-        }]);
-
-    if (!error) {
-        mostrarNotificación(`Reacción ${emojiCorrecto} registrada en el Búnker`, 'success');
-    }
-}
-            
-        } catch (e) {
-            console.error("Error Javascript:", e);
-            alert("❌ ERROR DEL SISTEMA: " + e.message);
+    function abrirTesisPrompt(id, titulo) {
+        const box = document.getElementById(`tesis-box-${id}`);
+        if(box) {
+            box.style.display = 'block';
+            box.scrollIntoView({behavior: "smooth"});
+            document.getElementById(`tesis-input-${id}`).focus();
         }
     }
 
-// Reacción específica para bibliografía
-async function reactBiblio(id, verdict, refText) {
-    if (!usuarioActual) return mostrarNotificación("Identificación requerida", 'error');
-    
-    // Guardar en tabla específica o en la general con metadata detallada
-    await _supabase.from('sinapsis_reacciones').insert([{
-        articulo_id: id,
-        tipo_reaccion: verdict, // 'pertinente', 'obsoleto', etc.
-        seccion: 'bibliografia',
-        comentario_texto: `Ref: ${refText}`,
-        usuario_nombre: usuarioActual.nombre,
-        usuario_email: usuarioActual.email
-    }]);
-    
-    // Guardar en dashboard para análisis de calidad de fuentes
-    await _supabase.from('dashboard_intervenciones').insert([{
-        usuario_nombre: usuarioActual.nombre,
-        usuario_email: usuarioActual.email,
-        tipo_accion: 'evaluacion_fuente',
-        contenido: verdict,
-        metadata: { referencia: refText, articulo_id: id }
-    }]);
+    async function reaccionar(id, tipoSeccion, emoji, titulo, autor) {
+        if (!usuarioActual) {
+            mostrarNotificacion("Identificación requerida para reaccionar", 'error');
+            document.getElementById('seccion-registro').scrollIntoView({ behavior: 'smooth' });
+            return;
+        }
+        
+        try {
+            console.log("Registrando reacción:", emoji);
+            
+            const { error } = await _supabase.from('sinapsis_reacciones').insert([{
+                articulo_id: parseInt(id), 
+                tipo_reaccion: emoji,
+                seccion: tipoSeccion,
+                usuario_nombre: usuarioActual.nombre,
+                usuario_email: usuarioActual.email
+            }]);
+            
+            if (error) {
+                console.error("Error de Supabase:", error);
+                mostrarNotificacion("Fallo de conexión al registrar reacción", 'error');
+            } else {
+                mostrarNotificacion(`Reacción ${emoji} registrada con éxito`, 'success');
+            }
+            
+        } catch (e) {
+            console.error("Error Javascript:", e);
+            mostrarNotificacion("Error del sistema", 'error');
+        }
+    }
 
-    mostrarNotificación(`Evaluación de fuente enviada al Búnker`, 'success');
-}
-
-// Enviar la tesis larga del cuadro final
-async function enviarTesisCompleta(id, autor, titulo) {
-    if (!usuarioActual) return mostrarNotificación("Regístrese primero", 'error');
-    
-    const input = document.getElementById(`tesis-input-${id}`);
-    const texto = input.value.trim();
-    
-    if(texto.length < 20) return mostrarNotificación("La tesis es demasiado corta", 'error');
-
-    try {
+    async function reactBiblio(id, verdict, refText) {
+        if (!usuarioActual) return mostrarNotificacion("Identificación requerida", 'error');
+        
         await _supabase.from('sinapsis_reacciones').insert([{
             articulo_id: id,
-            tipo_reaccion: '📝 TESIS',
-            comentario_texto: texto,
+            tipo_reaccion: verdict, 
+            seccion: 'bibliografia',
+            comentario_texto: `Ref: ${refText}`,
             usuario_nombre: usuarioActual.nombre,
             usuario_email: usuarioActual.email
         }]);
+        
+        await _supabase.from('dashboard_intervenciones').insert([{
+            usuario_nombre: usuarioActual.nombre,
+            usuario_email: usuarioActual.email,
+            tipo_accion: 'evaluacion_fuente',
+            contenido: verdict,
+            metadata: { referencia: refText, articulo_id: id }
+        }]);
 
-        mostrarNotificación("Tesis archivada en el Búnker", 'success');
-        document.getElementById(`tesis-box-${id}`).style.display = 'none';
-        input.value = '';
-    } catch (e) {
-        mostrarNotificación("Error al conectar", 'error');
+        mostrarNotificación(`Evaluación de fuente enviada al Búnker`, 'success');
     }
-} }
+
+    async function enviarTesisCompleta(id, autor, titulo) {
+        if (!usuarioActual) return mostrarNotificacion("Regístrese primero", 'error');
+        
+        const input = document.getElementById(`tesis-input-${id}`);
+        const texto = input.value.trim();
+        
+        if(texto.length < 20) return mostrarNotificacion("La tesis es demasiado corta", 'error');
+
+        try {
+            await _supabase.from('sinapsis_reacciones').insert([{
+                articulo_id: id,
+                tipo_reaccion: '📝 TESIS',
+                comentario_texto: texto,
+                usuario_nombre: usuarioActual.nombre,
+                usuario_email: usuarioActual.email
+            }]);
+
+            mostrarNotificacion("Tesis archivada en el Búnker", 'success');
+            document.getElementById(`tesis-box-${id}`).style.display = 'none';
+            input.value = '';
+        } catch (e) {
+            mostrarNotificacion("Error al conectar", 'error');
+        }
     }
     
     function cerrarLectura() {
