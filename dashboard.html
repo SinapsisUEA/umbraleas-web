@@ -130,7 +130,6 @@
             font-weight: bold;
         }
         
-        /* CLASES CORREGIDAS */
         .badge-Interesante { background: rgba(88, 166, 255, 0.2); color: var(--blue); border: 1px solid var(--blue); }
         .badge-Debatible { background: rgba(240, 136, 62, 0.2); color: var(--orange); border: 1px solid var(--orange); }
         .badge-Duda { background: rgba(201, 209, 217, 0.2); color: var(--silver); border: 1px solid var(--silver); }
@@ -278,7 +277,6 @@
             
             <select class="article-selector" id="articleSelector" onchange="cargarDatosArticulo()">
                 <option value="all">📈 TODOS LOS ARTÍCULOS (Vista Consolidada)</option>
-                <!-- Los artículos se cargarán dinámicamente -->
             </select>
             
             <div class="chart-container">
@@ -348,7 +346,6 @@
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhaml2aGJsZHBsenRqdnF1ZGh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzkxNjQsImV4cCI6MjA4MzMxNTE2NH0.NyDC18RuIZGoH_Epnt1oCgMMxDMBhfoK-wdEKHU0rYk';
         const _supabase = supabase.createClient(SB_URL, SB_KEY);
         
-        // Variables globales
         let articulos = [];
         let reacciones = [];
         let intervenciones = [];
@@ -366,74 +363,42 @@
         };
         
         // ==================== FUNCIONES DE CARGA DE DATOS ====================
-        async function cargarTodosLosDatos() {
-            try {
-                // 1. Cargar artículos
-                const { data: articulosData, error: errorArticulos } = await _supabase
-                    .from('articulos')
-                    .select('*')
-                    .order('id', { ascending: false });
-                
-                if (errorArticulos) throw errorArticulos;
-                articulos = articulosData || [];
-                console.log(`✅ ${articulos.length} artículos cargados`);
-                
-                // 2. Cargar reacciones
-                const { data: reaccionesData, error: errorReacciones } = await _supabase
-                    .from('sinapsis_reacciones')
-                    .select('*');
-                
-                if (errorReacciones) throw errorReacciones;
-                reacciones = reaccionesData || [];
-                console.log(`✅ ${reacciones.length} reacciones cargadas`);
-                
-                // 3. Cargar intervenciones (dashboard_intervenciones)
-                const { data: intervencionesData, error: errorIntervenciones } = await _supabase
-                    .from('dashboard_intervenciones')
-                    .select('*')
-                    .order('fecha', { ascending: false });
-                
-                if (errorIntervenciones) {
-                    console.warn('⚠️ No se encontró tabla dashboard_intervenciones, usando sinapsis_reacciones');
-                    // Si no existe la tabla, usar reacciones tipo TESIS
-                    intervenciones = reacciones.filter(r => r.tipo_reaccion.includes('💬'));
-                } else {
-                    intervenciones = intervencionesData || [];
-                }
-                console.log(`✅ ${intervenciones.length} intervenciones cargadas`);
-                
-                // 4. Cargar temas emergentes (si existe la tabla)
-                try {
-                    const { data: temasData, error: errorTemas } = await _supabase
-                        .from('simposio_temas')
-                        .select('*')
-                        .order('intervenciones_count', { ascending: false });
-                    
-                    if (!errorTemas) {
-                        temasEmergentes = temasData || [];
-                        console.log(`✅ ${temasEmergentes.length} temas emergentes cargados`);
-                    }
-                } catch (e) {
-                    console.warn('⚠️ Tabla simposio_temas no disponible');
-                    temasEmergentes = [];
-                }
-                
-            } catch (error) {
-                console.error('❌ Error cargando datos:', error);
-                alert('Error al cargar datos del búnker: ' + error.message);
-            }
+        // AJUSTE DE COHERENCIA EN EL DASHBOARD
+async function cargarTodosLosDatos() {
+    try {
+        // Carga consolidada de reacciones y tesis
+        const { data: reaccionesData } = await _supabase
+            .from('sinapsis_reacciones')
+            .select('*');
+        
+        reacciones = reaccionesData || [];
+
+        // Coherencia: Si la tabla de intervenciones falla, extraemos las tesis de las reacciones
+        const { data: intervencionesData, error: errInt } = await _supabase
+            .from('dashboard_intervenciones')
+            .select('*');
+
+        if (errInt) {
+            // Si no existe la tabla específica, filtramos las reacciones que tengan texto largo
+            intervenciones = reacciones.filter(r => r.tipo_reaccion.includes('💬') || r.tipo_reaccion.includes('📝'));
+        } else {
+            intervenciones = intervencionesData;
         }
+        
+        renderizarDashboard();
+    } catch (error) {
+        console.error('Error de sincronización:', error);
+    }
+}
         
         // ==================== FUNCIONES DE RENDERIZADO ====================
         function inicializarSelectArticulos() {
             const selector = document.getElementById('articleSelector');
             
-            // Limpiar opciones excepto la primera
             while (selector.options.length > 1) {
                 selector.remove(1);
             }
             
-            // Agregar cada artículo
             articulos.forEach(art => {
                 const option = document.createElement('option');
                 option.value = art.id;
@@ -459,17 +424,16 @@
         function renderizarEstadisticasGlobales() {
             const statsContainer = document.getElementById('globalStats');
             
-            // Filtrar reacciones según selección
             let reaccionesFiltradas = reacciones;
             if (articuloSeleccionado !== 'all') {
                 reaccionesFiltradas = reacciones.filter(r => r.articulo_id == articuloSeleccionado);
             }
             
-            // Contar por tipo (Usando los Emojis como fuente de verdad)
+            // CORRECCIÓN: Uso de variables en mayúscula para coincidir con el HTML interpolado
             const Interesante = reaccionesFiltradas.filter(r => r.tipo_reaccion === '💡').length;
             const Debatible = reaccionesFiltradas.filter(r => r.tipo_reaccion === '⚖️').length;
-            const Duda = reaccionesFiltradas.filter(r => r.tipo_reaccion === '❓').length;
-            const tesis = reaccionesFiltradas.filter(r => r.tipo_reaccion.includes('💬')).length;
+            const Duda = reaccionesFiltradas.filter(r => r.tipo_reaccion === '🔍').length; // Buscamos 🔍 en lugar de ❓
+            const tesis = reaccionesFiltradas.filter(r => r.tipo_reaccion.includes('📝')).length; // Buscamos 📝 en lugar de 💬
             const total = Interesante + Debatible + Duda;
             
             statsContainer.innerHTML = `
@@ -486,7 +450,7 @@
                     <div class="stat-number">${Debatible}</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">❓ Duda</div>
+                    <div class="stat-label">🔍 Duda</div>
                     <div class="stat-number">${Duda}</div>
                 </div>
                 <div class="stat-item">
@@ -503,21 +467,19 @@
         function renderizarGraficoImpacto() {
             const ctx = document.getElementById('impactChart').getContext('2d');
             
-            // Preparar datos según selección
             let labels = [];
             let datosInteresante = [];
             let datosDebatible = [];
             let datosDuda = [];
             
             if (articuloSeleccionado === 'all') {
-                // Para todos los artículos, mostrar los 10 más activos
                 const articulosConReacciones = articulos.map(art => {
                     const reaccionesArt = reacciones.filter(r => r.articulo_id === art.id);
                     return {
                         ...art,
                         Interesante: reaccionesArt.filter(r => r.tipo_reaccion === '💡').length,
                         Debatible: reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length,
-                        Duda: reaccionesArt.filter(r => r.tipo_reaccion === '❓').length,
+                        Duda: reaccionesArt.filter(r => r.tipo_reaccion === '🔍').length, // 🔍
                         total: reaccionesArt.length
                     };
                 }).sort((a, b) => b.total - a.total).slice(0, 10);
@@ -527,16 +489,14 @@
                 datosDebatible = articulosConReacciones.map(a => a.Debatible);
                 datosDuda = articulosConReacciones.map(a => a.Duda);
             } else {
-                // Para un artículo específico, mostrar por día/semana
                 const art = articulos.find(a => a.id == articuloSeleccionado);
                 labels = ['Interesante', 'Debatible', 'Duda'];
                 const reaccionesArt = reacciones.filter(r => r.articulo_id == articuloSeleccionado);
                 datosInteresante = [reaccionesArt.filter(r => r.tipo_reaccion === '💡').length, 0, 0];
                 datosDebatible = [0, reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length, 0];
-                datosDuda = [0, 0, reaccionesArt.filter(r => r.tipo_reaccion === '❓').length];
+                datosDuda = [0, 0, reaccionesArt.filter(r => r.tipo_reaccion === '🔍').length]; // 🔍
             }
             
-            // Destruir gráfico anterior si existe
             if (chartImpacto) chartImpacto.destroy();
             
             chartImpacto = new Chart(ctx, {
@@ -559,7 +519,7 @@
                             borderWidth: 1
                         },
                         {
-                            label: '❓ Duda',
+                            label: '🔍 Duda',
                             data: datosDuda,
                             backgroundColor: 'rgba(201, 209, 217, 0.7)',
                             borderColor: 'rgb(201, 209, 217)',
@@ -605,26 +565,24 @@
         function renderizarGraficoDebatible() {
             const ctx = document.getElementById('DebatibleChart').getContext('2d');
             
-            // Filtrar reacciones según selección
             let reaccionesFiltradas = reacciones;
             if (articuloSeleccionado !== 'all') {
                 reaccionesFiltradas = reacciones.filter(r => r.articulo_id == articuloSeleccionado);
             }
             
+            // CORRECCIÓN: Variables mayúsculas y filtros correctos
             const Interesante = reaccionesFiltradas.filter(r => r.tipo_reaccion === '💡').length;
             const Debatible = reaccionesFiltradas.filter(r => r.tipo_reaccion === '⚖️').length;
-            const Duda = reaccionesFiltradas.filter(r => r.tipo_reaccion === '❓').length;
+            const Duda = reaccionesFiltradas.filter(r => r.tipo_reaccion === '🔍').length;
             
-            // Actualizar detalles de reacciones
             document.getElementById('reactionDetails').innerHTML = `
                 <div style="margin-top: 20px;">
                     <span class="reaction-badge badge-Interesante">💡 Interesante: ${Interesante}</span>
                     <span class="reaction-badge badge-Debatible">⚖️ Debatible: ${Debatible}</span>
-                    <span class="reaction-badge badge-Duda">❓ Duda: ${Duda}</span>
+                    <span class="reaction-badge badge-Duda">🔍 Duda: ${Duda}</span>
                 </div>
             `;
             
-            // Destruir gráfico anterior si existe
             if (chartDebatible) chartDebatible.destroy();
             
             chartDebatible = new Chart(ctx, {
@@ -658,7 +616,7 @@
                             callbacks: {
                                 label: function(context) {
                                     const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = Math.round((context.raw / total) * 100);
+                                    const percentage = total > 0 ? Math.round((context.raw / total) * 100) : 0;
                                     return `${context.label}: ${context.raw} (${percentage}%)`;
                                 }
                             }
@@ -672,11 +630,10 @@
             const container = document.getElementById('criticalFindings');
             
             if (articuloSeleccionado === 'all') {
-                // Hallazgos globales: artículos con mayor disenso
                 const articulosConDisenso = articulos.map(art => {
                     const reaccionesArt = reacciones.filter(r => r.articulo_id === art.id);
                     const Debatible = reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length;
-                    const Duda = reaccionesArt.filter(r => r.tipo_reaccion === '❓').length;
+                    const Duda = reaccionesArt.filter(r => r.tipo_reaccion === '🔍').length;
                     const disenso = Debatible + Duda;
                     
                     return {
@@ -710,7 +667,6 @@
                 html += '</table>';
                 container.innerHTML = html;
                 
-                // Actualizar nudos críticos
                 const intervencionesDebatible = intervenciones.filter(i => 
                     i.contenido && (i.contenido.includes('Debatible') || i.contenido.includes('disenso') || 
                     i.contenido.includes('controversia') || i.contenido.includes('Duda'))
@@ -722,16 +678,17 @@
                     ).join('<br><br>');
                     
                     document.getElementById('nudosCriticos').innerHTML = nudos;
+                } else {
+                    document.getElementById('nudosCriticos').innerHTML = "No hay suficientes datos de disenso aún.";
                 }
                 
             } else {
-                // Hallazgos para artículo específico
                 const art = articulos.find(a => a.id == articuloSeleccionado);
                 const reaccionesArt = reacciones.filter(r => r.articulo_id == articuloSeleccionado);
                 
                 const Interesante = reaccionesArt.filter(r => r.tipo_reaccion === '💡').length;
                 const Debatible = reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length;
-                const Duda = reaccionesArt.filter(r => r.tipo_reaccion === '❓').length;
+                const Duda = reaccionesArt.filter(r => r.tipo_reaccion === '🔍').length;
                 
                 let prioridad = 'BAJA';
                 if (Debatible + Duda > 10) prioridad = 'ALTA - DISENSO';
@@ -753,7 +710,6 @@
         function renderizarIntervenciones() {
             const container = document.getElementById('interventionList');
             
-            // Filtrar intervenciones según selección
             let intervencionesFiltradas = intervenciones;
             if (articuloSeleccionado !== 'all') {
                 intervencionesFiltradas = intervenciones.filter(i => i.articulo_id == articuloSeleccionado);
@@ -799,7 +755,6 @@
             const container = document.getElementById('emergingTopics');
             
             if (temasEmergentes.length > 0) {
-                // Usar temas de la base de datos
                 let html = '';
                 temasEmergentes.forEach(tema => {
                     const articulosRel = tema.articulos_relacionados || [];
@@ -825,7 +780,6 @@
                 
                 container.innerHTML = html;
             } else {
-                // Generar temas emergentes automáticamente a partir de intervenciones
                 const temasDetectados = detectarTemasEmergentes();
                 
                 if (temasDetectados.length === 0) {
@@ -854,7 +808,6 @@
         }
         
         function detectarTemasEmergentes() {
-            // Palabras clave para detectar temas
             const keywords = [
                 { palabra: 'inteligencia artificial', tema: 'IA en estrategia militar' },
                 { palabra: 'seguridad ciudadana', tema: 'Estrategias de seguridad' },
@@ -870,7 +823,6 @@
             
             const temas = {};
             
-            // Analizar intervenciones
             intervenciones.forEach(intervencion => {
                 const texto = (intervencion.contenido || intervencion.comentario_texto || '').toLowerCase();
                 
@@ -888,20 +840,17 @@
                 });
             });
             
-            // Convertir a array y ordenar por frecuencia
             return Object.values(temas)
                 .sort((a, b) => b.frecuencia - a.frecuencia)
-                .slice(0, 5); // Top 5 temas
+                .slice(0, 5);
         }
         
         function detalleTema(temaId) {
-            // Implementar vista detallada del tema
             alert(`Detalle del tema ID: ${temaId} - Esta función se implementará en la siguiente fase.`);
         }
         
         async function generarReportePDF() {
             try {
-                // Recopilar datos para el reporte
                 const datosReporte = {
                     fecha: new Date().toISOString(),
                     articulosAnalizados: articulos.length,
@@ -911,14 +860,11 @@
                     hallazgosCriticos: obtenerHallazgosParaPDF()
                 };
                 
-                // Mostrar mensaje de generación
                 alert(`📄 Reporte estratégico generado con éxito!\n\nSe han procesado:\n• ${datosReporte.articulosAnalizados} artículos\n• ${datosReporte.totalReacciones} reacciones\n• ${datosReporte.totalIntervenciones} intervenciones\n\nLos temas emergentes han sido identificados para el Simposio 2025.`);
                 
-                // Aquí iría la lógica para generar el PDF real
-                // Podríamos usar jsPDF o enviar a un backend
                 console.log('Datos para PDF:', datosReporte);
                 
-                // Guardar en Supabase el reporte generado
+                // Enviar reporte a Supabase
                 await _supabase.from('reportes_simposio').insert([{
                     tipo: 'reporte_estrategico',
                     datos: datosReporte,
@@ -939,21 +885,18 @@
                     autor: art.autor,
                     Interesante: reaccionesArt.filter(r => r.tipo_reaccion === '💡').length,
                     Debatible: reaccionesArt.filter(r => r.tipo_reaccion === '⚖️').length,
-                    Duda: reaccionesArt.filter(r => r.tipo_reaccion === '❓').length,
-                    tesis: reaccionesArt.filter(r => r.tipo_reaccion.includes('💬')).length
+                    Duda: reaccionesArt.filter(r => r.tipo_reaccion === '🔍').length,
+                    tesis: reaccionesArt.filter(r => r.tipo_reaccion.includes('📝')).length
                 };
             }).sort((a, b) => (b.Debatible + b.Duda) - (a.Debatible + a.Duda));
         }
         
-        // ==================== FUNCIONES ADICIONALES ====================
-        // Función para actualizar datos en tiempo real (opcional)
         async function actualizarDatosEnVivo() {
             console.log('🔄 Actualizando datos en vivo...');
             await cargarTodosLosDatos();
             renderizarDashboard();
         }
         
-        // Configurar actualización automática cada 2 minutos
         setInterval(actualizarDatosEnVivo, 120000);
     </script>
 </body>
