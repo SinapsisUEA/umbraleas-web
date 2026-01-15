@@ -363,33 +363,62 @@
         };
         
         // ==================== FUNCIONES DE CARGA DE DATOS ====================
-        // AJUSTE DE COHERENCIA EN EL DASHBOARD
-async function cargarTodosLosDatos() {
-    try {
-        // Carga consolidada de reacciones y tesis
-        const { data: reaccionesData } = await _supabase
-            .from('sinapsis_reacciones')
-            .select('*');
-        
-        reacciones = reaccionesData || [];
-
-        // Coherencia: Si la tabla de intervenciones falla, extraemos las tesis de las reacciones
-        const { data: intervencionesData, error: errInt } = await _supabase
-            .from('dashboard_intervenciones')
-            .select('*');
-
-        if (errInt) {
-            // Si no existe la tabla específica, filtramos las reacciones que tengan texto largo
-            intervenciones = reacciones.filter(r => r.tipo_reaccion.includes('💬') || r.tipo_reaccion.includes('📝'));
-        } else {
-            intervenciones = intervencionesData;
+        async function cargarTodosLosDatos() {
+            try {
+                // 1. Cargar artículos
+                const { data: articulosData, error: errorArticulos } = await _supabase
+                    .from('articulos')
+                    .select('*')
+                    .order('id', { ascending: false });
+                
+                if (errorArticulos) throw errorArticulos;
+                articulos = articulosData || [];
+                console.log(`✅ ${articulos.length} artículos cargados`);
+                
+                // 2. Cargar reacciones
+                const { data: reaccionesData, error: errorReacciones } = await _supabase
+                    .from('sinapsis_reacciones')
+                    .select('*');
+                
+                if (errorReacciones) throw errorReacciones;
+                reacciones = reaccionesData || [];
+                console.log(`✅ ${reacciones.length} reacciones cargadas`);
+                
+                // 3. Cargar intervenciones
+                const { data: intervencionesData, error: errorIntervenciones } = await _supabase
+                    .from('dashboard_intervenciones')
+                    .select('*')
+                    .order('fecha', { ascending: false });
+                
+                if (errorIntervenciones) {
+                    console.warn('⚠️ No se encontró tabla dashboard_intervenciones, usando sinapsis_reacciones');
+                    intervenciones = reacciones.filter(r => r.tipo_reaccion.includes('📝'));
+                } else {
+                    intervenciones = intervencionesData || [];
+                }
+                console.log(`✅ ${intervenciones.length} intervenciones cargadas`);
+                
+                // 4. Cargar temas emergentes
+                try {
+                    const { data: temasData, error: errorTemas } = await _supabase
+                        .from('simposio_temas')
+                        .select('*')
+                        .order('intervenciones_count', { ascending: false });
+                    
+                    if (!errorTemas) {
+                        temasEmergentes = temasData || [];
+                        console.log(`✅ ${temasEmergentes.length} temas emergentes cargados`);
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Tabla simposio_temas no disponible');
+                    temasEmergentes = [];
+                }
+                
+            } catch (error) {
+                console.error('❌ Error cargando datos:', error);
+                alert('Error al cargar datos del búnker: ' + error.message);
+            }
         }
-        
-        renderizarDashboard();
-    } catch (error) {
-        console.error('Error de sincronización:', error);
-    }
-}
         
         // ==================== FUNCIONES DE RENDERIZADO ====================
         function inicializarSelectArticulos() {
